@@ -3,14 +3,46 @@ import { Entity } from "./Entity";
 import { State } from "./State";
 
 
-const jsdom = require("jsdom");
+const jsdom = require("jsdom-wc");
 const { JSDOM } = jsdom;
+//const { window } = new JSDOM(`<!DOCTYPE html>`);
+
+function exposeGlobal(dom)
+{
+
+//const dom=new JSDOM(``);
+// @ts-ignore
+global.document = dom.window.document
 
 // @ts-ignore
-global.window = JSDOM.defaultView;
+document.window = dom.window;
 
 // @ts-ignore
-console.log("window",global.window )
+global.window = document.window;
+
+var requestAnimationFrame = require('raf')
+//const document = dom.window.document
+// const window = dom.window
+window.requestAnimationFrame=requestAnimationFrame;
+
+
+
+
+Object.keys(document['window']).forEach((property) => {
+  console.log(property)
+  if (typeof global[property] === 'undefined') {
+    global[property] = document['window'][property];
+  }
+});
+// @ts-ignore
+global.navigator = {
+  userAgent: 'node.js'
+};
+
+
+require("../../../../aframe-headless-2/dist/aframe-master.js");
+
+}
 
 async function getAFRAMETestDOM() {
 
@@ -30,6 +62,14 @@ async function getAFRAMETestDOM() {
     runScripts: "dangerously",
     resources: "usable"
   });
+
+dom.then(dom=>{
+
+  exposeGlobal(dom)
+
+  return dom
+})
+
 
   return dom
 
@@ -52,8 +92,7 @@ mDOM.then(dom => {
     const document = dom.window.document
     const window = dom.window
 
-    
-
+   
     let scene = null;
     const id = setInterval(() => {
 
@@ -63,7 +102,13 @@ mDOM.then(dom => {
       }
       if (scene) {
         console.log("-----------inited---------------")
-        /*  scene.addEventListener('loaded', function () {
+
+
+
+
+
+        
+        scene.addEventListener('loaded', function () {
           resolve(dom)
         })
 
@@ -72,12 +117,15 @@ mDOM.then(dom => {
           resolve(dom)
         })
 
-        */
-        if (scene.object3D) {
+        resolve(dom)
+
+        clearInterval(id);
+        
+       /* if (scene.object3D) {
           console.log("whoot",scene.innerHTML)
           resolve(dom)
           clearInterval(id);
-        }
+        }*/
       }
 
     }, 100)
@@ -89,10 +137,8 @@ mDOM.then(dom => {
 }).then((dom: any) => {
 
 
-  var requestAnimationFrame = require('raf')
 
-  const document = dom.window.document
-  const window = dom.window
+
 
 /*
   window.constructor.prototype.resizeTo = function (width, height) {
@@ -102,7 +148,7 @@ mDOM.then(dom => {
   window.resizeTo(1, 1);
 */
 
-  const scene = document.body.querySelector("a-scene")
+  const scene = document.querySelector("a-scene")
 
   //only for those elements we need to create the physics
  /* const items = [scene.querySelectorAll("dynamic-body"),
@@ -116,16 +162,16 @@ mDOM.then(dom => {
   function step(timestamp) {
     if (!start) start = timestamp;
     var progress = timestamp - start;
-    const sphere = scene.querySelectorAll("a-sphere")
+    const sphere :any = scene.querySelectorAll("a-sphere")
     if (sphere[0].object3D)
       console.log(sphere[0].object3D.position)
     else
     console.log(sphere[0].object3D)
     if (progress < 15000) {
-      requestAnimationFrame(step);
+      window.requestAnimationFrame(step);
     }
   }
-  requestAnimationFrame(step);
+  window.requestAnimationFrame(step);
 
 
   console.log("-----------loaded---------------")

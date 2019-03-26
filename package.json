@@ -7,6 +7,7 @@
     "heroku-postbuild": "tsc && webpack",
     "start": "node ./lib/index.js",
     "dev": "nodemon",
+    "debug": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Endel Dreyer",
@@ -34,10 +35,12 @@
     "@colyseus/monitor": "^0.1.10",
     "@colyseus/schema": "^0.1.5",
     "@nk11/keyboard-interactions": "^1.0.8",
+    "aframe": "^0.9.0",
     "colyseus": "^0.9.26",
     "express": "^4.16.4",
     "express-basic-auth": "^1.1.6",
     "jsdom": "^14.0.0",
+    "jsdom-wc": "^11.0.0-alpha-1",
     "raf": "^3.4.1"
   }
 }
