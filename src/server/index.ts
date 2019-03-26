@@ -17,6 +17,7 @@ import * as basicAuth from "express-basic-auth";
 import { monitor } from "@colyseus/monitor";
 
 import { ArenaRoom } from "./rooms/ArenaRoom";
+import { AFramePhysicsRoom } from "./rooms/AFramePhysicsRoom";
 
 export const port = Number(process.env.PORT || 8080);
 export const endpoint = "localhost";
@@ -27,6 +28,7 @@ const app = express();
 const gameServer = new colyseus.Server({ server: http.createServer(app) });
 
 gameServer.register("arena", ArenaRoom);
+gameServer.register("aframe-region-1", AFramePhysicsRoom);
 
 if (process.env.NODE_ENV !== "production") {
     const webpackCompiler = webpack(webpackConfig({}));
@@ -40,8 +42,13 @@ if (process.env.NODE_ENV !== "production") {
     // on production, use ./public as static root
     STATIC_DIR = path.resolve(__dirname, "public");
 }
-
+console.log("STATIC_DIR",STATIC_DIR)
 app.use("/", express.static(STATIC_DIR));
+
+const DEV_DIR=path.resolve(STATIC_DIR, "..", "aframe-headless-2/dist");
+console.log("DEV_DIR",DEV_DIR)
+app.use("/dev", express.static(DEV_DIR));
+
 
 // add colyseus monitor
 const auth = basicAuth({ users: { 'admin': 'admin' }, challenge: true });

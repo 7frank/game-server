@@ -13,6 +13,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/express": "^4.16.1",
+    "@types/jsdom": "^12.2.3",
     "colyseus.js": "^0.9.16",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "file-loader": "^3.0.1",
@@ -32,8 +33,11 @@
   "dependencies": {
     "@colyseus/monitor": "^0.1.10",
     "@colyseus/schema": "^0.1.5",
+    "@nk11/keyboard-interactions": "^1.0.8",
     "colyseus": "^0.9.26",
     "express": "^4.16.4",
-    "express-basic-auth": "^1.1.6"
+    "express-basic-auth": "^1.1.6",
+    "jsdom": "^14.0.0",
+    "raf": "^3.4.1"
   }
 }
