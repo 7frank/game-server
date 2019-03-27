@@ -17,7 +17,7 @@ import * as basicAuth from "express-basic-auth";
 import { monitor } from "@colyseus/monitor";
 
 import { ArenaRoom } from "./rooms/ArenaRoom";
-import { AFramePhysicsRoom } from "./rooms/AFramePhysicsRoom";
+import { AFramePhysicsRoom } from "./rooms/physics/AFramePhysicsRoom";
 
 export const port = Number(process.env.PORT || 8080);
 export const endpoint = "localhost";
@@ -44,10 +44,6 @@ if (process.env.NODE_ENV !== "production") {
 }
 console.log("STATIC_DIR",STATIC_DIR)
 app.use("/", express.static(STATIC_DIR));
-
-const DEV_DIR=path.resolve(STATIC_DIR, "..", "aframe-headless-2/dist");
-console.log("DEV_DIR",DEV_DIR)
-app.use("/dev", express.static(DEV_DIR));
 
 
 // add colyseus monitor
