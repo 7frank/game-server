@@ -7,7 +7,7 @@ const DEFAULT_PLAYER_RADIUS = 10;
 const body = Symbol('body');
 
 import { createDemo } from "./demo"
-const demoPhysics = createDemo()
+let demoPhysics;
 
 export class State {
   width = WORLD_SIZE;
@@ -16,6 +16,10 @@ export class State {
   entities: { [id: string]: Entity } = {};
 
   constructor() {
+
+    demoPhysics = createDemo()
+
+
     // create some food entities
     /*   for (let i = 0; i < 50; i++) {
          this.createFood();
@@ -23,12 +27,12 @@ export class State {
     let i = 0
     setInterval(() => {
       i++;
-     
-      if (i > 50) return
+
+      if (i > 100) return
       this.createFood();
 
 
-    }, 200)
+    }, 500)
 
   }
 
@@ -44,7 +48,7 @@ export class State {
 
     const id = nanoid()
     this.entities[id] = food;
-console.log( food.x, food.y)
+
 
 
   }
@@ -66,6 +70,9 @@ console.log( food.x, food.y)
   }
 
   update() {
+
+
+
     const deadEntities: string[] = [];
     for (const sessionId in this.entities) {
       const entity = this.entities[sessionId];
@@ -76,7 +83,7 @@ console.log( food.x, food.y)
 
 
       demoPhysics.update()
-
+      let first = true
       if (entity.radius >= DEFAULT_PLAYER_RADIUS) {
         for (const collideSessionId in this.entities) {
           const collideTestEntity = this.entities[collideSessionId]
@@ -85,10 +92,16 @@ console.log( food.x, food.y)
 
           // prevent collision with itself
           if (collideTestEntity === entity) { continue; }
-
+  
 
           collideTestEntity.x = collideTestEntity[body].position.x
           collideTestEntity.y = collideTestEntity[body].position.y
+          collideTestEntity[body].position.z=0
+
+          if (first) {
+            console.log(collideTestEntity.x,collideTestEntity.y)
+            first = false
+          }
 
           /*
                     if (Entity.distance(entity, collideTestEntity) < entity.radius) {

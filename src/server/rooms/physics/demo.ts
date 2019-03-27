@@ -14,18 +14,30 @@ export function createDemo() {
 
     initScene = function () {
 
-        scene = new Physijs.Scene({ fixedTimeStep: 1 / 30 });
-
+       // scene = new Physijs.Scene({ fixedTimeStep: 1 / 30 });
+        scene = new Physijs.Scene();
 
         const ground = new Physijs.PlaneMesh(
             new THREE.PlaneGeometry(1e6, 1e6),
             new THREE.MeshBasicMaterial({ color: 0x888888 })
         );
-        ground.rotation.x = -Math.PI / 2
-
+        ground.rotation.x = Math.PI / 2
+        ground.position.y = 1000;
         scene.add(ground);
 
 
+
+      /*  const sky = new Physijs.PlaneMesh(
+            new THREE.PlaneGeometry(1e6, 1e6),
+            new THREE.MeshBasicMaterial({ color: 0x888888 })
+        );
+        sky.rotation.x = -Math.PI / 2
+        sky.position.x = 1000;
+        scene.add(sky);
+
+        */
+
+        scene.setGravity(new THREE.Vector3( 0, 5, 0 ))
 
         /*   
            // Box
@@ -69,8 +81,8 @@ export function createDemo() {
         },
         addEntity: (mass?: number) => {
 
-            const box_falling = new Physijs.BoxMesh(
-                new THREE.CubeGeometry(1, 1, 1),
+            const box_falling = new Physijs.SphereMesh(
+                new THREE.SphereGeometry(1, 8, 8),
                 new THREE.MeshBasicMaterial({ color: 0x888888 }),
                 mass
             );
