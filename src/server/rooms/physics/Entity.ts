@@ -1,23 +1,53 @@
 import { nosync } from "colyseus";
+import bodyParser = require("body-parser");
+
+export
+enum EntityType
+{
+    kinematic="kinematic",
+    static="static",
+    dynamic="dynamic"
+
+}
 
 export class Entity {
-    x: number;
-    y: number;
+
+    position: any//{ x: number, y: number, z: number }
+    get rotation() {
+        return this.body.rotation
+    }
+
     radius: number;
-    body:any;// physics body
+
+    type:EntityType=EntityType.dynamic;
+
+    toJSON(){
+
+        return {
+            position:this.position,
+            rotation:this.rotation,
+            type:this.type
+        }
+
+    }
+
+
+    @nosync body: any;// physics body
 
 
     @nosync dead: boolean = false;
     @nosync angle: number = 0;
     @nosync speed = 0;
 
-    constructor(x: number, y: number, radius: number) {
-        this.x = x;
-        this.y = y;
+    constructor(body, radius: number) {
+        this.body = body
+        this.position = this.body.position
+       // this.rotation = this.body.rotation
+
         this.radius = radius;
     }
 
     static distance(a: Entity, b: Entity) {
-        return Math.sqrt(Math.pow(a.y - b.y, 2) + Math.pow(a.x - b.x, 2))
+        return a.position.distanceTo(b.position)
     }
 }

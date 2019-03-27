@@ -1,7 +1,7 @@
 import { Room, Client } from "colyseus";
 import { Entity } from "./Entity";
 import { State } from "./State";
-
+import {MessageTypes} from "../../../common/types"
 
 const roomTemplate=`
 <a-scene physics="debug: true">
@@ -25,7 +25,7 @@ const roomTemplate=`
 `
 
 
-export class AFramePhysicsRoom extends Room {
+export class AFramePhysicsRoom extends Room<State> {
 
   onInit() {
 
@@ -50,6 +50,7 @@ export class AFramePhysicsRoom extends Room {
   }
 
   onJoin(client: Client, options: any) {
+    console.log("client joined room:",this.roomName,"roomId",this.roomId,"clientId",client.sessionId)
     this.state.createPlayer(client.sessionId);
   }
 
@@ -63,13 +64,32 @@ export class AFramePhysicsRoom extends Room {
     }
 
     const [command, data] = message;
-
     // change angle
     if (command === "mouse") {
-      const dst = Entity.distance(entity, data as Entity);
+    
+      const dst = Entity.distance(entity, {position:data} as Entity);
       entity.speed = (dst < 20) ? 0 : Math.min(dst / 10, 6);
-      entity.angle = Math.atan2(entity.y - data.y, entity.x - data.x);
+      entity.angle = Math.atan2(entity.position.y - data.y, entity.position.x - data.x);
+    } else if (command === MessageTypes.playerMove) 
+    {
+     // console.log(command,data)
+      entity.body.__dirtyPosition = true;
+      entity.position.copy(data)
+
     }
+    else if (command === MessageTypes.playerRotate) 
+    {
+     // console.log(command,data)
+      entity.body.rotation.copy(data)
+      entity.body.__dirtyRotation = true;
+   
+
+    }
+
+   
+
+
+
   }
 
   onLeave(client: Client) {

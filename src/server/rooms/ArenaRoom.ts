@@ -1,6 +1,6 @@
 import { Room, Client } from "colyseus";
 import { Entity } from "./Entity";
-import { State } from "./physics/State";
+import { State } from "./State";
 
 export class ArenaRoom extends Room {
   onInit() {

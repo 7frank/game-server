@@ -21,42 +21,9 @@ export function createDemo() {
             new THREE.PlaneGeometry(1e6, 1e6),
             new THREE.MeshBasicMaterial({ color: 0x888888 })
         );
-        ground.rotation.x = Math.PI / 2
-        ground.position.y = 1000;
+        ground.rotation.x = -Math.PI / 2
+        ground.position.y = 1;
         scene.add(ground);
-
-
-
-      /*  const sky = new Physijs.PlaneMesh(
-            new THREE.PlaneGeometry(1e6, 1e6),
-            new THREE.MeshBasicMaterial({ color: 0x888888 })
-        );
-        sky.rotation.x = -Math.PI / 2
-        sky.position.x = 1000;
-        scene.add(sky);
-
-        */
-
-        scene.setGravity(new THREE.Vector3( 0, 5, 0 ))
-
-        /*   
-           // Box
-           box_falling = new Physijs.BoxMesh(
-               new THREE.CubeGeometry( 5, 5, 5 ),
-               new THREE.MeshBasicMaterial({ color: 0x888888 })
-           );
-           scene.add( box_falling );
-           
-           // Box
-           var box = new Physijs.BoxMesh(
-               new THREE.CubeGeometry( 5, 5, 5 ),
-               new THREE.MeshBasicMaterial({ color: 0x880088 }),
-               0
-           );
-           box.position.y = -20;
-           scene.add( box );
-           */
-        //setTimeout(render, 200);
     };
 
 
@@ -79,13 +46,23 @@ export function createDemo() {
             scene.simulate(timeStep, maxSubSteps);
 
         },
-        addEntity: (mass?: number) => {
+        addEntity: (position,mass?: number) => {
 
-            const box_falling = new Physijs.SphereMesh(
-                new THREE.SphereGeometry(1, 8, 8),
+            const box_falling = new Physijs.BoxMesh(
+                new THREE.CubeGeometry(1, 1, 1),
                 new THREE.MeshBasicMaterial({ color: 0x888888 }),
                 mass
             );
+          
+          
+            box_falling.rotation.set(
+				Math.random() * Math.PI * 2,
+				Math.random() * Math.PI * 2,
+				Math.random() * Math.PI * 2
+			);
+
+
+            box_falling.position.copy(position)
             scene.add(box_falling);
             return box_falling
         }

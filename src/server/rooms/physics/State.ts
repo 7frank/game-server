@@ -1,10 +1,16 @@
 import * as nanoid from "nanoid";
-import { Entity } from "./Entity";
+import { Entity, EntityType } from "./Entity";
 
-const WORLD_SIZE = 2000;
-const DEFAULT_PLAYER_RADIUS = 10;
+const NodePhysijs = require('nodejs-physijs');
+const THREE = NodePhysijs.THREE;
+const Ammo = NodePhysijs.Ammo;
+const Physijs = NodePhysijs.Physijs(THREE, Ammo);
 
-const body = Symbol('body');
+
+
+const WORLD_SIZE = 20;
+const DEFAULT_PLAYER_RADIUS = 2;
+
 
 import { createDemo } from "./demo"
 let demoPhysics;
@@ -37,13 +43,12 @@ export class State {
   }
 
   createFood() {
-    const food = new Entity(Math.random() * this.width, Math.random() * this.height, 9);
 
-    food[body] = demoPhysics.addEntity(0.1)
+    const pos = new THREE.Vector3(Math.random() * this.width, Math.random() * this.height, 0)
+
+    const food = new Entity(demoPhysics.addEntity(pos, 1), 1);
 
 
-    food[body].position.x = food.x
-    food[body].position.y = food.y
 
 
     const id = nanoid()
@@ -55,23 +60,25 @@ export class State {
 
   createPlayer(sessionId: string) {
 
-    const player = new Entity(
-      Math.random() * this.width,
-      Math.random() * this.height,
+    const pos = new THREE.Vector3(Math.random() * this.width, Math.random() * this.height, 0)
+
+    const body = demoPhysics.addEntity(pos, 1)
+    body.setLinearFactor(new THREE.Vector3(0, 0, 0))
+    body.setAngularFactor(new THREE.Vector3(0, 0, 0))
+    const player = new Entity(body,
       DEFAULT_PLAYER_RADIUS
     );
 
-    player[body] = demoPhysics.addEntity(0)
-
-    player[body].position.x = player.x
-    player[body].position.y = player.y
+    player.type = EntityType.kinematic
 
     this.entities[sessionId] = player
+
+
   }
 
   update() {
 
-
+    demoPhysics.update()
 
     const deadEntities: string[] = [];
     for (const sessionId in this.entities) {
@@ -82,8 +89,12 @@ export class State {
       }
 
 
-      demoPhysics.update()
-      let first = true
+
+
+
+      //    console.log(Object.values(this.entities)[0].rotation)
+
+
       if (entity.radius >= DEFAULT_PLAYER_RADIUS) {
         for (const collideSessionId in this.entities) {
           const collideTestEntity = this.entities[collideSessionId]
@@ -92,16 +103,9 @@ export class State {
 
           // prevent collision with itself
           if (collideTestEntity === entity) { continue; }
-  
 
-          collideTestEntity.x = collideTestEntity[body].position.x
-          collideTestEntity.y = collideTestEntity[body].position.y
-          collideTestEntity[body].position.z=0
 
-          if (first) {
-            console.log(collideTestEntity.x,collideTestEntity.y)
-            first = false
-          }
+
 
           /*
                     if (Entity.distance(entity, collideTestEntity) < entity.radius) {
@@ -122,16 +126,21 @@ export class State {
         }
       }
 
-      if (entity.speed > 0) {
-        entity.x -= (Math.cos(entity.angle)) * entity.speed;
-        entity.y -= (Math.sin(entity.angle)) * entity.speed;
+      /*  if (entity.speed > 0) {
+          entity.position.x -= (Math.cos(entity.angle)) * entity.speed;
+          entity.position.y -= (Math.sin(entity.angle)) * entity.speed;
+  
+    
+        }*/
 
-        // apply boundary limits
-        if (entity.x < 0) { entity.x = 0; }
-        if (entity.x > WORLD_SIZE) { entity.x = WORLD_SIZE; }
-        if (entity.y < 0) { entity.y = 0; }
-        if (entity.y > WORLD_SIZE) { entity.y = WORLD_SIZE; }
-      }
+
+      // apply boundary limits
+      if (entity.position.x < -WORLD_SIZE / 2) { entity.position.x = -WORLD_SIZE / 2; }
+      if (entity.position.x > WORLD_SIZE / 2) { entity.position.x = WORLD_SIZE / 2; }
+      if (entity.position.y < -WORLD_SIZE / 2) { entity.position.y = -WORLD_SIZE / 2; }
+      if (entity.position.y > WORLD_SIZE / 2) { entity.position.y = WORLD_SIZE / 2; }
+      if (entity.position.z < -WORLD_SIZE / 2) { entity.position.z = -WORLD_SIZE / 2; }
+      if (entity.position.z > WORLD_SIZE / 2) { entity.position.z = WORLD_SIZE / 2; }
     }
 
     // delete all dead entities
