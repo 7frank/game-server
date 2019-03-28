@@ -9,7 +9,7 @@ const Physijs = NodePhysijs.Physijs(THREE, Ammo);
 
 
 const WORLD_SIZE = 20;
-const DEFAULT_PLAYER_RADIUS = 2;
+const DEFAULT_PLAYER_RADIUS = 1;
 
 
 import { createDemo } from "./demo"
@@ -46,15 +46,10 @@ export class State {
 
     const pos = new THREE.Vector3(Math.random() * this.width, Math.random() * this.height, 0)
 
-    const food = new Entity(demoPhysics.addEntity(pos, 1), 1);
-
-
-
+    const food = new Entity(demoPhysics.addEntity(pos, 1), 0.5);
 
     const id = nanoid()
     this.entities[id] = food;
-
-
 
   }
 

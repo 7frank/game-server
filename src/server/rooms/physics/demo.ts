@@ -22,7 +22,7 @@ export function createDemo() {
             new THREE.MeshBasicMaterial({ color: 0x888888 })
         );
         ground.rotation.x = -Math.PI / 2
-        ground.position.y = 1;
+        ground.position.y = 0;
         scene.add(ground);
     };
 

@@ -48,6 +48,7 @@
     "gl": "^4.2.2",
     "jsdom-wc": "^11.0.0-alpha-1",
     "nodejs-physijs": "^0.1.5",
+    "parsehtml": "^1.0.0",
     "raf": "^3.4.1"
   }
 }

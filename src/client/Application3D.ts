@@ -5,7 +5,7 @@ import { State } from "../server/rooms/physics/State"
 import { Room } from "colyseus";
 import { create } from "domain";
 import { MessageTypes } from "../common/types";
-
+import { Hotkeys } from "@nk11/keyboard-interactions";
 
 
 // @ts-ignore
@@ -33,11 +33,12 @@ export class Application3D {
 
 
     scene: any;
-
+    sceneEl: any
     _axisListener: any;
     _interpolation: boolean;
 
     constructor(sceneEl) {
+        this.sceneEl = sceneEl
         this.scene = sceneEl.object3D// init3DScene(scene)
 
         /*   super({
@@ -90,16 +91,72 @@ export class Application3D {
                 y = y / 180 * Math.PI
                 z = z / 180 * Math.PI
 
-                this.room.send([MessageTypes.playerRotate,  { x, y, z }]);
+                this.room.send([MessageTypes.playerRotate, { x, y, z }]);
             }
         });
 
         camera.addEventListener('positionChanged', (evt) => {
             if (this.currentPlayerEntity) {
 
-                this.room.send([MessageTypes.playerMove,evt.detail]);
+                this.room.send([MessageTypes.playerMove, evt.detail]);
             }
         });
+
+
+
+        // @ts-ignore
+        Hotkeys.register(MessageTypes.playerJump, 'space', {
+            // category: 'HUD',
+            target: this.sceneEl
+        });
+
+        // TODO use animation lib to create the path via functions
+        function createJumpCurve(entity) {
+            const dir = entity.getWorldDirection();
+            const pos = entity.position.clone()
+
+            // Create a sine-like wave
+            var curve = new THREE.SplineCurve([
+                pos,
+                pos.clone().add(dir),
+                new THREE.Vector2(0, 0),
+                new THREE.Vector2(5, -5),
+                new THREE.Vector2(10, 0)
+            ]);
+
+
+            return curve
+
+
+        }
+
+
+        let jumpCurve
+
+        Hotkeys().on(MessageTypes.playerJump, (evt) => {
+            console.log("jump on")
+            if (this.currentPlayerEntity) {
+                /*   if (!jumpCurve)
+                  {
+                      jumpCurve= createJumpCurve(this.currentPlayerEntity)
+      
+                  }
+               */
+
+
+                // TODO jump should block all move commands while jumping
+                //this.room.send([MessageTypes.playerJump, {}]);
+
+
+                let pos = this.currentPlayerEntity.position
+                pos.y += 0.05
+                this.room.send([MessageTypes.playerMove, pos]);
+            }
+        }, function () {
+            console.log("jump off")
+        });
+
+
 
 
 
@@ -138,18 +195,41 @@ export class Application3D {
                 graphics.position.copy(change.value.position);
                 this.scene.add(graphics);
 
+
+
+
                 this.entities[change.path.id] = graphics;
 
                 // detecting current user
                 if (isCurrentPlayer) {
-                    this.currentPlayerEntity = graphics;
-                    // this.viewport.follow(this.currentPlayerEntity);
+
+
+                    //FIXME using models will break phyiscs sync
+                    /*  const el=createEntityHTML()
+                      this.sceneEl.append(el)
+                      el.addEventListener('model-loaded',()=>{
+      
+                        //  this.scene.add(el.object3D);
+      
+                      })
+  
+                      this.entities[change.path.id]=el.object3D
+  
+                      this.currentPlayerEntity =   el.object3D;
+                      */
+
+                    graphics.material.visible = false
+                    this.currentPlayerEntity = graphics
+
                 }
 
             } else if (change.operation === "remove") {
-                this.scene.removeChild(this.entities[change.path.id]);
-                this.entities[change.path.id].destroy();
-                delete this.entities[change.path.id];
+
+                console.warn("TODO remove elements")
+                /*
+                                this.scene.removeChild(this.entities[change.path.id]);
+                                this.entities[change.path.id].destroy();
+                                delete this.entities[change.path.id];*/
             }
         });
 
@@ -205,6 +285,9 @@ export class Application3D {
             entity.rotation.x = new_entity.rotation.x// lerp(entity.rotation.x, new_entity.rotation.x, 0.2);
             entity.rotation.y = new_entity.rotation.y// lerp(entity.rotation.y, new_entity.rotation.y, 0.2);
             entity.rotation.z = new_entity.rotation.z //lerp(entity.rotation.z, new_entity.rotation.z, 0.2);
+
+
+            entity.scale.set(new_entity.radius, new_entity.radius, new_entity.radius)
 
 
         }
@@ -276,3 +359,16 @@ function createEntity() {
     var cube = new THREE.Mesh(geometry, material);
     return cube
 }
+
+function createEntityHTML(selector = "#tree") {
+
+    var parseHTML = require('parsehtml');
+
+    var htmlSnippet = `<a-entity gltf-model="${selector}"></a-entity>`,
+        html = parseHTML(htmlSnippet);
+
+    return html
+
+}
+
+
