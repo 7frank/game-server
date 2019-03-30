@@ -176,6 +176,8 @@ export class Application3D {
 
                 const isCurrentPlayer = change.path.id === this.room.sessionId
 
+                const isPlayerCharacter= change.value.type == "kinematic"
+
                 /*   const color = (isCurrentPlayer)
                    ? 0xff0000
                    : 0xFFFF0B;
@@ -189,39 +191,57 @@ export class Application3D {
                   graphics.endFill();
   */
 
-                const graphics = createEntity()
-                graphics.material.color.setHex(color)
-
-                graphics.position.copy(change.value.position);
-                this.scene.add(graphics);
+             
 
 
+                if (isPlayerCharacter)
+                {
 
 
-                this.entities[change.path.id] = graphics;
-
-                // detecting current user
-                if (isCurrentPlayer) {
-
-
-                    //FIXME using models will break phyiscs sync
-                    /*  const el=createEntityHTML()
-                      this.sceneEl.append(el)
-                      el.addEventListener('model-loaded',()=>{
-      
-                        //  this.scene.add(el.object3D);
-      
-                      })
-  
+                    //FIXME using models will break phyics sync
+                    const el=createEntityHTML()
+                    this.sceneEl.append(el)
+                   
+                  
+                    el.addEventListener('model-loaded',()=>{
+    
+                      //  this.scene.add(el.object3D);
                       this.entities[change.path.id]=el.object3D
-  
-                      this.currentPlayerEntity =   el.object3D;
-                      */
 
-                    graphics.material.visible = false
-                    this.currentPlayerEntity = graphics
+                        // detecting current user
+                        if (isCurrentPlayer) {
+                            this.currentPlayerEntity =   el.object3D;
+                            el.object3D.visible = false          
+                        
+                        //    this.currentPlayerEntity = graphics
+
+                        }
+
+                          
+                    })
+
+                
 
                 }
+                else
+                {
+
+                    const graphics = createEntity()
+                    graphics.material.color.setHex(color)
+    
+                    graphics.position.copy(change.value.position);
+                    this.scene.add(graphics);
+    
+                    //  <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
+         
+    
+    
+                    this.entities[change.path.id] = graphics;
+
+
+                }
+
+             
 
             } else if (change.operation === "remove") {
 
@@ -355,16 +375,20 @@ function createEntity() {
 
     // Create a Cube Mesh with basic material
     var geometry = new THREE.BoxGeometry(1, 1, 1);
-    var material = new THREE.MeshStandardMaterial({ color: "#433F81" });
+    var material = new THREE.MeshStandardMaterial({ color: "#433F81",transparent:true, opacity:0.5 });
     var cube = new THREE.Mesh(geometry, material);
     return cube
 }
 
-function createEntityHTML(selector = "#tree") {
+function createEntityHTML(selector = "#tree",text="Hello") {
 
     var parseHTML = require('parsehtml');
 
-    var htmlSnippet = `<a-entity gltf-model="${selector}"></a-entity>`,
+    var htmlSnippet = `<a-entity>
+   
+    <a-text position="0 4 0" scale="3 3 3" color="black" align='center' value=" ${text}"></a-text>
+    <a-entity  gltf-model="${selector}"></a-entity>
+    </a-entity>`,
         html = parseHTML(htmlSnippet);
 
     return html
