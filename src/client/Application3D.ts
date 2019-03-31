@@ -6,8 +6,9 @@ import { Room } from "colyseus";
 import { create } from "domain";
 import { MessageTypes } from "../common/types";
 import { Hotkeys } from "@nk11/keyboard-interactions";
+import { FPSCtrl } from "./FPSCtrl";
 
-
+const PLAYER_SIZE=1.8
 // @ts-ignore
 const THREE = window.THREE
 
@@ -81,7 +82,7 @@ export class Application3D {
         });*/
 
 
-        console.log(sceneEl)
+    
         var camera = sceneEl.camera.el;
         camera.addEventListener('rotationChanged', (evt) => {
             if (this.currentPlayerEntity) {
@@ -131,29 +132,54 @@ export class Application3D {
         }
 
 
+        // FIXME implement server side phyiscs based jumping and see where that leads us
+        // https://github.com/chandlerprall/Physijs/issues/147
+
         let jumpCurve
+        let jumping=false
+         const jumpScript= new FPSCtrl(30)
+         jumpScript.start()
+        jumpScript.on('frame',()=>{
 
+    /*   if (!jumpCurve)
+                     {
+                         jumpCurve= createJumpCurve(this.currentPlayerEntity)
+         
+                     }
+                  */
+   
+   
+                   // TODO jump should block all move commands while jumping
+                   //this.room.send([MessageTypes.playerJump, {}]);
+   
+                   var camera = sceneEl.camera.el.object3D;
+                   let pos = camera.position//this.currentPlayerEntity.position
+                        let posBefore=pos.clone()
+
+                   if (jumping)
+                   pos.y += 0.1
+                    else if (pos.y>PLAYER_SIZE)
+                    pos.y -= 0.1
+
+                    if (pos.distanceTo(posBefore)>0.05)
+                    {
+                    this.room.send([MessageTypes.playerMove, pos]);
+                            console.log("jumping")
+                    }
+          })
+
+        
         Hotkeys().on(MessageTypes.playerJump, (evt) => {
-            console.log("jump on")
-            if (this.currentPlayerEntity) {
-                /*   if (!jumpCurve)
-                  {
-                      jumpCurve= createJumpCurve(this.currentPlayerEntity)
-      
-                  }
-               */
-
-
-                // TODO jump should block all move commands while jumping
-                //this.room.send([MessageTypes.playerJump, {}]);
-
-
-                let pos = this.currentPlayerEntity.position
-                pos.y += 0.05
-                this.room.send([MessageTypes.playerMove, pos]);
+          
+            if (this.currentPlayerEntity&& !jumping) {
+              // console.log("jump on")
+              //  jumpScript.start()
+                jumping=true
             }
         }, function () {
-            console.log("jump off")
+          //  jumpScript.stop()
+          //  console.log("jump off")
+            jumping=false
         });
 
 
@@ -208,11 +234,12 @@ export class Application3D {
                 }
                 else
                 {
-
-                    const graphics = createEntity()
-                    graphics.material.color.setHex(color)
+                    const el=createEntity()
+                    this.sceneEl.append(el)
+                    const graphics = el.object3D
+                  //  graphics.material.color.setHex(color)
                     graphics.position.copy(change.value.position);
-                    this.scene.add(graphics);
+                   // this.scene.add(graphics);
     
                     //  <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
          
@@ -288,7 +315,7 @@ export class Application3D {
 
 
             entity.rotation.x = new_entity.rotation.x// lerp(entity.rotation.x, new_entity.rotation.x, 0.2);
-            entity.rotation.y = new_entity.rotation.y// lerp(entity.rotation.y, new_entity.rotation.y, 0.2);
+            entity.rotation.y = new_entity.rotation.y+Math.PI// lerp(entity.rotation.y, new_entity.rotation.y, 0.2);
             entity.rotation.z = new_entity.rotation.z //lerp(entity.rotation.z, new_entity.rotation.z, 0.2);
 
 
@@ -306,78 +333,35 @@ export class Application3D {
 
 
 
-export
-    function init3DScene(scene) {
-
-
-
-    //   var scene = new THREE.Scene();
-
-    // Create a basic perspective camera
-    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 40;
-
-    // Create a renderer with Antialiasing
-    var renderer = new THREE.WebGLRenderer({ antialias: true });
-
-    // Configure renderer clear color
-    renderer.setClearColor("#000000");
-
-    // Configure renderer size
-    renderer.setSize(window.innerWidth, window.innerHeight);
-
-    // Append Renderer to DOM
-    document.body.appendChild(renderer.domElement);
-
-    // ------------------------------------------------
-    // FUN STARTS HERE
-    // ------------------------------------------------
-
-   // const cube: any = createEntity()
-
-    // Add cube to Scene
-  //  scene.add(cube);
-
-    // Render Loop
-    var render = function () {
-        requestAnimationFrame(render);
-
-     //   cube.rotation.x += 0.01;
-    //  cube.rotation.y += 0.01;
-
-        // Render the scene
-        renderer.render(scene, camera);
-    };
-
-    render();
-
-    return scene
-
-}
-
+var parseHTML = require('parsehtml');
 
 function createEntity() {
 
     // Create a Cube Mesh with basic material
-    var geometry = new THREE.BoxGeometry(1, 1, 1);
+    /*var geometry = new THREE.BoxGeometry(1, 1, 1);
     var material = new THREE.MeshStandardMaterial({ color: "#433F81",transparent:true, opacity:0.5 });
     var cube = new THREE.Mesh(geometry, material);
     return cube
+*/
+
+   const el= parseHTML(`<a-box  color="#433F81"  shadow="cast: true;receive: true"></a-box>`)
+   
+return el
 }
 
 function createEntityHTML(selector = "#tree",text="Hello") {
 
-    var parseHTML = require('parsehtml');
-
-    var htmlSnippet = `<a-entity>
+ 
+  
+    var htmlSnippet = `<a-entity   >
     
     <a-text position="0 2.5 0" scale="3 3 3" color="black" align='center' value=" ${text}"></a-text>
-    <a-entity  gltf-model="${selector}"></a-entity>
+    <a-entity position="0 ${-PLAYER_SIZE} 0" gltf-model="${selector}" shadow="cast: true;receive: true"></a-entity>
     </a-entity>`,
         html = parseHTML(htmlSnippet);
   
     return html
-       
-}
-
+          
+}  
+  
 

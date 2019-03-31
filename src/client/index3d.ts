@@ -1,4 +1,4 @@
-import { Application3D,init3DScene } from "./Application3D";
+import { Application3D } from "./Application3D";
 
 document.querySelector('a-scene').addEventListener('loaded', function (e) {
 
