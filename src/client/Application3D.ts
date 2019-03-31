@@ -81,7 +81,7 @@ export class Application3D {
          
         });*/
 
-
+ 
     
         var camera = sceneEl.camera.el;
         camera.addEventListener('rotationChanged', (evt) => {
@@ -136,8 +136,9 @@ export class Application3D {
         // https://github.com/chandlerprall/Physijs/issues/147
 
         let jumpCurve
+        let downForce=0
         let jumping=false
-         const jumpScript= new FPSCtrl(30)
+         const jumpScript= new FPSCtrl(50)
          jumpScript.start()
         jumpScript.on('frame',()=>{
 
@@ -147,7 +148,7 @@ export class Application3D {
          
                      }
                   */
-   
+     
    
                    // TODO jump should block all move commands while jumping
                    //this.room.send([MessageTypes.playerJump, {}]);
@@ -157,9 +158,9 @@ export class Application3D {
                         let posBefore=pos.clone()
 
                    if (jumping)
-                   pos.y += 0.1
+                   pos.y += 0.06
                     else if (pos.y>PLAYER_SIZE)
-                    pos.y -= 0.1
+                    pos.y -= (downForce+=0.01)
 
                     if (pos.distanceTo(posBefore)>0.05)
                     {
@@ -175,6 +176,7 @@ export class Application3D {
               // console.log("jump on")
               //  jumpScript.start()
                 jumping=true
+                downForce=0
             }
         }, function () {
           //  jumpScript.stop()
@@ -231,7 +233,7 @@ export class Application3D {
 
                 
 
-                }
+                } 
                 else
                 {
                     const el=createEntity()
@@ -249,6 +251,14 @@ export class Application3D {
 
 
                 }
+
+
+                //bounding box
+                var box = new THREE.Box3();
+            box.setFromCenterAndSize( new THREE.Vector3( 0, -PLAYER_SIZE/2, 0 ), new THREE.Vector3().copy(change.value.dimensions) );
+
+            var helper = new THREE.Box3Helper( box, 0xffff00 );
+            this.entities[change.path.id].add( helper );
 
              
 
@@ -300,7 +310,7 @@ export class Application3D {
                 this.entities[change.path.id][change.path.axis] = change.value;
             }, true);
         }
-    }
+    }  
 
     loop() {
         for (let id in this.entities) {

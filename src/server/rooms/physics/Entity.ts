@@ -26,6 +26,7 @@ export class Entity {
         return {
             position:this.position,
             rotation:this.rotation,
+            dimensions:this.body.scale,
             type:this.type,
             radius:this.radius
         }

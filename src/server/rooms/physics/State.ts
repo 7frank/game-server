@@ -8,7 +8,7 @@ const Physijs = NodePhysijs.Physijs(THREE, Ammo);
 
 
 
-const WORLD_SIZE = 20;
+const WORLD_SIZE = 10;
 const DEFAULT_PLAYER_RADIUS = 1;
 
 
@@ -17,7 +17,7 @@ let demoPhysics;
 
 export class State {
   width = WORLD_SIZE;
-  height = WORLD_SIZE;
+  height = WORLD_SIZE*8;
 
   entities: { [id: string]: Entity } = {};
 
@@ -34,17 +34,17 @@ export class State {
     setInterval(() => {
       i++;
 
-      if (i > 100) return
+      if (i > 50) return
       this.createFood();
 
 
-    }, 500)
+    }, 200)
 
   }
 
   createFood() {
 
-    const pos = new THREE.Vector3(Math.random() * this.width, Math.random() * this.height, 0)
+    const pos = new THREE.Vector3(Math.random() * this.width,20 , Math.random() * this.height)
 
     const food = new Entity(demoPhysics.addEntity(pos, 1), 0.5);
 
@@ -55,9 +55,12 @@ export class State {
 
   createPlayer(sessionId: string) {
 
-    const pos = new THREE.Vector3(Math.random() * this.width, Math.random() * this.height, 0)
+    const pos = new THREE.Vector3(Math.random() * this.width,2 , Math.random() * this.height)
 
     const body = demoPhysics.addEntity(pos, 1)
+
+    body.scale.set(1,2,1)
+
     body.setLinearFactor(new THREE.Vector3(0, 0, 0))
     body.setAngularFactor(new THREE.Vector3(0, 0, 0))
     const player = new Entity(body,
@@ -133,7 +136,7 @@ export class State {
       if (entity.position.x < -WORLD_SIZE / 2) { entity.position.x = -WORLD_SIZE / 2; }
       if (entity.position.x > WORLD_SIZE / 2) { entity.position.x = WORLD_SIZE / 2; }
       if (entity.position.y < -WORLD_SIZE / 2) { entity.position.y = -WORLD_SIZE / 2; }
-      if (entity.position.y > WORLD_SIZE / 2) { entity.position.y = WORLD_SIZE / 2; }
+      if (entity.position.y > WORLD_SIZE*4 / 2) { entity.position.y = WORLD_SIZE*4 / 2; }
       if (entity.position.z < -WORLD_SIZE / 2) { entity.position.z = -WORLD_SIZE / 2; }
       if (entity.position.z > WORLD_SIZE / 2) { entity.position.z = WORLD_SIZE / 2; }
     }
