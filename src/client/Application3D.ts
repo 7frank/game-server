@@ -173,52 +173,35 @@ export class Application3D {
                 const color = (change.value.type == "kinematic")
                     ? 0xff0000
                     : 0xFFFF0B;
-
+ 
                 const isCurrentPlayer = change.path.id === this.room.sessionId
 
                 const isPlayerCharacter= change.value.type == "kinematic"
 
-                /*   const color = (isCurrentPlayer)
-                   ? 0xff0000
-                   : 0xFFFF0B;
-
-                  */
-
-                /*  const graphics = new PIXI.Graphics();
-                  graphics.lineStyle(0);
-                  graphics.beginFill(color, 0.5);
-                  graphics.drawCircle(0, 0, change.value.radius);
-                  graphics.endFill();
-  */
-
-             
-
-
+  
                 if (isPlayerCharacter)
                 {
 
 
                     //FIXME using models will break phyics sync
-                    const el=createEntityHTML()
+                    const el=createEntityHTML("#steve","Player "+this.room.sessionId)
                     this.sceneEl.append(el)
-                   
+                    console.log("Player "+this.room.sessionId,el,el.object3D)
+                    this.entities[change.path.id]=el.object3D
                   
+                    el.object3D.position.copy(change.value.position);
+
+                    if (isCurrentPlayer) {
+                        this.currentPlayerEntity =   el.object3D;
+                        el.object3D.visible = false          
+                       
+                    }
+
                     el.addEventListener('model-loaded',()=>{
     
-                      //  this.scene.add(el.object3D);
-                      this.entities[change.path.id]=el.object3D
-
-                        // detecting current user
-                        if (isCurrentPlayer) {
-                            this.currentPlayerEntity =   el.object3D;
-                            el.object3D.visible = false          
-                        
-                        //    this.currentPlayerEntity = graphics
-
-                        }
-
-                          
                     })
+
+                 
 
                 
 
@@ -228,7 +211,6 @@ export class Application3D {
 
                     const graphics = createEntity()
                     graphics.material.color.setHex(color)
-    
                     graphics.position.copy(change.value.position);
                     this.scene.add(graphics);
     
@@ -245,11 +227,14 @@ export class Application3D {
 
             } else if (change.operation === "remove") {
 
-                console.warn("TODO remove elements")
-                /*
-                                this.scene.removeChild(this.entities[change.path.id]);
-                                this.entities[change.path.id].destroy();
-                                delete this.entities[change.path.id];*/
+                                let o=this.entities[change.path.id]
+        
+                                this.scene.remove(o);
+                                if (o.geometry)
+                                o.geometry.dispose();
+                                if (o.material)
+                                o.material.dispose();
+                                delete this.entities[change.path.id];
             }
         });
 
@@ -348,17 +333,17 @@ export
     // FUN STARTS HERE
     // ------------------------------------------------
 
-    const cube: any = createEntity()
+   // const cube: any = createEntity()
 
     // Add cube to Scene
-    scene.add(cube);
+  //  scene.add(cube);
 
     // Render Loop
     var render = function () {
         requestAnimationFrame(render);
 
-        cube.rotation.x += 0.01;
-        cube.rotation.y += 0.01;
+     //   cube.rotation.x += 0.01;
+    //  cube.rotation.y += 0.01;
 
         // Render the scene
         renderer.render(scene, camera);
@@ -385,14 +370,14 @@ function createEntityHTML(selector = "#tree",text="Hello") {
     var parseHTML = require('parsehtml');
 
     var htmlSnippet = `<a-entity>
-   
-    <a-text position="0 4 0" scale="3 3 3" color="black" align='center' value=" ${text}"></a-text>
+    
+    <a-text position="0 2.5 0" scale="3 3 3" color="black" align='center' value=" ${text}"></a-text>
     <a-entity  gltf-model="${selector}"></a-entity>
     </a-entity>`,
         html = parseHTML(htmlSnippet);
-
+  
     return html
-
+       
 }
 
 
