@@ -29,6 +29,7 @@ const gameServer = new colyseus.Server({ server: http.createServer(app) });
 
 gameServer.register("arena", ArenaRoom);
 gameServer.register("aframe-region-1", AFramePhysicsRoom);
+gameServer.register("aframe-region-2", AFramePhysicsRoom);
 
 if (process.env.NODE_ENV !== "production") {
     const webpackCompiler = webpack(webpackConfig({}));
