@@ -8,7 +8,7 @@ import { MessageTypes } from "../common/types";
 import { Hotkeys } from "@nk11/keyboard-interactions";
 import { FPSCtrl } from "./FPSCtrl";
 
-const PLAYER_SIZE=1.8
+const PLAYER_SIZE = 1.8
 // @ts-ignore
 const THREE = window.THREE
 
@@ -21,14 +21,24 @@ const WORLD_SIZE = 20;
 export const lerp = (a: number, b: number, t: number) => (b - a) * t + a
 
 
+type EntityMap = { [id: string]: any }
+type RoomEntityMap = { [id: string]: EntityMap }
+
 
 
 export class Application3D {
-    entities: { [id: string]: any } = {};
+    //entities: EntityMap = {};
+
+    roomEntitiesMap: RoomEntityMap = {}
+
+
     currentPlayerEntity: any;//PIXI.Graphics;
 
     client = new Client(ENDPOINT);
-    room = this.client.join("aframe-region-1");
+
+    activeRoom;
+    connectedRooms: Room[] = []
+
 
     viewport: Viewport;
 
@@ -41,6 +51,7 @@ export class Application3D {
     constructor(sceneEl) {
         this.sceneEl = sceneEl
         this.scene = sceneEl.object3D// init3DScene(scene)
+
 
         /*   super({
                width: window.innerWidth,
@@ -81,8 +92,8 @@ export class Application3D {
          
         });*/
 
- 
-    
+
+
         var camera = sceneEl.camera.el;
         camera.addEventListener('rotationChanged', (evt) => {
             if (this.currentPlayerEntity) {
@@ -92,14 +103,14 @@ export class Application3D {
                 y = y / 180 * Math.PI
                 z = z / 180 * Math.PI
 
-                this.room.send([MessageTypes.playerRotate, { x, y, z }]);
+                this.activeRoom.send([MessageTypes.playerRotate, { x, y, z }]);
             }
         });
 
         camera.addEventListener('positionChanged', (evt) => {
             if (this.currentPlayerEntity) {
 
-                this.room.send([MessageTypes.playerMove, evt.detail]);
+                this.activeRoom.send([MessageTypes.playerMove, evt.detail]);
             }
         });
 
@@ -136,118 +147,146 @@ export class Application3D {
         // https://github.com/chandlerprall/Physijs/issues/147
 
         let jumpCurve
-        let downForce=0
-        let jumping=false
-         const jumpScript= new FPSCtrl(50)
-         jumpScript.start()
-        jumpScript.on('frame',()=>{
+        let downForce = 0
+        let jumping = false
+        const jumpScript = new FPSCtrl(50)
+        jumpScript.start()
+        jumpScript.on('frame', () => {
 
-    /*   if (!jumpCurve)
-                     {
-                         jumpCurve= createJumpCurve(this.currentPlayerEntity)
-         
-                     }
-                  */
-     
-   
-                   // TODO jump should block all move commands while jumping
-                   //this.room.send([MessageTypes.playerJump, {}]);
-   
-                   var camera = sceneEl.camera.el.object3D;
-                   let pos = camera.position//this.currentPlayerEntity.position
-                        let posBefore=pos.clone()
+            /*   if (!jumpCurve)
+                             {
+                                 jumpCurve= createJumpCurve(this.currentPlayerEntity)
+                 
+                             }
+                          */
 
-                   if (jumping)
-                   pos.y += 0.06
-                    else if (pos.y>PLAYER_SIZE)
-                    pos.y -= (downForce+=0.01)
 
-                    if (pos.distanceTo(posBefore)>0.05)
-                    {
-                    this.room.send([MessageTypes.playerMove, pos]);
-                            console.log("jumping")
-                    }
-          })
+            // TODO jump should block all move commands while jumping
+            //this.room.send([MessageTypes.playerJump, {}]);
 
-        
+            var camera = sceneEl.camera.el.object3D;
+            let pos = camera.position//this.currentPlayerEntity.position
+            let posBefore = pos.clone()
+
+            if (jumping)
+                pos.y += 0.06
+            else if (pos.y > PLAYER_SIZE)
+                pos.y -= (downForce += 0.01)
+
+            if (pos.distanceTo(posBefore) > 0.05) {
+                this.activeRoom.send([MessageTypes.playerMove, pos]);
+                console.log("jumping")
+            }
+        })
+
+
         Hotkeys().on(MessageTypes.playerJump, (evt) => {
-          
-            if (this.currentPlayerEntity&& !jumping) {
-              // console.log("jump on")
-              //  jumpScript.start()
-                jumping=true
-                downForce=0
+
+            if (this.currentPlayerEntity && !jumping) {
+                // console.log("jump on")
+                //  jumpScript.start()
+                jumping = true
+                downForce = 0
             }
         }, function () {
-          //  jumpScript.stop()
-          //  console.log("jump off")
-            jumping=false
+            //  jumpScript.stop()
+            //  console.log("jump off")
+            jumping = false
         });
 
 
 
+        Hotkeys.register("ChangeChannel", '1', {
+            target: this.sceneEl
+        });
 
 
 
+        Hotkeys().on("ChangeChannel", (evt) => {
+            this.activeRoom = this.client.join("aframe-region-2");
+
+        });
+
+
+
+        this.initialize();
 
         this.interpolation = true;
-        this.initialize();
+    
     }
 
-    initialize() {
+
+    initializeRoom(room) {
+        // init map
+        if (!this.roomEntitiesMap[room.sessionId]) this.roomEntitiesMap[room.sessionId] = {}
+
+        const entitiesInRoom = this.roomEntitiesMap[room.sessionId]
+
+
+
         // add / removal of entities
-        this.room.listen("entities/:id", (change: DataChange) => {
+        room.listen("entities/:id", (change: DataChange) => {
             if (change.operation === "add") {
                 const color = (change.value.type == "kinematic")
                     ? 0xff0000
                     : 0xFFFF0B;
- 
-                const isCurrentPlayer = change.path.id === this.room.sessionId
 
-                const isPlayerCharacter= change.value.type == "kinematic"
+                const isCurrentPlayer = change.path.id === room.sessionId
 
-  
-                if (isPlayerCharacter)
-                {
+                const isPlayerCharacter = change.value.type == "kinematic"
+
+
+                if (isPlayerCharacter) {
+                    console.log("Player added:")
+
+                    console.log("sessionId:", this.activeRoom.sessionId)
+                    console.log("change.path.id:", change.path.id)
+                    console.log("isCurrentPlayer", isCurrentPlayer)
+
 
 
                     //FIXME using models will break phyics sync
-                    const el=createEntityHTML("#steve","Player "+this.room.sessionId)
+                    const el = createEntityHTML("#steve", "Player " + room.sessionId)
                     this.sceneEl.append(el)
-                    console.log("Player "+this.room.sessionId,el,el.object3D)
-                    this.entities[change.path.id]=el.object3D
-                  
+
+                    entitiesInRoom[change.path.id] = el.object3D
+
                     el.object3D.position.copy(change.value.position);
 
+
+
+
                     if (isCurrentPlayer) {
-                        this.currentPlayerEntity =   el.object3D;
-                        el.object3D.visible = false          
-                       
+                        this.currentPlayerEntity = el.object3D;
+
+                        //el.object3D.visible = false    
+                        el.setAttribute("visible", false);
+
+
                     }
 
-                    el.addEventListener('model-loaded',()=>{
-    
+                    el.addEventListener('model-loaded', () => {
+
                     })
 
-                 
 
-                
 
-                } 
-                else
-                {
-                    const el=createEntity()
+
+
+                }
+                else {
+                    const el = createEntity()
                     this.sceneEl.append(el)
                     const graphics = el.object3D
-                  //  graphics.material.color.setHex(color)
+                    //  graphics.material.color.setHex(color)
                     graphics.position.copy(change.value.position);
-                   // this.scene.add(graphics);
-    
+                    // this.scene.add(graphics);
+
                     //  <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
-         
-    
-    
-                    this.entities[change.path.id] = graphics;
+
+
+
+                    entitiesInRoom[change.path.id] = graphics;
 
 
                 }
@@ -255,27 +294,27 @@ export class Application3D {
 
                 //bounding box
                 var box = new THREE.Box3();
-            box.setFromCenterAndSize( new THREE.Vector3( 0, -PLAYER_SIZE/2, 0 ), new THREE.Vector3().copy(change.value.dimensions) );
+                box.setFromCenterAndSize(new THREE.Vector3(0, -PLAYER_SIZE / 2, 0), new THREE.Vector3().copy(change.value.dimensions));
 
-            var helper = new THREE.Box3Helper( box, 0xffff00 );
-            this.entities[change.path.id].add( helper );
+                var helper = new THREE.Box3Helper(box, 0xffff00);
+                entitiesInRoom[change.path.id].add(helper);
 
-             
+
 
             } else if (change.operation === "remove") {
 
-                                let o=this.entities[change.path.id]
-        
-                                this.scene.remove(o);
-                                if (o.geometry)
-                                o.geometry.dispose();
-                                if (o.material)
-                                o.material.dispose();
-                                delete this.entities[change.path.id];
+                let o = entitiesInRoom[change.path.id]
+
+                this.scene.remove(o);
+                if (o.geometry)
+                    o.geometry.dispose();
+                if (o.material)
+                    o.material.dispose();
+                delete entitiesInRoom[change.path.id];
             }
         });
 
-        this.room.listen("entities/:id/radius", (change: DataChange) => {
+        room.listen("entities/:id/radius", (change: DataChange) => {
             const color = (change.value < 4) ? 0xff0000 : 0xFFFF0B;
 
             console.log("entities/:id/radius", change)
@@ -295,27 +334,57 @@ export class Application3D {
             // }
 
         });
+
+    }
+
+    initialize() {
+
+        this.activeRoom = this.client.join("aframe-region-1");
+   
+        this.connectedRooms.push(this.activeRoom)
+  
+
+
+        console.log("initialize", this.activeRoom.sessionId)
+        this.activeRoom.onJoin.add((...args) => {
+            //fixme wait for server to genertate sessionID
+            console.log("connected", args)
+
+            this.initializeRoom(this.activeRoom)
+
+        })
+
+
     }
 
     set interpolation(bool: boolean) {
+
+        const entitiesInRoom = this.roomEntitiesMap[this.activeRoom.sessionId]
+
         this._interpolation = bool;
 
         if (this._interpolation) {
-            this.room.removeListener(this._axisListener);
+            this.activeRoom.removeListener(this._axisListener);
             this.loop();
 
         } else {
             // update entities position directly when they arrive
-            this._axisListener = this.room.listen("entities/:id/:axis", (change: DataChange) => {
-                this.entities[change.path.id][change.path.axis] = change.value;
+            this._axisListener = this.activeRoom.listen("entities/:id/:axis", (change: DataChange) => {
+                entitiesInRoom[change.path.id][change.path.axis] = change.value;
             }, true);
         }
-    }  
+    }
 
     loop() {
-        for (let id in this.entities) {
-            const entity = this.entities[id]
-            const new_entity = this.room.state.entities[id]
+
+        const entitiesInRoom = this.roomEntitiesMap[this.activeRoom.sessionId]
+
+
+        for (let id in entitiesInRoom) {
+
+
+            const entity = entitiesInRoom[id]
+            const new_entity = this.activeRoom.state.entities[id]
 
 
             entity.position.x = lerp(entity.position.x, new_entity.position.x, 0.2);
@@ -325,7 +394,7 @@ export class Application3D {
 
 
             entity.rotation.x = new_entity.rotation.x// lerp(entity.rotation.x, new_entity.rotation.x, 0.2);
-            entity.rotation.y = new_entity.rotation.y+Math.PI// lerp(entity.rotation.y, new_entity.rotation.y, 0.2);
+            entity.rotation.y = new_entity.rotation.y + Math.PI// lerp(entity.rotation.y, new_entity.rotation.y, 0.2);
             entity.rotation.z = new_entity.rotation.z //lerp(entity.rotation.z, new_entity.rotation.z, 0.2);
 
 
@@ -354,24 +423,24 @@ function createEntity() {
     return cube
 */
 
-   const el= parseHTML(`<a-box  color="#433F81"  shadow="cast: true;receive: true"></a-box>`)
-   
-return el
+    const el = parseHTML(`<a-box  color="#433F81"  shadow="cast: true;receive: true"></a-box>`)
+
+    return el
 }
 
-function createEntityHTML(selector = "#tree",text="Hello") {
+function createEntityHTML(selector = "#tree", text = "Hello") {
 
- 
-  
+
+
     var htmlSnippet = `<a-entity   >
     
     <a-text position="0 2.5 0" scale="3 3 3" color="black" align='center' value=" ${text}"></a-text>
     <a-entity position="0 ${-PLAYER_SIZE} 0" gltf-model="${selector}" shadow="cast: true;receive: true"></a-entity>
     </a-entity>`,
         html = parseHTML(htmlSnippet);
-  
+
     return html
-          
-}  
-  
+
+}
+
 

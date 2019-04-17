@@ -382,8 +382,7 @@ return el
 
 function createEntityHTML(selector = "#tree",text="Hello") {
 
- 
-  
+
     var htmlSnippet = `<a-entity   >
     
     <a-text position="0 2.5 0" scale="3 3 3" color="black" align='center' value=" ${text}"></a-text>

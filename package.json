@@ -13,6 +13,7 @@
   "author": "Endel Dreyer",
   "license": "MIT",
   "devDependencies": {
+    "@nk11/keyboard-interactions": "^1.0.8",
     "@types/express": "^4.16.1",
     "@types/jsdom": "^12.2.3",
     "colyseus.js": "^0.9.16",
@@ -37,7 +38,6 @@
     "@colyseus/monitor": "^0.1.10",
     "@colyseus/schema": "^0.1.5",
     "@nk11/animation-lib": "^1.0.3",
-    "@nk11/keyboard-interactions": "^1.0.8",
     "@types/three": "^0.93.28",
     "aframe": "^0.9.0",
     "ammo-node": "^1.0.0",
