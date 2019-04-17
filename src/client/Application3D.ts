@@ -24,7 +24,7 @@ export const lerp = (a: number, b: number, t: number) => (b - a) * t + a
 type EntityMap = { [id: string]: any }
 type RoomEntityMap = { [id: string]: EntityMap }
 
-
+   
 
 export class Application3D {
     //entities: EntityMap = {};
@@ -203,16 +203,16 @@ export class Application3D {
 
 
         Hotkeys().on("ChangeChannel", (evt) => {
-            this.activeRoom = this.client.join("aframe-region-2");
+            this.joinRoom("aframe-region-2");
 
         });
 
 
 
-        this.initialize();
+        this.joinRoom("aframe-region-1")
 
-        this.interpolation = true;
-    
+    //    this.interpolation = true;
+
     }
 
 
@@ -337,25 +337,25 @@ export class Application3D {
 
     }
 
-    initialize() {
+ 
 
-        this.activeRoom = this.client.join("aframe-region-1");
-   
-        this.connectedRooms.push(this.activeRoom)
-  
+    joinRoom(name) {
 
+        const newRoom = this.client.join(name);
+        console.log("initialize room ", name)
+        newRoom.onJoin.add((...args) => {
+            console.log("connected to room ", name, args)
+            this.initializeRoom(newRoom)
+            this.activeRoom = newRoom
+            this.connectedRooms.push(newRoom as any)
 
-        console.log("initialize", this.activeRoom.sessionId)
-        this.activeRoom.onJoin.add((...args) => {
-            //fixme wait for server to genertate sessionID
-            console.log("connected", args)
+            this.interpolation = true;
 
-            this.initializeRoom(this.activeRoom)
 
         })
-
-
     }
+
+
 
     set interpolation(bool: boolean) {
 
@@ -365,7 +365,7 @@ export class Application3D {
 
         if (this._interpolation) {
             this.activeRoom.removeListener(this._axisListener);
-            this.loop();
+            this.loop( this.activeRoom);
 
         } else {
             // update entities position directly when they arrive
@@ -375,16 +375,16 @@ export class Application3D {
         }
     }
 
-    loop() {
+    loop(room) {
 
-        const entitiesInRoom = this.roomEntitiesMap[this.activeRoom.sessionId]
+        const entitiesInRoom = this.roomEntitiesMap[room.sessionId]
 
 
         for (let id in entitiesInRoom) {
 
 
             const entity = entitiesInRoom[id]
-            const new_entity = this.activeRoom.state.entities[id]
+            const new_entity = room.state.entities[id]
 
 
             entity.position.x = lerp(entity.position.x, new_entity.position.x, 0.2);
@@ -405,7 +405,7 @@ export class Application3D {
 
         // continue looping if interpolation is still enabled.
         if (this._interpolation) {
-            requestAnimationFrame(this.loop.bind(this));
+            requestAnimationFrame(()=> this.loop(room));
         }
     }
 }
