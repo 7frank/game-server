@@ -203,9 +203,23 @@ export class Application3D {
 
 
         Hotkeys().on("ChangeChannel", (evt) => {
+            this.joinRoom("aframe-region-1");
+
+        });
+
+   
+
+        Hotkeys.register("ChangeChannel2", '2', {
+            target: this.sceneEl
+        });
+
+
+
+        Hotkeys().on("ChangeChannel2", (evt) => {
             this.joinRoom("aframe-region-2");
 
         });
+
 
 
 
@@ -317,7 +331,7 @@ export class Application3D {
         room.listen("entities/:id/radius", (change: DataChange) => {
             const color = (change.value < 4) ? 0xff0000 : 0xFFFF0B;
 
-            console.log("entities/:id/radius", change)
+          //  console.log("entities/:id/radius", change)
             /*
             const graphics = this.entities[change.path.id];
             graphics.clear();
@@ -377,6 +391,7 @@ export class Application3D {
 
     loop(room) {
 
+
         const entitiesInRoom = this.roomEntitiesMap[room.sessionId]
 
 
@@ -391,6 +406,10 @@ export class Application3D {
             entity.position.y = lerp(entity.position.y, new_entity.position.y, 0.2);
             entity.position.z = lerp(entity.position.z, new_entity.position.z, 0.2);
 
+/*entity.position.x =new_entity.position.x
+entity.position.y = new_entity.position.y
+entity.position.z = new_entity.position.z
+*/
 
 
             entity.rotation.x = new_entity.rotation.x// lerp(entity.rotation.x, new_entity.rotation.x, 0.2);
