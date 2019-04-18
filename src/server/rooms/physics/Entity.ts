@@ -1,5 +1,6 @@
 import { nosync } from "colyseus";
 import bodyParser = require("body-parser");
+import { BaseEntity } from "../region/BaseEntity";
 
 export
 enum EntityType
@@ -10,7 +11,7 @@ enum EntityType
 
 }
 
-export class Entity {
+export class Entity extends BaseEntity {
 
     position: any//{ x: number, y: number, z: number }
     get rotation() {
@@ -42,6 +43,8 @@ export class Entity {
     @nosync speed = 0;
 
     constructor(body, radius: number) {
+        super()
+
         this.body = body
         this.position = this.body.position
        // this.rotation = this.body.rotation

@@ -8,30 +8,37 @@ const Physijs = NodePhysijs.Physijs(THREE, Ammo);
 
 import { nosync } from "colyseus";
 
-const WORLD_SIZE = 10;
+
 const DEFAULT_PLAYER_RADIUS = 1;
 
 
 import { createDemo } from "./demo"
+import { RegionState } from "../region/RegionState";
+import { getRandomInt } from "../../util";
 
-export class State {
-  width = WORLD_SIZE;
-  height = WORLD_SIZE*8;
+export class State extends RegionState {
+
 
   entities: { [id: string]: Entity } = {};
 
   @nosync
   maxFoodCount=20
+  data="";
 
 
-  data=""
-  position=new THREE.Vector3
 
+
+  toJSON():object
+  {
+     return Object.assign(super.toJSON(),{data:this.data,entities:this.entities})
+  }
 
   @nosync
   protected demoPhysics;
 
   constructor() {
+
+    super()
 
     this.demoPhysics = createDemo()
 
@@ -54,7 +61,7 @@ export class State {
 
   createFood() {
 
-    const pos = new THREE.Vector3(Math.random() * this.width,20 , Math.random() * this.height)
+    const pos = new THREE.Vector3(getRandomInt(this.boundingBox.min.x, this.boundingBox.max.x), 2, getRandomInt(this.boundingBox.min.z, this.boundingBox.max.z))
 
     const food = new Entity(this.demoPhysics.addEntity(pos, 1), 0.5);
 
@@ -88,70 +95,7 @@ export class State {
 
     this.demoPhysics.update()
 
-    const deadEntities: string[] = [];
-    for (const sessionId in this.entities) {
-      const entity = this.entities[sessionId];
-
-      if (entity.dead) {
-        deadEntities.push(sessionId);
-      }
-
-
-
-
-
-      //    console.log(Object.values(this.entities)[0].rotation)
-
-
-      if (entity.radius >= DEFAULT_PLAYER_RADIUS) {
-        for (const collideSessionId in this.entities) {
-          const collideTestEntity = this.entities[collideSessionId]
-
-
-
-          // prevent collision with itself
-          if (collideTestEntity === entity) { continue; }
-
-
-
-
-          /*
-                    if (Entity.distance(entity, collideTestEntity) < entity.radius) {
-                      entity.radius += collideTestEntity.radius / 5;
-                      collideTestEntity.dead = true;
-                      deadEntities.push(collideSessionId);
-          
-                      // create a replacement food
-                      if (collideTestEntity.radius < DEFAULT_PLAYER_RADIUS) {
-                        this.createFood();
-                      }
-                    }
-          */
-
-
-
-
-        }
-      }
-
-      /*  if (entity.speed > 0) {
-          entity.position.x -= (Math.cos(entity.angle)) * entity.speed;
-          entity.position.y -= (Math.sin(entity.angle)) * entity.speed;
+    super.update()
   
-    
-        }*/
-
-
-      // apply boundary limits
-      if (entity.position.x < -WORLD_SIZE / 2) { entity.position.x = -WORLD_SIZE / 2; }
-      if (entity.position.x > WORLD_SIZE / 2) { entity.position.x = WORLD_SIZE / 2; }
-      if (entity.position.y < -WORLD_SIZE / 2) { entity.position.y = -WORLD_SIZE / 2; }
-      if (entity.position.y > WORLD_SIZE*4 / 2) { entity.position.y = WORLD_SIZE*4 / 2; }
-      if (entity.position.z < -WORLD_SIZE / 2) { entity.position.z = -WORLD_SIZE / 2; }
-      if (entity.position.z > WORLD_SIZE / 2) { entity.position.z = WORLD_SIZE / 2; }
-    }
-
-    // delete all dead entities
-    deadEntities.forEach(entityId => delete this.entities[entityId]);
   }
 }

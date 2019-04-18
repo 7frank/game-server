@@ -47,13 +47,17 @@ export class AFramePhysicsRoom extends Room<State> {
 
 
 
-
+   
 
     const mState = new State()
     mState.maxFoodCount = options.boxCount || mState.maxFoodCount
     mState.data = options.data //|| mState.data
     if (options.position)
     mState.position.copy(options.position)
+
+
+// TODO 
+mState.boundingBox.copy(options.boundingBox)
 
 
 

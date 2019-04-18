@@ -5,31 +5,29 @@ const NodePhysijs = require('nodejs-physijs');
 const THREE = NodePhysijs.THREE;
 
 import { nosync } from "colyseus";
+import { getRandomInt } from "../../util";
 
-export
-  function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+
 
 export class RegionState extends THREE.Object3D {
   position: THREE.Vector3;
   boundingBox: THREE.Box3;
 
-  entities: { [id: string]: BaseEntity } = {};
+
+  public entities: { [id: string]: BaseEntity } = {};
 
 
   children: RegionState[] = []
+
   parent: RegionState = null
 
-  toJSON() {
-    return {
-      position: this.position,
-      boundingBox:this.boundingBox
-    }
-  }
-
+   toJSON():object {
+     return {
+       position: this.position,
+       boundingBox:this.boundingBox
+     }
+   }
+ 
 
   constructor() {
     super()
