@@ -6,14 +6,13 @@ const THREE = NodePhysijs.THREE;
 const Ammo = NodePhysijs.Ammo;
 const Physijs = NodePhysijs.Physijs(THREE, Ammo);
 
-
+import { nosync } from "colyseus";
 
 const WORLD_SIZE = 10;
 const DEFAULT_PLAYER_RADIUS = 1;
 
 
 import { createDemo } from "./demo"
-let demoPhysics;
 
 export class State {
   width = WORLD_SIZE;
@@ -21,9 +20,12 @@ export class State {
 
   entities: { [id: string]: Entity } = {};
 
+  @nosync
+  protected demoPhysics;
+
   constructor() {
 
-    demoPhysics = createDemo()
+    this.demoPhysics = createDemo()
 
 
     // create some food entities
@@ -46,7 +48,7 @@ export class State {
 
     const pos = new THREE.Vector3(Math.random() * this.width,20 , Math.random() * this.height)
 
-    const food = new Entity(demoPhysics.addEntity(pos, 1), 0.5);
+    const food = new Entity(this.demoPhysics.addEntity(pos, 1), 0.5);
 
     const id = nanoid()
     this.entities[id] = food;
@@ -57,7 +59,7 @@ export class State {
 
     const pos = new THREE.Vector3(Math.random() * this.width,2 , Math.random() * this.height)
 
-    const body = demoPhysics.addEntity(pos, 1)
+    const body = this.demoPhysics.addEntity(pos, 1)
 
     body.scale.set(1,2,1)
 
@@ -76,7 +78,7 @@ export class State {
 
   update() {
 
-    demoPhysics.update()
+    this.demoPhysics.update()
 
     const deadEntities: string[] = [];
     for (const sessionId in this.entities) {

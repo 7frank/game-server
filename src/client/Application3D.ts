@@ -216,7 +216,7 @@ export class Application3D {
 
 
         Hotkeys().on("ChangeChannel2", (evt) => {
-            this.joinRoom("aframe-region-2");
+            this.joinRoom("aframe-region-2","green","15 0 0");
 
         });
 
@@ -230,7 +230,7 @@ export class Application3D {
     }
 
 
-    initializeRoom(room) {
+    initializeRoom(room,sceneEl) {
         // init map
         if (!this.roomEntitiesMap[room.sessionId]) this.roomEntitiesMap[room.sessionId] = {}
 
@@ -261,7 +261,7 @@ export class Application3D {
 
                     //FIXME using models will break phyics sync
                     const el = createEntityHTML("#steve", "Player " + room.sessionId)
-                    this.sceneEl.append(el)
+                    sceneEl.append(el)
 
                     entitiesInRoom[change.path.id] = el.object3D
 
@@ -290,7 +290,7 @@ export class Application3D {
                 }
                 else {
                     const el = createEntity()
-                    this.sceneEl.append(el)
+                    sceneEl.append(el)
                     const graphics = el.object3D
                     //  graphics.material.color.setHex(color)
                     graphics.position.copy(change.value.position);
@@ -350,16 +350,20 @@ export class Application3D {
         });
 
     }
-
+   
  
 
-    joinRoom(name) {
+    joinRoom(name,color?,position?) {
 
         const newRoom = this.client.join(name);
+
+
+        const regionEl=createRegion(color,position)
+        this.sceneEl.append(regionEl)
         console.log("initialize room ", name)
         newRoom.onJoin.add((...args) => {
             console.log("connected to room ", name, args)
-            this.initializeRoom(newRoom)
+            this.initializeRoom(newRoom,regionEl)
             this.activeRoom = newRoom
             this.connectedRooms.push(newRoom as any)
 
@@ -432,6 +436,15 @@ entity.position.z = new_entity.position.z
 
 
 var parseHTML = require('parsehtml');
+
+
+function createRegion(color="#7BC8A4",position="0 0 0")
+{
+ const tpl= `  <a-box position="${position}"  width="10.5" height="0.1" depth="10.5" color="${color}" shadow></a-box> `
+ const el = parseHTML(tpl)
+ return el
+ 
+}
 
 function createEntity() {
 
