@@ -18,6 +18,7 @@ import { monitor } from "@colyseus/monitor";
 
 import { ArenaRoom } from "./rooms/ArenaRoom";
 import { AFramePhysicsRoom } from "./rooms/physics/AFramePhysicsRoom";
+import { Region } from "./rooms/region/Region";
 
 export const port = Number(process.env.PORT || 8080);
 export const endpoint = "localhost";
@@ -27,9 +28,27 @@ export let STATIC_DIR: string;
 const app = express();
 const gameServer = new colyseus.Server({ server: http.createServer(app) });
 
+
+// TODO we'll need a broker that connects actual rooms and regions with each other
+// this way we can have multiple stateless node instances have run in parallel (maybe spawning rooms on demand) instead of one monolith
 gameServer.register("arena", ArenaRoom);
-gameServer.register("aframe-region-1", AFramePhysicsRoom);
-gameServer.register("aframe-region-2", AFramePhysicsRoom);
+gameServer.register("aframe-region-1", AFramePhysicsRoom, { boxCount: 10, position: { x: 0, y: 0, z: 0 }, data: `<a-box  width="10.5" height="0.1" depth="10.5" color="433F81" shadow></a-box> ` });
+gameServer.register("aframe-region-2", AFramePhysicsRoom, { boxCount: 5, position: { x: 20, y: 0, z: 0 }, data: `<a-box  width="10.5" height="0.1" depth="10.5" color="green" shadow></a-box> ` });
+
+
+
+gameServer.register("world-1", Region, {
+    position: { x: 0, y: 0, z: 0 },
+    boundingBox: {
+        min: { x: -100, y: -1, z: -100 },
+        max: { x: 100, y: 50, z: 100 }
+    }
+});
+
+
+// TODO add regions to world at position x
+
+
 
 if (process.env.NODE_ENV !== "production") {
     const webpackCompiler = webpack(webpackConfig({}));
@@ -43,7 +62,7 @@ if (process.env.NODE_ENV !== "production") {
     // on production, use ./public as static root
     STATIC_DIR = path.resolve(__dirname, "public");
 }
-console.log("STATIC_DIR",STATIC_DIR)
+console.log("STATIC_DIR", STATIC_DIR)
 app.use("/", express.static(STATIC_DIR));
 
 

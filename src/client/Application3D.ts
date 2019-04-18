@@ -12,6 +12,27 @@ const PLAYER_SIZE = 1.8
 // @ts-ignore
 const THREE = window.THREE
 
+
+
+// @ts-ignore
+const AFRAME = window.AFRAME
+
+
+AFRAME.registerComponent('wireframe', {
+    dependencies: ['material'],
+    init: function () {
+      this.el.components.material.material.wireframe = true;
+    }
+  });
+
+
+
+
+
+
+
+
+
 const ENDPOINT = (process.env.NODE_ENV === "development")
     ? "ws://localhost:8080"
     : "wss://colyseus-pixijs-boilerplate.herokuapp.com";
@@ -24,7 +45,7 @@ export const lerp = (a: number, b: number, t: number) => (b - a) * t + a
 type EntityMap = { [id: string]: any }
 type RoomEntityMap = { [id: string]: EntityMap }
 
-   
+
 
 export class Application3D {
     //entities: EntityMap = {};
@@ -207,7 +228,7 @@ export class Application3D {
 
         });
 
-   
+
 
         Hotkeys.register("ChangeChannel2", '2', {
             target: this.sceneEl
@@ -216,21 +237,35 @@ export class Application3D {
 
 
         Hotkeys().on("ChangeChannel2", (evt) => {
-            this.joinRoom("aframe-region-2","green","15 0 0");
+            this.joinRoom("aframe-region-2", "green", "15 0 0");
+
+        });
+
+
+
+        Hotkeys.register("ChangeChannel3", '3', {
+            target: this.sceneEl
+        });
+
+
+
+        Hotkeys().on("ChangeChannel3", (evt) => {
+            this.joinRoom("world-1", "red", "0 -1 0", 1000, 0.1, 1000);
 
         });
 
 
 
 
+
         this.joinRoom("aframe-region-1")
 
-    //    this.interpolation = true;
+        //    this.interpolation = true;
 
     }
 
 
-    initializeRoom(room,sceneEl) {
+    initializeRoom(room, sceneEl) {
         // init map
         if (!this.roomEntitiesMap[room.sessionId]) this.roomEntitiesMap[room.sessionId] = {}
 
@@ -331,7 +366,7 @@ export class Application3D {
         room.listen("entities/:id/radius", (change: DataChange) => {
             const color = (change.value < 4) ? 0xff0000 : 0xFFFF0B;
 
-          //  console.log("entities/:id/radius", change)
+            //  console.log("entities/:id/radius", change)
             /*
             const graphics = this.entities[change.path.id];
             graphics.clear();
@@ -350,20 +385,24 @@ export class Application3D {
         });
 
     }
-   
- 
 
-    joinRoom(name,color?,position?) {
+
+
+    joinRoom(name, color?, position?, width?, height?, depth?) {
 
         const newRoom = this.client.join(name);
 
+        const regionEl = createRegion(color, `0 0 0`, width, height, depth)
+        
 
-        const regionEl=createRegion(color,position)
-        this.sceneEl.append(regionEl)
         console.log("initialize room ", name)
-        newRoom.onJoin.add((...args) => {
-            console.log("connected to room ", name, args)
-            this.initializeRoom(newRoom,regionEl)
+        newRoom.onJoin.add(() => {
+            console.log("connected to room ", name,newRoom)
+   
+            this.sceneEl.append(regionEl)
+
+
+            this.initializeRoom(newRoom, regionEl)
             this.activeRoom = newRoom
             this.connectedRooms.push(newRoom as any)
 
@@ -371,6 +410,39 @@ export class Application3D {
 
 
         })
+
+
+        let roomInited=false
+        newRoom.onStateChange.add(() => {
+           // console.log("state changed room ", name ,newRoom.state) 
+            regionEl.setAttribute("position", `${newRoom.state.position.x} ${newRoom.state.position.y} ${newRoom.state.position.z} `)
+
+            if (newRoom.state.data)
+            if (!roomInited)
+            {
+                regionEl.append(parseHTML(newRoom.state.data))
+
+                roomInited=true
+            }
+
+            if (newRoom.state.boundingBox)
+            if (!roomInited)
+            {
+                const bb=new THREE.Box3()
+                bb.copy(newRoom.state.boundingBox)
+
+                var helper = new THREE.Box3Helper( bb, 0xffff00 );
+              
+                regionEl.object3D.add(helper)
+
+                roomInited=true
+            }
+
+
+            
+        })
+
+
     }
 
 
@@ -383,7 +455,7 @@ export class Application3D {
 
         if (this._interpolation) {
             this.activeRoom.removeListener(this._axisListener);
-            this.loop( this.activeRoom);
+            this.loop(this.activeRoom);
 
         } else {
             // update entities position directly when they arrive
@@ -410,10 +482,10 @@ export class Application3D {
             entity.position.y = lerp(entity.position.y, new_entity.position.y, 0.2);
             entity.position.z = lerp(entity.position.z, new_entity.position.z, 0.2);
 
-/*entity.position.x =new_entity.position.x
-entity.position.y = new_entity.position.y
-entity.position.z = new_entity.position.z
-*/
+            /*entity.position.x =new_entity.position.x
+            entity.position.y = new_entity.position.y
+            entity.position.z = new_entity.position.z
+            */
 
 
             entity.rotation.x = new_entity.rotation.x// lerp(entity.rotation.x, new_entity.rotation.x, 0.2);
@@ -428,7 +500,7 @@ entity.position.z = new_entity.position.z
 
         // continue looping if interpolation is still enabled.
         if (this._interpolation) {
-            requestAnimationFrame(()=> this.loop(room));
+            requestAnimationFrame(() => this.loop(room));
         }
     }
 }
@@ -438,12 +510,10 @@ entity.position.z = new_entity.position.z
 var parseHTML = require('parsehtml');
 
 
-function createRegion(color="#7BC8A4",position="0 0 0")
-{
- const tpl= `  <a-box position="${position}"  width="10.5" height="0.1" depth="10.5" color="${color}" shadow></a-box> `
- const el = parseHTML(tpl)
- return el
- 
+function createRegion(color = "#7BC8A4", position = "0 0 0", width = "10.5", height = "0.1", depth = "10.5") {
+    const tpl = `  <a-entity position="${position}"  width="${width}" height=${height}" depth="${depth}" color="${color}" shadow></a-entity> `
+    const el = parseHTML(tpl)
+    return el
 }
 
 function createEntity() {

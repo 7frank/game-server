@@ -21,6 +21,14 @@ export class State {
   entities: { [id: string]: Entity } = {};
 
   @nosync
+  maxFoodCount=20
+
+
+  data=""
+  position=new THREE.Vector3
+
+
+  @nosync
   protected demoPhysics;
 
   constructor() {
@@ -36,7 +44,7 @@ export class State {
     setInterval(() => {
       i++;
 
-      if (i > 50) return
+      if (i > this.maxFoodCount) return
       this.createFood();
 
 
