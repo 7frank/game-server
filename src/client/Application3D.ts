@@ -250,7 +250,7 @@ export class Application3D {
 
 
         Hotkeys().on("ChangeChannel3", (evt) => {
-            this.joinRoom("world-1", "red", "0 -1 0", 1000, 0.1, 1000);
+            this.joinRoom("world-1", "red", "0 -1 0");
 
         });
 
@@ -388,11 +388,11 @@ export class Application3D {
 
 
 
-    joinRoom(name, color?, position?, width?, height?, depth?) {
+    joinRoom(name, color?, position?) {
 
         const newRoom = this.client.join(name);
 
-        const regionEl = createRegion(color, `0 0 0`, width, height, depth)
+        const regionEl = createRegion(color)
         
 
         console.log("initialize room ", name)
@@ -510,8 +510,12 @@ export class Application3D {
 var parseHTML = require('parsehtml');
 
 
-function createRegion(color = "#7BC8A4", position = "0 0 0", width = "10.5", height = "0.1", depth = "10.5") {
-    const tpl = `  <a-entity position="${position}"  width="${width}" height=${height}" depth="${depth}" color="${color}" shadow></a-entity> `
+function createRegion(color = "#7BC8A4") {
+
+    
+    //const tpl = `<a-box position="0 1 0"  width="10.5" height="1" depth="10.5" color="green" custom-shadow></a-box>`
+
+    const tpl = `<a-entity class="region"></a-entity> `
     const el = parseHTML(tpl)
     return el
 }

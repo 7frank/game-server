@@ -27,7 +27,7 @@ const roomTemplate = `
 
 export class AFramePhysicsRoom extends Room<State> {
 
-test=1
+
 
   onInit(options) {
 

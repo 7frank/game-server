@@ -40,8 +40,8 @@ gameServer.register("aframe-region-2", AFramePhysicsRoom, { boxCount: 5, positio
 gameServer.register("world-1", Region, {
     position: { x: 0, y: 0, z: 0 },
     boundingBox: {
-        min: { x: -100, y: -1, z: -100 },
-        max: { x: 100, y: 50, z: 100 }
+        min: { x: -50, y: -1, z: -50 },
+        max: { x: 50, y: 50, z: 50 }
     }
 });
 
