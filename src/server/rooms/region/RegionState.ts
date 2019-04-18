@@ -59,13 +59,13 @@ export class RegionState extends THREE.Object3D {
       if (!this.parent || !entity.canChangeRooms) {
         // apply boundary limits
         if (entity.position.x < this.boundingBox.min.x) { entity.position.x = this.boundingBox.min.x }
-        if (entity.position.x < this.boundingBox.max.x) { entity.position.x = this.boundingBox.max.x }
+        if (entity.position.x >= this.boundingBox.max.x) { entity.position.x = this.boundingBox.max.x }
 
         if (entity.position.y < this.boundingBox.min.y) { entity.position.y = this.boundingBox.min.y }
-        if (entity.position.y < this.boundingBox.max.y) { entity.position.y = this.boundingBox.max.y }
+        if (entity.position.y >= this.boundingBox.max.y) { entity.position.y = this.boundingBox.max.y }
 
         if (entity.position.z < this.boundingBox.min.z) { entity.position.z = this.boundingBox.min.z }
-        if (entity.position.z < this.boundingBox.max.z) { entity.position.z = this.boundingBox.max.z }
+        if (entity.position.z >= this.boundingBox.max.z) { entity.position.z = this.boundingBox.max.z }
 
       }
 

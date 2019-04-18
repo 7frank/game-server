@@ -95,6 +95,7 @@ export class State extends RegionState {
 
     this.demoPhysics.update()
 
+    // TODO instead of relying on super boundingBox behaviour we could reflect entities at boundingBox via physics
     super.update()
   
   }
