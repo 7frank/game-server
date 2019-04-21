@@ -21,9 +21,9 @@ const AFRAME = window.AFRAME
 AFRAME.registerComponent('wireframe', {
     dependencies: ['material'],
     init: function () {
-      this.el.components.material.material.wireframe = true;
+        this.el.components.material.material.wireframe = true;
     }
-  });
+});
 
 
 
@@ -129,9 +129,21 @@ export class Application3D {
             }
         });
 
+
+        // TODO send direction vector instead & only update positions based on direction * current speed
+        //  let lastPosition;
         camera.addEventListener('positionChanged', (evt) => {
             if (this.currentPlayerEntity) {
-                    console.log("positionChanged",evt.detail)
+
+                /*   if (!lastPosition) {
+                       lastPosition=evt.detail
+                       return
+                   }
+   
+                   let direction=evt.detail.clone().sub(lastPosition)
+                   console.log(direction,evt.detail)
+                   lastPosition=evt.detail
+                   */  
                 this.activeRoom.send([MessageTypes.playerMove, evt.detail]);
             }
         });
@@ -331,12 +343,18 @@ export class Application3D {
 
                 }
                 else {
-                    const el = createEntity()
+
+
+                    const pArr=Object.values(change.value.position).join(" ")
+                    const el = createEntity(pArr)
                     sceneEl.append(el)
                     const graphics = el.object3D
                     //  graphics.material.color.setHex(color)
 
-                    graphics.position.copy(change.value.position);
+                    // TODO setting position this way does interfere wigth interpolation as the value will somehow only be later applied
+                   // graphics.position.copy(change.value.position);
+                         
+
                     // this.scene.add(graphics);
 
                     //  <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
@@ -347,11 +365,11 @@ export class Application3D {
 
 
 
-                      //bounding box
-                var box = new THREE.Box3();
-                box.setFromCenterAndSize(new THREE.Vector3(0, 0, 0), new THREE.Vector3().copy(change.value.dimensions));
-                var helper = new THREE.Box3Helper(box, 0xffff00);
-                entitiesInRoom[change.path.id].add(helper);
+                    //bounding box
+                    var box = new THREE.Box3();
+                    box.setFromCenterAndSize(new THREE.Vector3(0, 0, 0), new THREE.Vector3().copy(change.value.dimensions));
+                    var helper = new THREE.Box3Helper(box, 0xffff00);
+                    entitiesInRoom[change.path.id].add(helper);
 
 
 
@@ -359,7 +377,7 @@ export class Application3D {
 
 
 
-              
+
 
 
 
@@ -406,12 +424,12 @@ export class Application3D {
         const newRoom = this.client.join(name);
 
         const regionEl = createRegion(color)
-        
+
 
         console.log("initialize room ", name)
         newRoom.onJoin.add(() => {
-            console.log("connected to room ", name,newRoom)
-   
+            console.log("connected to room ", name, newRoom)
+
             this.sceneEl.append(regionEl)
 
 
@@ -425,34 +443,32 @@ export class Application3D {
         })
 
 
-        let roomInited=false
+        let roomInited = false
         newRoom.onStateChange.add(() => {
-            console.log("state changed room ", name ,newRoom.state) 
+            // console.log("state changed room ", name ,newRoom.state) 
             regionEl.setAttribute("position", `${newRoom.state.position.x} ${newRoom.state.position.y} ${newRoom.state.position.z} `)
 
             if (newRoom.state.data)
-            if (!roomInited)
-            {
-                regionEl.append(parseHTML(newRoom.state.data))
+                if (!roomInited) {
+                    regionEl.append(parseHTML(newRoom.state.data))
 
-                roomInited=true
-            }
+                    roomInited = true
+                }
 
             if (newRoom.state.boundingBox)
-            if (!roomInited)
-            {
-                const bb=new THREE.Box3()
-                bb.copy(newRoom.state.boundingBox)
+                if (!roomInited) {
+                    const bb = new THREE.Box3()
+                    bb.copy(newRoom.state.boundingBox)
 
-                var helper = new THREE.Box3Helper( bb, 0xffff00 );
-              
-                regionEl.object3D.add(helper)
+                    var helper = new THREE.Box3Helper(bb, 0xffff00);
 
-                roomInited=true
-            }
+                    regionEl.object3D.add(helper)
+
+                    roomInited = true
+                }
 
 
-            
+
         })
 
 
@@ -482,7 +498,7 @@ export class Application3D {
 
 
         const entitiesInRoom = this.roomEntitiesMap[room.sessionId]
-   
+
 
 
 
@@ -500,14 +516,14 @@ export class Application3D {
             entity.position.y = new_entity.position.y
             entity.position.z = new_entity.position.z
             */
-    
+
 
             entity.rotation.x = new_entity.rotation.x// lerp(entity.rotation.x, new_entity.rotation.x, 0.2);
             entity.rotation.y = new_entity.rotation.y + Math.PI// lerp(entity.rotation.y, new_entity.rotation.y, 0.2);
             entity.rotation.z = new_entity.rotation.z //lerp(entity.rotation.z, new_entity.rotation.z, 0.2);
 
 
-          //  entity.scale.set(new_entity.radius, new_entity.radius, new_entity.radius)
+            //  entity.scale.set(new_entity.radius, new_entity.radius, new_entity.radius)
 
 
         }
@@ -526,7 +542,7 @@ var parseHTML = require('parsehtml');
 
 function createRegion(color = "#7BC8A4") {
 
-    
+
     //const tpl = `<a-box position="0 1 0"  width="10.5" height="1" depth="10.5" color="green" custom-shadow></a-box>`
 
     const tpl = `<a-entity class="region"></a-entity> `
@@ -534,7 +550,7 @@ function createRegion(color = "#7BC8A4") {
     return el
 }
 
-function createEntity() {
+function createEntity(position) {
 
     // Create a Cube Mesh with basic material
     /*var geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -543,7 +559,7 @@ function createEntity() {
     return cube
 */
 
-    const el = parseHTML(`<a-box  color="#433F81"  shadow="cast: true;receive: true"></a-box>`)
+    const el = parseHTML(`<a-box  color="#433F81" position="${position}" shadow="cast: true;receive: true"></a-box>`)
 
     return el
 }
