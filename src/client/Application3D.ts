@@ -143,7 +143,7 @@ export class Application3D {
                    let direction=evt.detail.clone().sub(lastPosition)
                    console.log(direction,evt.detail)
                    lastPosition=evt.detail
-                   */  
+                   */
                 this.activeRoom.send([MessageTypes.playerMove, evt.detail]);
             }
         });
@@ -345,21 +345,24 @@ export class Application3D {
                 else {
 
 
-                    const pArr=Object.values(change.value.position).join(" ")
-                    const el = createEntity(pArr)
+
+                    const el = createEntity()
                     sceneEl.append(el)
                     const graphics = el.object3D
                     //  graphics.material.color.setHex(color)
 
-                    // TODO setting position this way does interfere wigth interpolation as the value will somehow only be later applied
-                   // graphics.position.copy(change.value.position);
-                         
-
-                    // this.scene.add(graphics);
-
-                    //  <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
+                    // have timeout so that lerp later does work as intended
+                    setTimeout(() => {
 
 
+                        graphics.position.copy(change.value.position)
+
+
+
+                        graphics.scale.copy(change.value.dimensions)
+
+
+                    }, 1)
 
                     entitiesInRoom[change.path.id] = graphics;
 
@@ -367,7 +370,9 @@ export class Application3D {
 
                     //bounding box
                     var box = new THREE.Box3();
-                    box.setFromCenterAndSize(new THREE.Vector3(0, 0, 0), new THREE.Vector3().copy(change.value.dimensions));
+                    //box.setFromCenterAndSize(new THREE.Vector3(0, 0, 0), new THREE.Vector3().copy(change.value.dimensions));
+                    box.setFromCenterAndSize(new THREE.Vector3(0, 0, 0), new THREE.Vector3(1,1,1));
+                
                     var helper = new THREE.Box3Helper(box, 0xffff00);
                     entitiesInRoom[change.path.id].add(helper);
 
@@ -550,7 +555,7 @@ function createRegion(color = "#7BC8A4") {
     return el
 }
 
-function createEntity(position) {
+function createEntity() {
 
     // Create a Cube Mesh with basic material
     /*var geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -559,12 +564,23 @@ function createEntity(position) {
     return cube
 */
 
-    const el = parseHTML(`<a-box  color="#433F81" position="${position}" shadow="cast: true;receive: true"></a-box>`)
+    const el = parseHTML(`<a-box  color="#433F81" shadow="cast: true;receive: true"></a-box>`)
 
     return el
 }
 
-function createEntityHTML(selector = "#tree", text = "Hello") {
+
+function createEntityFromData(data) {
+
+    const el = parseHTML(`<a-entity></a-entity>`)
+    const dataEl = parseHTML(data)
+    el.append(dataEl)
+
+    return el
+}
+
+
+function createEntityHTML(selector = "#steve", text = "Hello") {
 
 
 

@@ -55,9 +55,9 @@ export class State extends RegionState {
 
   createFood() {
 
-    const pos = new THREE.Vector3(getRandomInt(this.boundingBox.min.x, this.boundingBox.max.x), 2, getRandomInt(this.boundingBox.min.z, this.boundingBox.max.z))
+    const pos = new THREE.Vector3(getRandomInt(this.boundingBox.min.x, this.boundingBox.max.x), this.boundingBox.max.y, getRandomInt(this.boundingBox.min.z, this.boundingBox.max.z))
 
-    const dimensions=[1,1,1]
+    const dimensions=[Math.random()+1,Math.random()+1,Math.random()+1]
 
     const food = new Entity(this.demoPhysics.addEntity(pos,dimensions, 10));
 

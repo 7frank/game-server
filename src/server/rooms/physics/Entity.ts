@@ -28,10 +28,8 @@ export class Entity extends BaseEntity {
     get rotation() {
         return this.body.rotation
     }
-
     dimesions:THREE.Vector3
-
-    boundingBox: THREE.Box3
+    data:string="";
 
     type: EntityType = EntityType.dynamic;
 
