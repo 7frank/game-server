@@ -47,17 +47,17 @@ export class AFramePhysicsRoom extends Room<State> {
 
 
 
-   
+
 
     const mState = new State()
     mState.maxFoodCount = options.boxCount || mState.maxFoodCount
     mState.data = options.data //|| mState.data
     if (options.position)
-    mState.position.copy(options.position)
+      mState.position.copy(options.position)
 
 
-// TODO 
-mState.boundingBox.copy(options.boundingBox)
+    // TODO 
+    mState.boundingBox.copy(options.boundingBox)
 
 
 
@@ -86,18 +86,17 @@ mState.boundingBox.copy(options.boundingBox)
       const dst = Entity.distance(entity, { position: data } as Entity);
       entity.speed = (dst < 20) ? 0 : Math.min(dst / 10, 6);
       entity.angle = Math.atan2(entity.position.y - data.y, entity.position.x - data.x);
-    } else if (command === MessageTypes.playerMove) {
+    }
+    else if (command === MessageTypes.playerMove) {
       // console.log(command,data)
       entity.body.__dirtyPosition = true;
       entity.position.copy(data)
-
+    
     }
     else if (command === MessageTypes.playerRotate) {
       // console.log(command,data)
-      entity.body.rotation.copy(data)
       entity.body.__dirtyRotation = true;
-
-
+      entity.body.rotation.copy(data)
     }
 
 

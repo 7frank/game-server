@@ -47,6 +47,7 @@ type RoomEntityMap = { [id: string]: EntityMap }
 
 
 
+
 export class Application3D {
     //entities: EntityMap = {};
 
@@ -130,7 +131,7 @@ export class Application3D {
 
         camera.addEventListener('positionChanged', (evt) => {
             if (this.currentPlayerEntity) {
-
+                    console.log("positionChanged",evt.detail)
                 this.activeRoom.send([MessageTypes.playerMove, evt.detail]);
             }
         });
@@ -320,6 +321,12 @@ export class Application3D {
 
 
 
+                    //bounding box
+                    var box = new THREE.Box3();
+                    box.setFromCenterAndSize(new THREE.Vector3(0, -PLAYER_SIZE / 2, 0), new THREE.Vector3().copy(change.value.dimensions));
+                    var helper = new THREE.Box3Helper(box, 0xffff00);
+                    entitiesInRoom[change.path.id].add(helper);
+
 
 
                 }
@@ -328,6 +335,7 @@ export class Application3D {
                     sceneEl.append(el)
                     const graphics = el.object3D
                     //  graphics.material.color.setHex(color)
+
                     graphics.position.copy(change.value.position);
                     // this.scene.add(graphics);
 
@@ -338,15 +346,20 @@ export class Application3D {
                     entitiesInRoom[change.path.id] = graphics;
 
 
+
+                      //bounding box
+                var box = new THREE.Box3();
+                box.setFromCenterAndSize(new THREE.Vector3(0, 0, 0), new THREE.Vector3().copy(change.value.dimensions));
+                var helper = new THREE.Box3Helper(box, 0xffff00);
+                entitiesInRoom[change.path.id].add(helper);
+
+
+
                 }
 
 
-                //bounding box
-                var box = new THREE.Box3();
-                box.setFromCenterAndSize(new THREE.Vector3(0, -PLAYER_SIZE / 2, 0), new THREE.Vector3().copy(change.value.dimensions));
 
-                var helper = new THREE.Box3Helper(box, 0xffff00);
-                entitiesInRoom[change.path.id].add(helper);
+              
 
 
 
@@ -414,7 +427,7 @@ export class Application3D {
 
         let roomInited=false
         newRoom.onStateChange.add(() => {
-           // console.log("state changed room ", name ,newRoom.state) 
+            console.log("state changed room ", name ,newRoom.state) 
             regionEl.setAttribute("position", `${newRoom.state.position.x} ${newRoom.state.position.y} ${newRoom.state.position.z} `)
 
             if (newRoom.state.data)
@@ -457,43 +470,44 @@ export class Application3D {
             this.activeRoom.removeListener(this._axisListener);
             this.loop(this.activeRoom);
 
-        } else {
+        } /* else {
             // update entities position directly when they arrive
             this._axisListener = this.activeRoom.listen("entities/:id/:axis", (change: DataChange) => {
                 entitiesInRoom[change.path.id][change.path.axis] = change.value;
             }, true);
-        }
+        }*/
     }
 
     loop(room) {
 
 
         const entitiesInRoom = this.roomEntitiesMap[room.sessionId]
+   
+
 
 
         for (let id in entitiesInRoom) {
 
-
             const entity = entitiesInRoom[id]
             const new_entity = room.state.entities[id]
-
 
             entity.position.x = lerp(entity.position.x, new_entity.position.x, 0.2);
             entity.position.y = lerp(entity.position.y, new_entity.position.y, 0.2);
             entity.position.z = lerp(entity.position.z, new_entity.position.z, 0.2);
 
-            /*entity.position.x =new_entity.position.x
+            /*
+            entity.position.x =new_entity.position.x
             entity.position.y = new_entity.position.y
             entity.position.z = new_entity.position.z
             */
-
+    
 
             entity.rotation.x = new_entity.rotation.x// lerp(entity.rotation.x, new_entity.rotation.x, 0.2);
             entity.rotation.y = new_entity.rotation.y + Math.PI// lerp(entity.rotation.y, new_entity.rotation.y, 0.2);
             entity.rotation.z = new_entity.rotation.z //lerp(entity.rotation.z, new_entity.rotation.z, 0.2);
 
 
-            entity.scale.set(new_entity.radius, new_entity.radius, new_entity.radius)
+          //  entity.scale.set(new_entity.radius, new_entity.radius, new_entity.radius)
 
 
         }

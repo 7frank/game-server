@@ -1,15 +1,26 @@
 import { nosync } from "colyseus";
-import bodyParser = require("body-parser");
 import { BaseEntity } from "../region/BaseEntity";
 
+const NodePhysijs = require('nodejs-physijs');
+const THREE = NodePhysijs.THREE;
+
+
 export
-enum EntityType
-{
-    kinematic="kinematic",
-    static="static",
-    dynamic="dynamic"
+    enum EntityType {
+    kinematic = "kinematic",
+    static = "static",
+    dynamic = "dynamic"
 
 }
+
+const roundTo = (val) => Math.round(val * 100) / 100;
+
+const vectorRoundTo = (val) => ({
+    x: roundTo(val.x),
+    y: roundTo(val.y),
+    z: roundTo(val.z),
+});
+
 
 export class Entity extends BaseEntity {
 
@@ -18,20 +29,19 @@ export class Entity extends BaseEntity {
         return this.body.rotation
     }
 
-    radius: number;
+    dimesions:THREE.Vector3
 
-    type:EntityType=EntityType.dynamic;
+    boundingBox: THREE.Box3
 
-    toJSON(){
+    type: EntityType = EntityType.dynamic;
 
+    toJSON() {
         return {
-            position:this.position,
-            rotation:this.rotation,
-            dimensions:this.body.scale,
-            type:this.type,
-            radius:this.radius
+            position: vectorRoundTo(this.position),
+            rotation: vectorRoundTo(this.rotation),
+            dimensions: vectorRoundTo(this.dimesions),
+            type: this.type
         }
-
     }
 
 
@@ -42,14 +52,13 @@ export class Entity extends BaseEntity {
     @nosync angle: number = 0;
     @nosync speed = 0;
 
-    constructor(body, radius: number) {
+    constructor(body) {
         super()
 
         this.body = body
         this.position = this.body.position
-       // this.rotation = this.body.rotation
 
-        this.radius = radius;
+        // this.rotation = this.body.rotation
     }
 
     static distance(a: Entity, b: Entity) {

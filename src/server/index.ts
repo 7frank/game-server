@@ -33,7 +33,7 @@ const gameServer = new colyseus.Server({ server: http.createServer(app) });
 // this way we can have multiple stateless node instances have run in parallel (maybe spawning rooms on demand) instead of one monolith
 gameServer.register("arena", ArenaRoom);
 gameServer.register("aframe-region-1", AFramePhysicsRoom, {
-    boxCount: 10,
+    boxCount: 50,
     position: { x: 0, y: 0, z: 0 },
     boundingBox: {
         min: { x: -5, y: 0, z: -5 },

@@ -9,7 +9,7 @@ const Physijs = NodePhysijs.Physijs(THREE, Ammo);
 import { nosync } from "colyseus";
 
 
-const DEFAULT_PLAYER_RADIUS = 1;
+
 
 
 import { createDemo } from "./demo"
@@ -22,15 +22,12 @@ export class State extends RegionState {
   entities: { [id: string]: Entity } = {};
 
   @nosync
-  maxFoodCount=20
-  data="";
+  maxFoodCount = 20
+  data = "";
 
 
-
-
-  toJSON():object
-  {
-     return Object.assign(super.toJSON(),{data:this.data,entities:this.entities})
+  toJSON(): object {
+    return Object.assign(super.toJSON(), { data: this.data, entities: this.entities })
   }
 
   @nosync
@@ -44,9 +41,6 @@ export class State extends RegionState {
 
 
     // create some food entities
-    /*   for (let i = 0; i < 50; i++) {
-         this.createFood();
-       }*/
     let i = 0
     setInterval(() => {
       i++;
@@ -63,7 +57,11 @@ export class State extends RegionState {
 
     const pos = new THREE.Vector3(getRandomInt(this.boundingBox.min.x, this.boundingBox.max.x), 2, getRandomInt(this.boundingBox.min.z, this.boundingBox.max.z))
 
-    const food = new Entity(this.demoPhysics.addEntity(pos, 1), 0.5);
+    const dimensions=[1,1,1]
+
+    const food = new Entity(this.demoPhysics.addEntity(pos,dimensions, 10));
+
+    food.dimesions=new THREE.Vector3(...dimensions)
 
     const id = nanoid()
     this.entities[id] = food;
@@ -72,17 +70,19 @@ export class State extends RegionState {
 
   createPlayer(sessionId: string) {
 
-    const pos = new THREE.Vector3(Math.random() * this.width,2 , Math.random() * this.height)
+   // const pos = new THREE.Vector3(Math.random() * this.width, 2, Math.random() * this.height)
+    const pos = new THREE.Vector3(0, 0, 0)
+    const dimensions=[1,2,1]
+    const body = this.demoPhysics.addEntity(pos,dimensions, 1)
 
-    const body = this.demoPhysics.addEntity(pos, 1)
-
-    body.scale.set(1,2,1)
 
     body.setLinearFactor(new THREE.Vector3(0, 0, 0))
     body.setAngularFactor(new THREE.Vector3(0, 0, 0))
-    const player = new Entity(body,
-      DEFAULT_PLAYER_RADIUS
-    );
+    const player = new Entity(body);
+    player.dimesions=new THREE.Vector3(...dimensions)
+
+    
+
 
     player.type = EntityType.kinematic
 
@@ -97,6 +97,6 @@ export class State extends RegionState {
 
     // TODO instead of relying on super boundingBox behaviour we could reflect entities at boundingBox via physics
     super.update()
-  
+
   }
 }

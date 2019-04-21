@@ -46,10 +46,10 @@ export function createDemo() {
             scene.simulate(timeStep, maxSubSteps);
 
         },
-        addEntity: (position,mass?: number) => {
+        addEntity: (position,dimensions=[1,1,1],mass?: number) => {
 
             const box_falling = new Physijs.BoxMesh(
-                new THREE.CubeGeometry(1, 1, 1),
+                new THREE.CubeGeometry(...dimensions),
                 new THREE.MeshBasicMaterial({ color: 0x888888 }),
                 mass
             );
