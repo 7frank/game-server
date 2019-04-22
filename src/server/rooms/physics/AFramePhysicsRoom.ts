@@ -28,6 +28,33 @@ const roomTemplate = `
 export class AFramePhysicsRoom extends Room<State> {
 
 
+  constructor(...args) {
+    super(...args)
+
+    this.addListener(MessageTypes.playerMove, (player,data) => {
+
+     // console.log(command,data)
+     player.body.__dirtyPosition = true;
+     player.position.copy(data)
+
+
+    })
+
+
+    this.addListener(MessageTypes.playerRotate, (player,data) => {
+      player.body.__dirtyRotation = true;
+      player.body.rotation.copy(data)
+     })
+
+    // TODO example state machine if (onground||jump1) => jump
+     this.addListener(MessageTypes.playerJump, (player,data) => {
+     //TODO
+     })
+
+
+
+  }
+
 
   onInit(options) {
 
@@ -78,31 +105,8 @@ export class AFramePhysicsRoom extends Room<State> {
       console.log("DEAD PLAYER ACTING...");
       return;
     }
-
     const [command, data] = message;
-    // change angle
-    if (command === "mouse") {
-
-      const dst = Entity.distance(entity, { position: data } as Entity);
-      entity.speed = (dst < 20) ? 0 : Math.min(dst / 10, 6);
-      entity.angle = Math.atan2(entity.position.y - data.y, entity.position.x - data.x);
-    }
-    else if (command === MessageTypes.playerMove) {
-      // console.log(command,data)
-      entity.body.__dirtyPosition = true;
-      entity.position.copy(data)
-    
-    }
-    else if (command === MessageTypes.playerRotate) {
-      // console.log(command,data)
-      entity.body.__dirtyRotation = true;
-      entity.body.rotation.copy(data)
-    }
-
-
-
-
-
+    this.emit(command,entity,data)
   }
 
   onLeave(client: Client) {
