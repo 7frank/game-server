@@ -37,7 +37,7 @@ export class State extends RegionState {
 
     super()
 
-    this.demoPhysics = createDemo()
+    this.demoPhysics = createDemo(this.boundingBox)
 
 
     // create some food entities
@@ -96,7 +96,7 @@ export class State extends RegionState {
     this.demoPhysics.update()
 
     // TODO instead of relying on super boundingBox behaviour we could reflect entities at boundingBox via physics
-    super.update()
+   // super.update()
 
   }
 }
