@@ -6,7 +6,7 @@ const Ammo = NodePhysijs.Ammo;
 const Physijs = NodePhysijs.Physijs(THREE, Ammo);
 
 
-
+export 
 function roomPlanesFromBoundingBox(boundingBox: THREE.Box3) {
     Object.values(boundingBox.min)
     Object.values(boundingBox.max)
@@ -73,7 +73,7 @@ function roomPlanesFromBoundingBox(boundingBox: THREE.Box3) {
     return planes
 }
 
-
+export 
 function createBasicPhysicsMaterial() {
 
     var friction = 0.8; // high friction

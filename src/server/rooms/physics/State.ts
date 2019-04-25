@@ -10,8 +10,6 @@ import { nosync } from "colyseus";
 
 
 
-
-
 import { createDemo } from "./demo"
 import { RegionState } from "../region/RegionState";
 import { getRandomInt } from "../../util";
@@ -24,6 +22,7 @@ export class State extends RegionState {
   @nosync
   maxFoodCount = 20
   data = "";
+
 
 
   toJSON(): object {
