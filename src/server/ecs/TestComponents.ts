@@ -4,6 +4,17 @@ import { DynamicBody } from "./PhysicsSystem";
 const NodePhysijs = require('nodejs-physijs');
 const THREE = NodePhysijs.THREE;
 
+import * as nanoid from 'nanoid'
+import { Vector3 } from "three";
+
+
+export
+    class BaseProperties3D implements Component {
+    static readonly tag = "core/BaseEntity3D";
+    position: THREE.Vector3 = new THREE.Vector3
+    rotation: THREE.Vector3 = new THREE.Vector3
+}
+
 
 export
     class PositionComponent extends THREE.Vector3 implements Component {
@@ -24,8 +35,8 @@ export
     class TemplateComponent implements Component {
     static readonly tag = "core/TemplateComponent";
 
-    data:string="<a-box></a-box>";
-    
+    data: string = "<a-box></a-box>";
+
 }
 
 
@@ -50,19 +61,45 @@ export
 
 }
 
+class SerializableEntity extends Entity {
 
-export
-    class Actor extends Entity {
 
     constructor() {
         super()
-        this.putComponent(PositionComponent)
-        this.putComponent(Inventory)
+        this.id = nanoid();
+    }
 
+
+    toJSON() {
+        const res = { name: this.constructor.name, id: this.id }
+
+        this.listComponents().forEach(c => res[c.constructor.name] = c)
+
+
+        return res
+
+    }
+
+}
+
+
+
+
+
+
+export
+    class Actor extends SerializableEntity {
+
+    constructor() {
+        super()
+       // this.putComponent(BaseProperties3D)
+        this.putComponent(Inventory)
         this.putComponent(DynamicBody)
 
 
     }
+
+
 
 
 }

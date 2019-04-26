@@ -21,8 +21,6 @@ const THREE = NodePhysijs.THREE;
 //----------------------------------
 
 
-
-
 //const gravity = new GravitySystem();
 //engine.addSystem(gravity)
 
@@ -34,15 +32,27 @@ const physics = new PhysicsSystem();
 const entity2 = new Actor()
 
 
+const test=entity2.toJSON()
+console.log("json",test)
+export
 const room = new Room(new THREE.Box3)
 room.addSystem(physics)
 
-
-
 room.addEntity(entity2)
 
+let i = 0
+setInterval(() => {
+  i++;
+
+  if (i > 20) return
+  const block = new Actor()
+  //physics.addEntity(block)
+  room.addEntity(block)
+}, 200)
 
 
-setInterval((t) => room.update(t), 500)
+
+
+//setInterval((t) => room.update(t), 500)
 
 

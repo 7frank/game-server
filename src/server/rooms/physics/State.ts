@@ -13,6 +13,7 @@ import { nosync } from "colyseus";
 import { createDemo } from "./demo"
 import { RegionState } from "../region/RegionState";
 import { getRandomInt } from "../../util";
+import { room } from "../../ecs";
 
 export class State extends RegionState {
 
@@ -24,9 +25,20 @@ export class State extends RegionState {
   data = "";
 
 
+  escEngine
+
 
   toJSON(): object {
-    return Object.assign(super.toJSON(), { data: this.data, entities: this.entities })
+
+
+    const res = { }
+
+    this.escEngine._entities.forEach(c => res[c.id] = c)
+
+
+    return Object.assign(super.toJSON(), { data: this.data,
+      // entities: this.entities,
+       entities:res })
   }
 
   @nosync
@@ -37,6 +49,10 @@ export class State extends RegionState {
     super()
 
     this.demoPhysics = createDemo(this.boundingBox)
+
+    
+
+   this.escEngine = room
 
 
     // create some food entities
@@ -92,7 +108,10 @@ export class State extends RegionState {
 
   update() {
 
-    this.demoPhysics.update()
+   // this.demoPhysics.update()
+
+   this.escEngine.update()
+
 
     // TODO instead of relying on super boundingBox behaviour we could reflect entities at boundingBox via physics
    // super.update()

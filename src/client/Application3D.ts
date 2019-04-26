@@ -7,6 +7,7 @@ import { create } from "domain";
 import { MessageTypes } from "../common/types";
 import { Hotkeys } from "@nk11/keyboard-interactions";
 import { FPSCtrl } from "./FPSCtrl";
+import { BaseProperties3D } from "../server/ecs/TestComponents";
 
 const PLAYER_SIZE = 1.8
 // @ts-ignore
@@ -288,14 +289,16 @@ export class Application3D {
 
         // add / removal of entities
         room.listen("entities/:id", (change: DataChange) => {
+console.log("DataChange:",change)
+
             if (change.operation === "add") {
-                const color = (change.value.type == "kinematic")
+                const color = (change.value.KinematicBody)
                     ? 0xff0000
                     : 0xFFFF0B;
 
                 const isCurrentPlayer = change.path.id === room.sessionId
 
-                const isPlayerCharacter = change.value.type == "kinematic"
+                const isPlayerCharacter = change.value.KinematicBody!=undefined
 
 
                 if (isPlayerCharacter) {
@@ -313,7 +316,8 @@ export class Application3D {
 
                     entitiesInRoom[change.path.id] = el.object3D
 
-                    el.object3D.position.copy(change.value.position);
+                    if (change.value.BaseProperties3D)
+                    el.object3D.position.copy(change.value.BaseProperties3D.position);
 
 
 
@@ -332,6 +336,8 @@ export class Application3D {
                     })
 
 
+                    // FIXME Dimensions
+                    change.value.dimensions={x:1,y:2,z:1}
 
                     //bounding box
                     var box = new THREE.Box3();
@@ -354,10 +360,13 @@ export class Application3D {
                     // have timeout so that lerp later does work as intended
                     setTimeout(() => {
 
+                        if (change.value.BaseProperties3D)
+                        graphics.position.copy(change.value.BaseProperties3D.position);
+    
 
-                        graphics.position.copy(change.value.position)
 
-
+                    // FIXME Dimensions
+                    change.value.dimensions={x:1,y:1,z:1}
 
                         graphics.scale.copy(change.value.dimensions)
 
@@ -451,6 +460,8 @@ export class Application3D {
         let roomInited = false
         newRoom.onStateChange.add(() => {
             // console.log("state changed room ", name ,newRoom.state) 
+window['StateChange']=newRoom.state
+
             regionEl.setAttribute("position", `${newRoom.state.position.x} ${newRoom.state.position.y} ${newRoom.state.position.z} `)
 
             if (newRoom.state.data)
@@ -512,20 +523,25 @@ export class Application3D {
             const entity = entitiesInRoom[id]
             const new_entity = room.state.entities[id]
 
-            entity.position.x = lerp(entity.position.x, new_entity.position.x, 0.2);
-            entity.position.y = lerp(entity.position.y, new_entity.position.y, 0.2);
-            entity.position.z = lerp(entity.position.z, new_entity.position.z, 0.2);
+            if (!new_entity.BaseProperties3D) return 
+
+            const newPosition=new_entity.BaseProperties3D.position
+            const newRotation=new_entity.BaseProperties3D.rotation
+
+            entity.position.x = lerp(entity.position.x, newPosition.x, 0.2);
+            entity.position.y = lerp(entity.position.y, newPosition.y, 0.2);
+            entity.position.z = lerp(entity.position.z, newPosition.z, 0.2);
 
             /*
-            entity.position.x =new_entity.position.x
-            entity.position.y = new_entity.position.y
-            entity.position.z = new_entity.position.z
+            entity.position.x =newPosition.x
+            entity.position.y = newPosition.y
+            entity.position.z = newPosition.z
             */
 
 
-            entity.rotation.x = new_entity.rotation.x// lerp(entity.rotation.x, new_entity.rotation.x, 0.2);
-            entity.rotation.y = new_entity.rotation.y + Math.PI// lerp(entity.rotation.y, new_entity.rotation.y, 0.2);
-            entity.rotation.z = new_entity.rotation.z //lerp(entity.rotation.z, new_entity.rotation.z, 0.2);
+            entity.rotation.x = newRotation.x// lerp(entity.rotation.x, newRotation.x, 0.2);
+            entity.rotation.y = newRotation.y + Math.PI// lerp(entity.rotation.y, newRotation.y, 0.2);
+            entity.rotation.z = newRotation.z //lerp(entity.rotation.z, newRotation.z, 0.2);
 
 
             //  entity.scale.set(new_entity.radius, new_entity.radius, new_entity.radius)
