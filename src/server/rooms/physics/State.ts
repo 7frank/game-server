@@ -48,7 +48,7 @@ export class State extends RegionState {
 
     super()
 
-    this.demoPhysics = createDemo(this.boundingBox)
+   // this.demoPhysics = createDemo(this.boundingBox)
 
     
 
@@ -70,6 +70,8 @@ export class State extends RegionState {
 
   createFood() {
 
+return 
+
     const pos = new THREE.Vector3(getRandomInt(this.boundingBox.min.x, this.boundingBox.max.x), this.boundingBox.max.y, getRandomInt(this.boundingBox.min.z, this.boundingBox.max.z))
 
     const dimensions=[Math.random()+1,Math.random()+1,Math.random()+1]
@@ -84,6 +86,8 @@ export class State extends RegionState {
   }
 
   createPlayer(sessionId: string) {
+
+return
 
    // const pos = new THREE.Vector3(Math.random() * this.width, 2, Math.random() * this.height)
     const pos = new THREE.Vector3(0, 0, 0)

@@ -36,9 +36,12 @@ const test=entity2.toJSON()
 console.log("json",test)
 export
 const room = new Room(new THREE.Box3)
-room.addSystem(physics)
 
+
+
+room.addSystem(physics)
 room.addEntity(entity2)
+
 
 let i = 0
 setInterval(() => {
@@ -46,7 +49,7 @@ setInterval(() => {
 
   if (i > 20) return
   const block = new Actor()
-  //physics.addEntity(block)
+  physics.addWorldEntity(block)
   room.addEntity(block)
 }, 200)
 

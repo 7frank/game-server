@@ -522,8 +522,11 @@ window['StateChange']=newRoom.state
 
             const entity = entitiesInRoom[id]
             const new_entity = room.state.entities[id]
-
+           
             if (!new_entity.BaseProperties3D) return 
+
+           // console.log("loop",new_entity,!new_entity.BaseProperties3D)
+        
 
             const newPosition=new_entity.BaseProperties3D.position
             const newRotation=new_entity.BaseProperties3D.rotation

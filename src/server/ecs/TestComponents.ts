@@ -10,7 +10,7 @@ import { Vector3 } from "three";
 
 export
     class BaseProperties3D implements Component {
-    static readonly tag = "core/BaseEntity3D";
+    static readonly tag = "core/BaseProperties3D";
     position: THREE.Vector3 = new THREE.Vector3
     rotation: THREE.Vector3 = new THREE.Vector3
 }
