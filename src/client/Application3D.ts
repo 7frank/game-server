@@ -522,10 +522,10 @@ window['StateChange']=newRoom.state
 
             const entity = entitiesInRoom[id]
             const new_entity = room.state.entities[id]
-           
-            if (!new_entity.BaseProperties3D) return 
+          
+            if (!new_entity.BaseProperties3D) break 
 
-           // console.log("loop",new_entity,!new_entity.BaseProperties3D)
+     //  console.log("entitiesInRoom",new_entity,!new_entity.BaseProperties3D)
         
 
             const newPosition=new_entity.BaseProperties3D.position
@@ -555,7 +555,7 @@ window['StateChange']=newRoom.state
         // continue looping if interpolation is still enabled.
         if (this._interpolation) {
             requestAnimationFrame(() => this.loop(room));
-        }
+       }
     }
 }
 

@@ -12,7 +12,7 @@ export
     class BaseProperties3D implements Component {
     static readonly tag = "core/BaseProperties3D";
     position: THREE.Vector3 = new THREE.Vector3
-    rotation: THREE.Vector3 = new THREE.Vector3
+    rotation= {x:0,y:0,z:0,order:"XYZ"}
 }
 
 

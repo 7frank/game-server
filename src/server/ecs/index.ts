@@ -32,30 +32,37 @@ const physics = new PhysicsSystem();
 const entity2 = new Actor()
 
 
-const test=entity2.toJSON()
-console.log("json",test)
+const test = entity2.toJSON()
+
 export
-const room = new Room(new THREE.Box3)
+    function createRoom() {
+        const boundingBox = new THREE.Box3(new THREE.Vector3(-5, 0, -5), new THREE.Vector3(5, 10, 5))
+  
+        const room = new Room(boundingBox)
+    room.addSystem(physics)
+    room.addEntity(entity2)
+
+
+    let i = 0
+    setInterval(() => {
+        i++;
+
+        if (i > 20) return
+        const block = new Actor()
+        physics.addWorldEntity(block)
+        room.addEntity(block)
+    }, 200)
+
+
+    return room
+
+}
 
 
 
-room.addSystem(physics)
-room.addEntity(entity2)
-
-
-let i = 0
-setInterval(() => {
-  i++;
-
-  if (i > 20) return
-  const block = new Actor()
-  physics.addWorldEntity(block)
-  room.addEntity(block)
-}, 200)
 
 
 
 
-//setInterval((t) => room.update(t), 500)
 
 

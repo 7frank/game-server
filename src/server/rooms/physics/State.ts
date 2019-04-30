@@ -9,11 +9,9 @@ const Physijs = NodePhysijs.Physijs(THREE, Ammo);
 import { nosync } from "colyseus";
 
 
-
-import { createDemo } from "./demo"
 import { RegionState } from "../region/RegionState";
 import { getRandomInt } from "../../util";
-import { room } from "../../ecs";
+import { createRoom } from "../../ecs";
 
 export class State extends RegionState {
 
@@ -52,7 +50,7 @@ export class State extends RegionState {
 
     
 
-   this.escEngine = room
+   this.escEngine = createRoom()
 
 
     // create some food entities
