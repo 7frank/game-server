@@ -52,8 +52,6 @@ export
 
 
 
-
-
 export
     class Inventory implements Component {
     static readonly tag = "core/Inventory";
@@ -61,12 +59,13 @@ export
 
 }
 
+export 
 class SerializableEntity extends Entity {
 
 
-    constructor() {
+    constructor(id?:string) {
         super()
-        this.id = nanoid();
+        this.id = id || nanoid();
     }
 
 
@@ -85,10 +84,26 @@ class SerializableEntity extends Entity {
 
 
 
+export
+    class Player extends SerializableEntity {
+
+    constructor(id:string) {
+        super(id)
+        this.putComponent(BaseProperties3D)
+        this.putComponent(Inventory)
+        this.putComponent(DynamicBody)
+
+
+    }
+
+
+
+
+}
 
 
 export
-    class Actor extends SerializableEntity {
+    class NPC extends SerializableEntity {
 
     constructor() {
         super()
@@ -115,6 +130,23 @@ export
 
 
 }
+
+/**
+ * spawn points should be used to spawn players & players
+ */
+export
+    class SpawnPoint extends SerializableEntity {
+
+    constructor() {
+        super()
+        this.putComponent(BaseProperties3D)
+    }
+
+
+
+
+}
+
 
 
 

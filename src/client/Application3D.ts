@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js";
 import * as Viewport from "pixi-viewport";
 import { Client, DataChange } from "colyseus.js";
-import { State } from "../server/rooms/physics/State"
+
 import { Room } from "colyseus";
 import { create } from "domain";
 import { MessageTypes } from "../common/types";
@@ -145,6 +145,7 @@ export class Application3D {
                    console.log(direction,evt.detail)
                    lastPosition=evt.detail
                    */
+              
                 this.activeRoom.send([MessageTypes.playerMove, evt.detail]);
             }
         });
@@ -289,16 +290,26 @@ export class Application3D {
 
         // add / removal of entities
         room.listen("entities/:id", (change: DataChange) => {
-console.log("DataChange:",change)
+            console.log("DataChange:", change)
 
             if (change.operation === "add") {
-                const color = (change.value.KinematicBody)
-                    ? 0xff0000
-                    : 0xFFFF0B;
+                /*   const color = (change.value.KinematicBody)
+                       ? 0xff0000
+                       : 0xFFFF0B;*/
+
+                let color;
+                switch (change.value.name) {
+                    case "Player": color = 0xff0000; break;
+                    case "NPC": color = 0xFFFF0B; break;
+                    default: color = 0x000000; break;
+                }
+
+
+
 
                 const isCurrentPlayer = change.path.id === room.sessionId
 
-                const isPlayerCharacter = change.value.KinematicBody!=undefined
+                const isPlayerCharacter = change.value.name=="Player" // change.value.KinematicBody != undefined
 
 
                 if (isPlayerCharacter) {
@@ -317,7 +328,7 @@ console.log("DataChange:",change)
                     entitiesInRoom[change.path.id] = el.object3D
 
                     if (change.value.BaseProperties3D)
-                    el.object3D.position.copy(change.value.BaseProperties3D.position);
+                        el.object3D.position.copy(change.value.BaseProperties3D.position);
 
 
 
@@ -337,7 +348,7 @@ console.log("DataChange:",change)
 
 
                     // FIXME Dimensions
-                    change.value.dimensions={x:1,y:2,z:1}
+                    change.value.dimensions = { x: 1, y: 2, z: 1 }
 
                     //bounding box
                     var box = new THREE.Box3();
@@ -361,12 +372,12 @@ console.log("DataChange:",change)
                     setTimeout(() => {
 
                         if (change.value.BaseProperties3D)
-                        graphics.position.copy(change.value.BaseProperties3D.position);
-    
+                            graphics.position.copy(change.value.BaseProperties3D.position);
 
 
-                    // FIXME Dimensions
-                    change.value.dimensions={x:1,y:1,z:1}
+
+                        // FIXME Dimensions
+                        change.value.dimensions = { x: 1, y: 1, z: 1 }
 
                         graphics.scale.copy(change.value.dimensions)
 
@@ -380,14 +391,18 @@ console.log("DataChange:",change)
                     //bounding box
                     var box = new THREE.Box3();
                     //box.setFromCenterAndSize(new THREE.Vector3(0, 0, 0), new THREE.Vector3().copy(change.value.dimensions));
-                    box.setFromCenterAndSize(new THREE.Vector3(0, 0, 0), new THREE.Vector3(1,1,1));
-                
+                    box.setFromCenterAndSize(new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 1, 1));
+
                     var helper = new THREE.Box3Helper(box, 0xffff00);
                     entitiesInRoom[change.path.id].add(helper);
 
 
 
                 }
+
+
+
+                entitiesInRoom[change.path.id].el.append(parseHTML(`<a-text position="0 2 0" color="${'#'+color.toString(16)}" value="${change.value.name}: ${change.path.id.substring(0, 5)}"></a-text>`))
 
 
 
@@ -460,7 +475,7 @@ console.log("DataChange:",change)
         let roomInited = false
         newRoom.onStateChange.add(() => {
             // console.log("state changed room ", name ,newRoom.state) 
-window['StateChange']=newRoom.state
+            window['StateChange'] = newRoom.state
 
             regionEl.setAttribute("position", `${newRoom.state.position.x} ${newRoom.state.position.y} ${newRoom.state.position.z} `)
 
@@ -522,14 +537,14 @@ window['StateChange']=newRoom.state
 
             const entity = entitiesInRoom[id]
             const new_entity = room.state.entities[id]
-          
-            if (!new_entity.BaseProperties3D) break 
 
-     //  console.log("entitiesInRoom",new_entity,!new_entity.BaseProperties3D)
-        
+            if (!new_entity.BaseProperties3D) break
 
-            const newPosition=new_entity.BaseProperties3D.position
-            const newRotation=new_entity.BaseProperties3D.rotation
+            //  console.log("entitiesInRoom",new_entity,!new_entity.BaseProperties3D)
+
+
+            const newPosition = new_entity.BaseProperties3D.position
+            const newRotation = new_entity.BaseProperties3D.rotation
 
             entity.position.x = lerp(entity.position.x, newPosition.x, 0.2);
             entity.position.y = lerp(entity.position.y, newPosition.y, 0.2);
@@ -555,7 +570,7 @@ window['StateChange']=newRoom.state
         // continue looping if interpolation is still enabled.
         if (this._interpolation) {
             requestAnimationFrame(() => this.loop(room));
-       }
+        }
     }
 }
 

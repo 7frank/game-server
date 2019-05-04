@@ -1,7 +1,9 @@
 import { Room, Client } from "colyseus";
-import { Entity } from "./Entity";
-import { State } from "./State";
+
 import { MessageTypes } from "../../../common/types"
+import { Player, BaseProperties3D } from "../../ecs/TestComponents";
+import { DynamicBody } from "../../ecs/PhysicsSystem";
+import { RegionState } from "../region/RegionState";
 
 const roomTemplate = `
 <a-scene physics="debug: true">
@@ -25,31 +27,44 @@ const roomTemplate = `
 `
 
 
-export class AFramePhysicsRoom extends Room<State> {
+export class AFramePhysicsRoom extends Room<RegionState> {
 
 
   constructor(...args) {
     super(...args)
 
-    this.addListener(MessageTypes.playerMove, (player,data) => {
 
-     // console.log(command,data)
-     player.body.__dirtyPosition = true;
-     player.position.copy(data)
+
+
+    this.addListener(MessageTypes.playerMove, (player: Player, data) => {
+
+
+      if (player.hasComponent(DynamicBody)) {
+        const body = player.getComponent(DynamicBody).body
+        if (!body) return // waiting for physics to init body
+        // console.log(player,data)
+        body.__dirtyPosition = true;
+        body.position.copy(data)
+      }
+      else if (player.hasComponent(BaseProperties3D)) {
+        const position = player.getComponent(BaseProperties3D).position
+
+        position.copy(data)
+      }
 
 
     })
 
 
-    this.addListener(MessageTypes.playerRotate, (player,data) => {
-      player.body.__dirtyRotation = true;
-      player.body.rotation.copy(data)
-     })
+    this.addListener(MessageTypes.playerRotate, (player, data) => {
+      // player.body.__dirtyRotation = true;
+      // player.body.rotation.copy(data)
+    })
 
     // TODO example state machine if (onground||jump1) => jump
-     this.addListener(MessageTypes.playerJump, (player,data) => {
-     //TODO
-     })
+    this.addListener(MessageTypes.playerJump, (player, data) => {
+      //TODO
+    })
 
 
 
@@ -76,7 +91,7 @@ export class AFramePhysicsRoom extends Room<State> {
 
 
 
-    const mState = new State()
+    const mState = new RegionState()
     mState.maxFoodCount = options.boxCount || mState.maxFoodCount
     mState.data = options.data //|| mState.data
     if (options.position)
@@ -94,6 +109,7 @@ export class AFramePhysicsRoom extends Room<State> {
 
   onJoin(client: Client, options: any) {
     console.log("client joined room:", this.roomName, "roomId", this.roomId, "clientId", client.sessionId)
+
     this.state.createPlayer(client.sessionId);
   }
 
@@ -106,14 +122,17 @@ export class AFramePhysicsRoom extends Room<State> {
       return;
     }
     const [command, data] = message;
-    this.emit(command,entity,data)
+
+    this.emit(command, entity, data)
   }
 
   onLeave(client: Client) {
     const entity = this.state.entities[client.sessionId];
 
+    delete this.state.entities[client.sessionId]
+
     // entity may be already dead.
-    if (entity) { entity.dead = true; }
+    // if (entity) { entity.dead = true; }
   }
 
 }

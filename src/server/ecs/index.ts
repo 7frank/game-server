@@ -1,7 +1,7 @@
 import { Engine, Entity } from "@nova-engine/ecs";
 import { GravitySystem } from "./GravitySystem";
 import { PhysicsSystem, DynamicBody } from "./PhysicsSystem";
-import { PositionComponent, VelocityComponent, Actor, Room } from "./TestComponents";
+import { PositionComponent, VelocityComponent, Room, NPC, Player } from "./TestComponents";
 const engine = new Engine();
 
 
@@ -25,22 +25,23 @@ const THREE = NodePhysijs.THREE;
 //engine.addSystem(gravity)
 
 
-const physics = new PhysicsSystem();
 
 
-
-const entity2 = new Actor()
-
-
-const test = entity2.toJSON()
 
 export
     function createRoom() {
+
+        const physics = new PhysicsSystem();
+
+
+
+     
+
         const boundingBox = new THREE.Box3(new THREE.Vector3(-5, 0, -5), new THREE.Vector3(5, 10, 5))
   
         const room = new Room(boundingBox)
     room.addSystem(physics)
-    room.addEntity(entity2)
+
 
 
     let i = 0
@@ -48,7 +49,7 @@ export
         i++;
 
         if (i > 20) return
-        const block = new Actor()
+        const block = new NPC()
         physics.addWorldEntity(block)
         room.addEntity(block)
     }, 200)

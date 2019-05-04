@@ -1,11 +1,12 @@
 import * as nanoid from "nanoid";
-import { BaseEntity } from "./BaseEntity";
 
 const NodePhysijs = require('nodejs-physijs');
 const THREE = NodePhysijs.THREE;
 
 import { nosync } from "colyseus";
 import { getRandomInt } from "../../util";
+import { SerializableEntity, Player, BaseProperties3D } from "../../ecs/TestComponents";
+import { createRoom } from "../../ecs";
 
 
 
@@ -14,68 +15,81 @@ export class RegionState extends THREE.Object3D {
   boundingBox: THREE.Box3;
 
 
-  public entities: { [id: string]: BaseEntity } = {};
+  public entities: { [id: string]: SerializableEntity } = {};
 
 
   children: RegionState[] = []
 
   parent: RegionState = null
 
-   toJSON():object {
-     return {
-       position: this.position,
-       boundingBox:this.boundingBox
-     }
-   }
  
+
+   escEngine
+
+
+   toJSON(): object {
+ 
+ 
+     const res = {}
+ 
+     if (this.escEngine)
+       this.escEngine._entities.forEach(c => res[c.id] = c)
+ 
+ 
+     return Object.assign({
+      position: this.position,
+      boundingBox:this.boundingBox
+    }, {
+       data: this.data,
+       // entities: this.entities,
+       entities: res
+     })
+   }
+
 
   constructor() {
     super()
   //  this.boundingBox = new THREE.Box3(new THREE.Vector3(-500, 0, -500), new THREE.Vector3(500, 200, 500))
   this.boundingBox = new THREE.Box3(new THREE.Vector3(-5, 0, -5), new THREE.Vector3(5, 10, 5))
+
+  this.initRoom();
+
   }
 
+  
+  initRoom() {
+
+    this.escEngine = createRoom()
+    this.entities=this.escEngine._entities
+
+  }  
 
   createPlayer(sessionId: string) {
 
     const pos = new THREE.Vector3(getRandomInt(this.boundingBox.min.x, this.boundingBox.max.x), 2, getRandomInt(this.boundingBox.min.z, this.boundingBox.max.z))
-    const player = new BaseEntity();
-    player.canChangeRooms = true
+    const player = new Player(sessionId);
 
+    const props=player.getComponent(BaseProperties3D)
+
+    props.position.copy(pos)
+
+   // player.canChangeRooms = true
+
+    // override auto-id with session id
+   
     this.entities[sessionId] = player
+    this.escEngine.addEntity(player)
+
+
+
+    return player
   }
 
+ 
   update() {
 
-    const deadEntities: string[] = [];
-    for (const sessionId in this.entities) {
-      const entity = this.entities[sessionId];
-
-
-      if (entity.dead) {
-        deadEntities.push(sessionId);
-      }
-
-      //restrict movement to within boundingBox
-      if (!this.parent || !entity.canChangeRooms) {
-        // apply boundary limits
-        if (entity.position.x < this.boundingBox.min.x) { entity.position.x = this.boundingBox.min.x }
-        if (entity.position.x >= this.boundingBox.max.x) { entity.position.x = this.boundingBox.max.x }
-
-        if (entity.position.y < this.boundingBox.min.y) { entity.position.y = this.boundingBox.min.y }
-        if (entity.position.y >= this.boundingBox.max.y) { entity.position.y = this.boundingBox.max.y }
-
-        if (entity.position.z < this.boundingBox.min.z) { entity.position.z = this.boundingBox.min.z }
-        if (entity.position.z >= this.boundingBox.max.z) { entity.position.z = this.boundingBox.max.z }
-
-      }
-
-
-    }
-
-    // delete all dead entities
-    deadEntities.forEach(entityId => delete this.entities[entityId]);
-
+    if (this.escEngine)
+      this.escEngine.update()
 
   }
 }

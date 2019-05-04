@@ -8,14 +8,15 @@ const Physijs = NodePhysijs.Physijs(THREE, Ammo);
 
 import { Engine, Family, System, FamilyBuilder, Component } from "@nova-engine/ecs";
 import { VelocityComponent, PositionComponent, Room, BaseProperties3D } from "./TestComponents";
+import { nosync } from "colyseus";
 
 
 
 
 
 
-export 
-function roomPlanesFromBoundingBox(boundingBox: THREE.Box3) {
+export
+    function roomPlanesFromBoundingBox(boundingBox: THREE.Box3) {
     Object.values(boundingBox.min)
     Object.values(boundingBox.max)
 
@@ -81,8 +82,8 @@ function roomPlanesFromBoundingBox(boundingBox: THREE.Box3) {
     return planes
 }
 
-export 
-function createBasicPhysicsMaterial() {
+export
+    function createBasicPhysicsMaterial() {
 
     var friction = 0.8; // high friction
     var restitution = 0.3; // low restitution
@@ -97,6 +98,14 @@ function createBasicPhysicsMaterial() {
 }
 
 
+
+export
+    class PhysicsBody implements Component {
+    static readonly tag = "core/PhysicsBody";
+
+}
+
+
 export
     class DynamicBody implements Component {
     static readonly tag = "core/DynamicBody";
@@ -105,7 +114,13 @@ export
     friction: number = 1;
     restitution: number = 0.1
 
+    @nosync
+    body: any = null // Physijs body
 }
+
+
+
+
 
 export
     class PhysicsSystem extends System {
@@ -136,15 +151,15 @@ export
 
         // this.world=createDemo(engine.boundingBox)
         this.world = new Physijs.Scene();
-            
-        
+
+
         // FIXME calling simulate in update loop will leak mem        
         let render;
-            render = () => {
-                this.world.simulate() // run physics
-                setTimeout( render, 20 );
-            };
-            render()
+        render = () => {
+            this.world.simulate() // run physics
+            setTimeout(render, 20);
+        };
+        render()
 
 
         // FIXME no longer working  all the time
@@ -153,9 +168,9 @@ export
 
 
         // Families are an easy way to have groups of entities with some criteria.
-        this.family = new FamilyBuilder(engine).include(DynamicBody,BaseProperties3D).build();
+        this.family = new FamilyBuilder(engine).include(DynamicBody, PhysicsBody).build();
 
-        this.notInitializedEntities = new FamilyBuilder(engine).include(DynamicBody).exclude(BaseProperties3D).build();
+        this.notInitializedEntities = new FamilyBuilder(engine).include(DynamicBody).exclude(PhysicsBody).build();
 
 
 
@@ -163,7 +178,7 @@ export
 
     }
 
-// TODO addEntity(entity:BaseProperties3D,bb:BoundingBox, props: DynamicBody)
+    // TODO addEntity(entity:BaseProperties3D,bb:BoundingBox, props: DynamicBody)
     addWorldEntity(position, dimensions = [1, 1, 1], mass?: number) {
 
         const material = createBasicPhysicsMaterial()
@@ -173,12 +188,12 @@ export
             material,
             mass
         );
-       /* box_falling.rotation.set(
-            Math.random() * Math.PI * 2,
-            Math.random() * Math.PI * 2,
-            Math.random() * Math.PI * 2
-        );
-*/
+        /* box_falling.rotation.set(
+             Math.random() * Math.PI * 2,
+             Math.random() * Math.PI * 2,
+             Math.random() * Math.PI * 2
+         );
+ */
 
 
         box_falling.position.copy(position)
@@ -193,31 +208,41 @@ export
 
         for (let entity of this.family.entities) {
 
-                const position = entity.getComponent(BaseProperties3D).position;
-                const rotation = entity.getComponent(BaseProperties3D).rotation;
-                
-                if (entity==this.family.entities[0])
-                console.log("physics first entry", rotation)
- 
+            const prop = entity.getComponent(BaseProperties3D)
+            const position = prop.position;
+            const rotation = entity.getComponent(BaseProperties3D).rotation;
+
+            //  if (entity==this.family.entities[0])
+            //  {
+            //  console.log("physics first entry", rotation, this.world.children[0].rotation)
+            //  entity.getComponent(BaseProperties3D).rotation=prop.rotation
+            //  }
         }
 
         for (let entity of this.notInitializedEntities.entities) {
-  
-                // You can create components on an entity easily.
-               const props= entity.putComponent(BaseProperties3D);
-               props.position.y=5
-              const physicsFU=  this.addWorldEntity(props.position,[1,1,1],1)
-                props.position=physicsFU.position
-                props.rotation=physicsFU.rotation
 
-            
+            entity.putComponent(PhysicsBody);
+
+            // You can create components on an entity easily.
+
+            if (!entity.hasComponent(BaseProperties3D))
+                entity.putComponent(BaseProperties3D)
+
+
+            const props = entity.getComponent(BaseProperties3D);
+            props.position.y = 5
+            const physicsFU = this.addWorldEntity(props.position, [1, 1, 1], 1)
+            props.position = physicsFU.position
+            props.rotation = physicsFU.rotation
+
+            entity.getComponent(DynamicBody).body = physicsFU;
         }
 
-        
 
 
-      
-      //  this.updateWorld()
+
+
+        //  this.updateWorld()
 
     }
 }
