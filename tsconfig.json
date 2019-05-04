@@ -9,6 +9,7 @@
         "noImplicitAny": false,
         "sourceMap": false,
         "allowSyntheticDefaultImports": true
+        
     },
     "include": [
       "src/server/**/*.ts", "src/server/jsdom-global/jsdom-global.ts"

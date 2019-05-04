@@ -31,6 +31,19 @@ const gameServer = new colyseus.Server({ server: http.createServer(app) });
 // TODO we'll need a broker that connects actual rooms and regions with each other
 // this way we can have multiple stateless node instances have run in parallel (maybe spawning rooms on demand) instead of one monolith
 
+
+/*
+gameServer.register("world-server-1", AFramePhysicsRoom, {
+    position: { x: 0, y: 0, z: 0 },
+    boundingBox: {
+        min: { x: -5000, y: 0, z: -5000 },
+        max: { x: 5000, y: 10, z: 5000 }
+    },
+    data: `<a-box  width="10000" height="0.01" depth="10000" color="white" shadow></a-box> `
+});
+*/
+
+
 gameServer.register("aframe-region-1", AFramePhysicsRoom, {
     boxCount: 50,
     position: { x: 0, y: 0, z: 0 },

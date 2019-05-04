@@ -5,8 +5,59 @@ const THREE = NodePhysijs.THREE;
 
 import { nosync } from "colyseus";
 import { getRandomInt } from "../../util";
-import { SerializableEntity, Player, BaseProperties3D } from "../../ecs/TestComponents";
-import { createRoom } from "../../ecs";
+import { SerializableEntity,  BaseProperties3D,Room, NPC, Player, SpawnPoint  } from "../../ecs/TestComponents";
+
+import { Engine, Entity } from "@nova-engine/ecs";
+import { PhysicsSystem } from "../../ecs/PhysicsSystem";
+
+
+
+
+
+
+// Components can have custom constructors, but they must be able to be initialized
+// with no arguments, because entities creates the instances for you.
+// Try not to save complex data types in yout components
+
+// If you are making a component library, and want to avoid collitions
+// You can add a tag to your component implementations
+
+
+
+//----------------------------------
+// TODO spawnPoint(entity) extends FPSCtrl that has a tick or update method 
+export
+    function createRoom() {
+
+        const physics = new PhysicsSystem();
+
+
+        const boundingBox = new THREE.Box3(new THREE.Vector3(-5, 0, -5), new THREE.Vector3(5, 10, 5))
+  
+        const room = new Room(boundingBox)
+    room.addSystem(physics)
+
+
+
+ /*   let i = 0
+    setInterval(() => {
+        i++;
+
+        if (i > 20) return
+        const block = new NPC()
+       // physics.addWorldEntity(block)
+        room.addEntity(block)
+    }, 200)
+*/
+
+   const spawnPoint= new SpawnPoint()
+   room.addEntity(spawnPoint)
+
+    return room
+
+}
+
+
 
 
 
@@ -24,7 +75,7 @@ export class RegionState extends THREE.Object3D {
 
  
 
-   escEngine
+   _engine
 
 
    toJSON(): object {
@@ -32,8 +83,8 @@ export class RegionState extends THREE.Object3D {
  
      const res = {}
  
-     if (this.escEngine)
-       this.escEngine._entities.forEach(c => res[c.id] = c)
+     if (this._engine)
+       this._engine._entities.forEach(c => res[c.id] = c)
  
  
      return Object.assign({
@@ -59,8 +110,8 @@ export class RegionState extends THREE.Object3D {
   
   initRoom() {
 
-    this.escEngine = createRoom()
-    this.entities=this.escEngine._entities
+    this._engine = createRoom()
+    this.entities=this._engine._entities
 
   }  
 
@@ -78,7 +129,7 @@ export class RegionState extends THREE.Object3D {
     // override auto-id with session id
    
     this.entities[sessionId] = player
-    this.escEngine.addEntity(player)
+    this._engine.addEntity(player)
 
 
 
@@ -88,8 +139,8 @@ export class RegionState extends THREE.Object3D {
  
   update() {
 
-    if (this.escEngine)
-      this.escEngine.update()
+    if (this._engine)
+      this._engine.update()
 
   }
 }

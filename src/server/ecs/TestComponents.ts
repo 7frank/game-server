@@ -48,6 +48,13 @@ export
         super()
 
     }
+
+
+    addEntity(entity){
+        entity.engine=this
+       return super.addEntity(entity)
+    }
+
 }
 
 
@@ -62,6 +69,8 @@ export
 export 
 class SerializableEntity extends Entity {
 
+    // reference to the containing ecs engine/room 
+    engine:Room;
 
     constructor(id?:string) {
         super()
@@ -137,18 +146,54 @@ export
 export
     class SpawnPoint extends SerializableEntity {
 
+  script:FPSCtrl;
+
+  current=0;
+  max=20;
+
     constructor() {
         super()
         this.putComponent(BaseProperties3D)
+
+
+        this.script=new FPSCtrl(5).start()
+
+        this.script.on('frame',()=> this.update())
+
     }
 
 
+    update()
+    {
+       
+        this.current++;
+
+        if (this.current > 20) return
+        const block = new NPC()
+       this.engine.addEntity(block)
+
+    }
 
 
 }
 
 
+import {FPSCtrl} from '../../common/FPSCtrl'
+
+
+// TODO iterate components of entity and forward entity attribute to be able to handle certain effects on component level
+export
+    class XYZComponent implements Component {
+    static readonly tag = "core/TemplateComponent";
+
+    data: string = "<a-box></a-box>";
+
+    update(mEntity:Entity)
+    {
 
 
 
+        
+    }
 
+}

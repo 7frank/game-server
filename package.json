@@ -25,6 +25,7 @@
     "nodemon": "^1.18.9",
     "pixi-viewport": "^3.17.0",
     "pixi.js": "^5.0.0-rc",
+    "raf": "^3.4.1",
     "ts-loader": "^5.3.3",
     "ts-node": "^8.0.2",
     "typescript": "^3.3.1",
@@ -46,14 +47,13 @@
     "ammojs": "0.0.2",
     "canvas": "^2.4.1",
     "colyseus": "^0.9.26",
-    "eventemitter3": "^3.1.0",
+    "eventemitter3": "^3.1.2",
     "express": "^4.16.4",
     "express-basic-auth": "^1.1.6",
     "fbx2gltf": "^0.9.5",
     "gl": "^4.2.2",
     "jsdom-wc": "^11.0.0-alpha-1",
     "nodejs-physijs": "^0.1.5",
-    "parsehtml": "^1.0.0",
-    "raf": "^3.4.1"
+    "parsehtml": "^1.0.0"
   }
 }
