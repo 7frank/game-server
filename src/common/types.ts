@@ -3,6 +3,8 @@ enum MessageTypes
 {
    playerMove="playerMove",
    playerRotate="playerRotate",
-   playerJump="playerJump"
+   playerJump="playerJump",
+   playerInteractWith="playerInteractWith",
+   playerTalkTo="playerTalkTo"
 
 }

@@ -66,6 +66,12 @@ export class ContainerRoom extends Room<PhysicsContainerState> {
       //TODO
     })
 
+      // TODO example state machine if (onground||jump1) => jump
+      this.addListener(MessageTypes.playerInteractWith, (player, data) => {
+      
+        
+      })
+  
 
 
   }

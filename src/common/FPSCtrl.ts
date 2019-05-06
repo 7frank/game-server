@@ -86,7 +86,7 @@ export class FPSCtrl {
     };
 
 // enable starting/pausing of the object
-    start() {
+    start():FPSCtrl {
 
         if (this.paused) {
             this.paused = false;
@@ -102,7 +102,7 @@ export class FPSCtrl {
      * circumvent fps limit
      * alter 'time' so the next time loop gets called the next frame will be updated
      */
-    forceNext() {
+    forceNext():FPSCtrl {
         this.timestampStart -= this.delay;
         return this;
     };
@@ -119,7 +119,7 @@ export class FPSCtrl {
 
     }
 
-    pause() {
+    pause():FPSCtrl {
 
         if (!this.paused) {
 
@@ -132,7 +132,7 @@ export class FPSCtrl {
         return this;
     };
 
-    stop() {
+    stop():FPSCtrl {
         if (!this.paused) {
             cancelAnimationFrame(this.tref);
             this.paused = true;
@@ -144,14 +144,15 @@ export class FPSCtrl {
 
             this._events.emit("stop")
         }
+        return this;
     };
 
-    on(event, cb) {
+    on(event, cb):FPSCtrl {
         this._events.on(event, cb)
         return this
     }
 
-    off(event, cb) {
+    off(event, cb):FPSCtrl {
         this._events.removeListener(event, cb)
         return this
     }

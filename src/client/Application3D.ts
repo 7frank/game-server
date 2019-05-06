@@ -145,7 +145,7 @@ export class Application3D {
                    console.log(direction,evt.detail)
                    lastPosition=evt.detail
                    */
-              
+
                 this.activeRoom.send([MessageTypes.playerMove, evt.detail]);
             }
         });
@@ -231,6 +231,15 @@ export class Application3D {
         });
 
 
+        Hotkeys.register(MessageTypes.playerInteractWith, 'e', {
+            target: this.sceneEl
+        });
+        Hotkeys().on(MessageTypes.playerInteractWith, (evt) => {
+            this.activeRoom.send([MessageTypes.playerInteractWith, {}]);
+            console.log("interactWith")
+        });
+
+
 
         Hotkeys.register("ChangeChannel", '1', {
             target: this.sceneEl
@@ -293,9 +302,6 @@ export class Application3D {
             console.log("DataChange:", change)
 
             if (change.operation === "add") {
-                /*   const color = (change.value.KinematicBody)
-                       ? 0xff0000
-                       : 0xFFFF0B;*/
 
                 let color;
                 switch (change.value.name) {
@@ -309,7 +315,7 @@ export class Application3D {
 
                 const isCurrentPlayer = change.path.id === room.sessionId
 
-                const isPlayerCharacter = change.value.name=="Player" // change.value.KinematicBody != undefined
+                const isPlayerCharacter = change.value.name == "Player" // change.value.KinematicBody != undefined
 
 
                 if (isPlayerCharacter) {
@@ -355,17 +361,27 @@ export class Application3D {
                     box.setFromCenterAndSize(new THREE.Vector3(0, -PLAYER_SIZE / 2, 0), new THREE.Vector3().copy(change.value.dimensions));
                     var helper = new THREE.Box3Helper(box, 0xffff00);
                     entitiesInRoom[change.path.id].add(helper);
-
+                    entitiesInRoom[change.path.id].boxHelper = helper
 
 
                 }
                 else {
 
+                    const asset = change.value.AssetsComponent
+                    let el;
+                    if (asset) {
+                        const assetEl = parseHTML(` <a-asset-item id="#${asset.id}" src="${asset.src}" animation-mixer="clip: *"></a-asset-item>`)
+                        sceneEl.append(assetEl)
+                        el = createEntityHTML(`#${asset.id}`)
+                        sceneEl.append(el)
+                    }
+                    else {
+                        el = change.value.TemplateComponent ? createEntityFromData(change.value.TemplateComponent.data) : createEntity()
+                        sceneEl.append(el)
 
 
+                    }
 
-                    const el = change.value.TemplateComponent?createEntityFromData(change.value.TemplateComponent.data):createEntity()
-                    sceneEl.append(el)
                     const graphics = el.object3D
                     //  graphics.material.color.setHex(color)
 
@@ -396,14 +412,14 @@ export class Application3D {
 
                     var helper = new THREE.Box3Helper(box, 0xffff00);
                     entitiesInRoom[change.path.id].add(helper);
-
+                    entitiesInRoom[change.path.id].boxHelper = helper
 
 
                 }
 
 
 
-                entitiesInRoom[change.path.id].el.append(parseHTML(`<a-text position="0 2 0" color="${'#'+color.toString(16)}" value="${change.value.name}: ${change.path.id.substring(0, 5)}"></a-text>`))
+                entitiesInRoom[change.path.id].el.append(parseHTML(`<a-text position="0 2 0" color="${'#' + color.toString(16)}" value="${change.value.name}: ${change.path.id.substring(0, 5)}"></a-text>`))
 
 
 
@@ -422,7 +438,29 @@ export class Application3D {
                     o.material.dispose();
                 delete entitiesInRoom[change.path.id];
             }
+
+
         });
+
+
+        room.listen("entities/:id/PhysicsBody", (change: DataChange) => {
+            console.log("entities/:id/PhysicsBody", change)
+
+            const el = entitiesInRoom[change.path.id]
+            el.boxHelper.matierial
+
+            const hasCollisions = change.value.collisions.length != 0
+
+
+
+            if (!el.boxHelper._origColor) el.boxHelper._origColor = el.boxHelper.material.color
+
+            if (hasCollisions)
+                el.boxHelper.material.color.setHex(0xff0000);
+            else
+                el.boxHelper.material.color.set(el.boxHelper._origColor);
+
+        })
 
         room.listen("entities/:id/radius", (change: DataChange) => {
             const color = (change.value < 4) ? 0xff0000 : 0xFFFF0B;

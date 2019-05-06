@@ -12,7 +12,7 @@ export
     class BaseProperties3D implements Component {
     static readonly tag = "core/BaseProperties3D";
     position: THREE.Vector3 = new THREE.Vector3
-    rotation= {x:0,y:0,z:0,order:"XYZ"}
+    rotation = { x: 0, y: 0, z: 0, order: "XYZ" }
 }
 
 // TODO
@@ -21,6 +21,18 @@ export
     static readonly tag = "core/TemplateComponent";
 
     data: string = "<a-sphere></a-box>";
+
+}
+
+
+// TODO
+export
+    class AssetsComponent implements Component {
+    static readonly tag = "core/TemplateComponent";
+
+
+    id = "pineTree"
+    src: string = "https://github.com/waverider404/game-assets/raw/master/Pine_Tree.glb";
 
 }
 
@@ -35,9 +47,9 @@ export
     }
 
 
-    addEntity(entity){
-        entity.engine=this
-       return super.addEntity(entity)
+    addEntity(entity) {
+        entity.engine = this
+        return super.addEntity(entity)
     }
 
 }
@@ -51,13 +63,13 @@ export
 
 }
 
-export 
-class SerializableEntity extends Entity {
+export
+    class SerializableEntity extends Entity {
 
     // reference to the containing ecs engine/room 
-    engine:BaseEngine;
+    engine: BaseEngine;
 
-    constructor(id?:string) {
+    constructor(id?: string) {
         super()
         this.id = id || nanoid();
     }
@@ -73,6 +85,16 @@ class SerializableEntity extends Entity {
 
     }
 
+    distanceTo(otherEntity: Entity) {
+        let mProp = this.getComponent(BaseProperties3D)
+        let oProp = otherEntity.getComponent(BaseProperties3D)
+
+        if (!mProp || !oProp) return Infinity // as no position, distance can't be evaluated
+
+        return mProp.position.distanceTo(oProp.position)
+
+    }
+
 }
 
 
@@ -81,7 +103,7 @@ class SerializableEntity extends Entity {
 export
     class Player extends SerializableEntity {
 
-    constructor(id:string) {
+    constructor(id: string) {
         super(id)
         this.putComponent(BaseProperties3D)
         this.putComponent(Inventory)
@@ -101,10 +123,10 @@ export
 
     constructor() {
         super()
-       // this.putComponent(BaseProperties3D)
+        // this.putComponent(BaseProperties3D)
         this.putComponent(Inventory)
         this.putComponent(DynamicBody)
-    
+
     }
 
 
@@ -130,35 +152,39 @@ export
 export
     class SpawnPoint extends SerializableEntity {
 
-  script:FPSCtrl;
+    script: FPSCtrl;
 
-  current=0;
-  max=20;
+    current = 0;
+    max = 20;
 
     constructor() {
         super()
         this.putComponent(BaseProperties3D)
 
 
-        this.script=new FPSCtrl(5).start()
+        this.script = new FPSCtrl(5).start()
 
-        this.script.on('frame',()=> this.update())
+        this.script.on('frame', () => this.update())
 
     }
 
 
-    update()
-    {
-       
+    update() {
+
         this.current++;
 
         if (this.current > 20) return
         const block = new NPC()
 
-      const color=  '#'+new THREE.Color(Math.random()*255*255*255).getHex().toString(16)
-        block.putComponent(TemplateComponent).data=`<a-sphere radius=0.5 color="${color}"></a-sphere>`
+        const color = '#' + new THREE.Color(Math.random() * 255 * 255 * 255).getHex().toString(16)
 
-       this.engine.addEntity(block)
+        if (this.current % 5 != 0)
+            block.putComponent(TemplateComponent).data = `<a-sphere radius=0.5 color="${color}"></a-sphere>`
+        else
+            block.putComponent(AssetsComponent)
+
+
+        this.engine.addEntity(block)
 
     }
 
@@ -166,22 +192,85 @@ export
 }
 
 
-import {FPSCtrl} from '../../common/FPSCtrl'
+import { FPSCtrl } from '../../common/FPSCtrl'
 
+
+
+interface FOVEntry {
+    distance: number;
+    entity: Entity;
+}
+
+
+
+
+export
+    class ProximityComponent implements Component {
+    static readonly tag = "core/FOVComponent";
+
+    maxDistance = Infinity;
+
+    entries: FOVEntry[] = []
+
+    update(mEntity: SerializableEntity) {
+        this.entries = []
+        for (let otherEntity of mEntity.engine.entities) {
+            const distance = mEntity.distanceTo(otherEntity)
+
+            if (distance < this.maxDistance)
+                this.entries.push({ distance, entity: otherEntity })
+        }
+    }
+}
 
 // TODO iterate components of entity and forward entity attribute to be able to handle certain effects on component level
 export
-    class XYZComponent implements Component {
-    static readonly tag = "core/TemplateComponent";
+    class FOVComponent implements Component {
+    static readonly tag = "core/FOVComponent";
 
-    data: string = "<a-box></a-box>";
+    maxDistance;
 
-    update(mEntity:Entity)
-    {
+    entries: FOVEntry[] = []
+
+    update(mEntity: SerializableEntity) {
+
+        // TODO camera component? or calculate from basePorperties3d?
+        let camera = new THREE.PerpectiveCamera()
+        camera.updateMatrix();
+        camera.updateMatrixWorld();
+        var frustum = new THREE.Frustum();
+        frustum.setFromMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
+
+
+        let props = mEntity.getComponent(BaseProperties3D)
+
+        camera.position.set(props.position)
+        camera.rotation.set(props.rotation)
+
+
+        //get ProximityComponent and its elements
+        const proximity = mEntity.hasComponent(ProximityComponent) ? mEntity.getComponent(ProximityComponent) : mEntity.putComponent(ProximityComponent)
+
+        //find elements within Field of view 
+        for (let other of proximity.entries) {
+            let oProps = other.entity.getComponent(BaseProperties3D)
+            // Your 3d point to check
+            if (frustum.containsPoint(oProps.position)) {
+
+                //  const distance = mEntity.distanceTo(other.entity)
+                // if (distance < this.maxDistance)
+                this.entries.push({ distance: other.distance, entity: other.entity })
+                // }
+
+
+            }
 
 
 
-        
+        }
+
     }
 
-}
+// TODO RayTraceComponent use raytracer from threejs to find elements in front 
+// ProximityComponent find ellements that are in proximity
+// use proximityComponent 

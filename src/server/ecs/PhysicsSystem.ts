@@ -9,6 +9,7 @@ const Physijs = NodePhysijs.Physijs(THREE, Ammo);
 import { Engine, Family, System, FamilyBuilder, Component } from "@nova-engine/ecs";
 import { BaseEngine, BaseProperties3D } from "./TestComponents";
 import { nosync } from "colyseus";
+import { FPSCtrl } from "../../common/FPSCtrl";
 
 
 
@@ -102,6 +103,7 @@ export
 export
     class PhysicsBody implements Component {
     static readonly tag = "core/PhysicsBody";
+    collisions = []
 
 }
 
@@ -153,14 +155,10 @@ export
         this.world = new Physijs.Scene();
 
 
-        // FIXME calling simulate in update loop will leak mem        
-        let render;
-        render = () => {
-            this.world.simulate() // run physics
-            setTimeout(render, 20);
-        };
-        render()
-
+        const script = new FPSCtrl(30).start()
+        script.on("frame", () => {
+            this.world.simulate(undefined, 1)
+        })
 
         // FIXME no longer working  all the time
         const boundingBox = new THREE.Box3(new THREE.Vector3(-5, 0, -5), new THREE.Vector3(5, 10, 5))
@@ -198,6 +196,7 @@ export
 
         box_falling.position.copy(position)
         this.world.add(box_falling);
+
         return box_falling
     }
 
@@ -221,7 +220,7 @@ export
 
         for (let entity of this.notInitializedEntities.entities) {
 
-            entity.putComponent(PhysicsBody);
+            const body = entity.putComponent(PhysicsBody);
 
             // You can create components on an entity easily.
 
@@ -235,7 +234,41 @@ export
             props.position = physicsFU.position
             props.rotation = physicsFU.rotation
 
+            physicsFU._entity = entity
+
             entity.getComponent(DynamicBody).body = physicsFU;
+
+
+
+
+
+            let tempCollisions = []
+            // called whenever "simulate" really triggered a simulation step
+            this.world.addEventListener('update', function () {
+                body.collisions = []
+                body.collisions.push(...tempCollisions)
+                tempCollisions = []
+            });
+
+            physicsFU.addEventListener('collision', function (other_object, relative_velocity, relative_rotation, contact_normal) {
+                // `this` has collided with `other_object` with an impact speed of `relative_velocity` and a rotational force of `relative_rotation` and at normal `contact_normal`
+                //    console.log(other_object, relative_velocity, relative_rotation, contact_normal )
+               if (!other_object._entity) return //TODO handle room and collisions for jumping from ground e.g.
+               
+                tempCollisions.push({
+                    id: other_object._entity.id,
+                    name: other_object._entity.name,
+                    relative_velocity,
+                    relative_rotation,
+                    contact_normal
+                })
+            });
+
+
+
+
+
+
         }
 
 
