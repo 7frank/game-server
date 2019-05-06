@@ -16,7 +16,8 @@ import * as path from "path";
 import * as basicAuth from "express-basic-auth";
 import { monitor } from "@colyseus/monitor";
 
-import { AFramePhysicsRoom } from "./rooms/physics/AFramePhysicsRoom";
+import { ContainerRoom } from "./rooms/physics/ContainerRoom";
+import { PhysicsContainerState } from "./rooms/region/ContainerState";
 
 
 export const port = Number(process.env.PORT || 8080);
@@ -44,7 +45,7 @@ gameServer.register("world-server-1", AFramePhysicsRoom, {
 */
 
 
-gameServer.register("aframe-region-1", AFramePhysicsRoom, {
+gameServer.register("aframe-region-1", ContainerRoom, {
     boxCount: 50,
     position: { x: 0, y: 0, z: 0 },
     boundingBox: {
@@ -53,7 +54,7 @@ gameServer.register("aframe-region-1", AFramePhysicsRoom, {
     },
     data: `<a-box  width="10.5" height="0.1" depth="10.5" color="433F81" shadow></a-box> `
 });
-gameServer.register("aframe-region-2", AFramePhysicsRoom, {
+gameServer.register("aframe-region-2", ContainerRoom, {
     boxCount: 5,
     position: { x: 20, y: 0, z: 0 },
     boundingBox: {

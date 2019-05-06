@@ -363,7 +363,8 @@ export class Application3D {
 
 
 
-                    const el = createEntity()
+
+                    const el = change.value.TemplateComponent?createEntityFromData(change.value.TemplateComponent.data):createEntity()
                     sceneEl.append(el)
                     const graphics = el.object3D
                     //  graphics.material.color.setHex(color)

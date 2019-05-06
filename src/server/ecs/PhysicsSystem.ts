@@ -7,7 +7,7 @@ const Physijs = NodePhysijs.Physijs(THREE, Ammo);
 
 
 import { Engine, Family, System, FamilyBuilder, Component } from "@nova-engine/ecs";
-import { VelocityComponent, PositionComponent, Room, BaseProperties3D } from "./TestComponents";
+import { BaseEngine, BaseProperties3D } from "./TestComponents";
 import { nosync } from "colyseus";
 
 
@@ -144,7 +144,7 @@ export
     }
     // This is called when a system is added to an engine, you may want to
     // startup your families here.
-    onAttach(engine: Room) {
+    onAttach(engine: BaseEngine) {
 
         // Needed to work properly
         super.onAttach(engine);

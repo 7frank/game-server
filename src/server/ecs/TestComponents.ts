@@ -15,33 +15,18 @@ export
     rotation= {x:0,y:0,z:0,order:"XYZ"}
 }
 
-
-export
-    class PositionComponent extends THREE.Vector3 implements Component {
-    static readonly tag = "core/PositionComponent";
-
-}
-
-export
-    class VelocityComponent extends THREE.Vector3 implements Component {
-    static readonly tag = "core/VelocityComponent";
-    x = 0;
-    y = 0;
-}
-
-
 // TODO
 export
     class TemplateComponent implements Component {
     static readonly tag = "core/TemplateComponent";
 
-    data: string = "<a-box></a-box>";
+    data: string = "<a-sphere></a-box>";
 
 }
 
 
 export
-    class Room extends Engine {
+    class BaseEngine extends Engine {
     static readonly tag = "core/Room";
 
     constructor(public boundingBox: THREE.Box3) {
@@ -70,7 +55,7 @@ export
 class SerializableEntity extends Entity {
 
     // reference to the containing ecs engine/room 
-    engine:Room;
+    engine:BaseEngine;
 
     constructor(id?:string) {
         super()
@@ -119,8 +104,7 @@ export
        // this.putComponent(BaseProperties3D)
         this.putComponent(Inventory)
         this.putComponent(DynamicBody)
-
-
+    
     }
 
 
@@ -170,6 +154,10 @@ export
 
         if (this.current > 20) return
         const block = new NPC()
+
+      const color=  '#'+new THREE.Color(Math.random()*255*255*255).getHex().toString(16)
+        block.putComponent(TemplateComponent).data=`<a-sphere radius=0.5 color="${color}"></a-sphere>`
+
        this.engine.addEntity(block)
 
     }
