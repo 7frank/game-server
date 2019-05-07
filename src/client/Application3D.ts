@@ -443,10 +443,9 @@ export class Application3D {
         });
 
 
-        room.listen("entities/:id/PhysicsBody", (change: DataChange) => {
-            console.log("entities/:id/PhysicsBody", change)
-
-            const el = entitiesInRoom[change.path.id]
+        room.listen("entities/:id/PhysicsBody/collisions/:pos", (change: DataChange) => {
+          //  console.log("entities/:id/PhysicsBody", change)
+            const el = entitiesInRoom[change.value.id]
             el.boxHelper.matierial
 
             const hasCollisions = change.value.collisions.length != 0
@@ -462,24 +461,14 @@ export class Application3D {
 
         })
 
-        room.listen("entities/:id/radius", (change: DataChange) => {
-            const color = (change.value < 4) ? 0xff0000 : 0xFFFF0B;
+        room.listen("entities/:id/ProximityComponent/entries/:pos", (change: DataChange) => {
+            // const color = (change.value.distance<4) ? 0xff0000 : 0xFFFF0B;
+            const bVisible = change.value.distance < 4
 
-            //  console.log("entities/:id/radius", change)
-            /*
-            const graphics = this.entities[change.path.id];
-            graphics.clear();
-            graphics.lineStyle(0);
-            graphics.beginFill(color, 0.5);
-            graphics.drawCircle(0, 0, change.value);
-            graphics.endFill();
-        */
-            // if (this.currentPlayerEntity) {
-            //     // console.log(this.currentPlayerEntity.width);
-            //     // console.log(this.currentPlayerEntity.width / 20);
-            //     this.viewport.scale.x = lerp(this.viewport.scale.x, this.currentPlayerEntity.width / 20, 0.2)
-            //     this.viewport.scale.y = lerp(this.viewport.scale.y, this.currentPlayerEntity.width / 20, 0.2)
-            // }
+            console.log("entities/:id/ProximityComponent", change)
+            console.log(bVisible)
+            const el = entitiesInRoom[change.value.id]
+            el.object3D.visible = bVisible
 
         });
 

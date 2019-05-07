@@ -44,6 +44,12 @@ export
     constructor(public boundingBox: THREE.Box3) {
         super()
 
+
+
+        const componentUpdater = new ComponentUpdateSystem();
+
+        this.addSystem(componentUpdater)
+
     }
 
 
@@ -68,15 +74,16 @@ export
 
     // reference to the containing ecs engine/room 
     engine: BaseEngine;
-
+    name: string;
     constructor(id?: string) {
         super()
         this.id = id || nanoid();
+        this.name = this.constructor.name
     }
 
 
     toJSON() {
-        const res = { name: this.constructor.name, id: this.id }
+        const res = { name: this.name, id: this.id }
 
         this.listComponents().forEach(c => res[c.constructor.name] = c)
 
@@ -106,6 +113,8 @@ export
     constructor(id: string) {
         super(id)
         this.putComponent(BaseProperties3D)
+        this.putComponent(ProximityComponent)
+
         this.putComponent(Inventory)
         this.putComponent(DynamicBody)
 
@@ -193,6 +202,8 @@ export
 
 
 import { FPSCtrl } from '../../common/FPSCtrl'
+import { ComponentUpdateSystem } from "./ComponentUpdateSystem";
+import { nosync } from "colyseus";
 
 
 
@@ -202,11 +213,35 @@ interface FOVEntry {
 }
 
 
+interface Updateable {
+    update: Function;
+}
 
+
+
+
+class ProximityModel {
+    @nosync
+    entity: Entity;
+
+    id: string | number;
+    name: string;
+
+    constructor(public distance: number, entity: Entity) {
+        this.entity = entity
+
+        this.id = entity.id
+
+        // @ts-ignore
+        this.name = entity.name
+
+    }
+
+}
 
 export
-    class ProximityComponent implements Component {
-    static readonly tag = "core/FOVComponent";
+    class ProximityComponent implements Component, Updateable {
+    static readonly tag = "core/ProximityComponent";
 
     maxDistance = Infinity;
 
@@ -215,17 +250,19 @@ export
     update(mEntity: SerializableEntity) {
         this.entries = []
         for (let otherEntity of mEntity.engine.entities) {
+            if (otherEntity == mEntity) continue;
+
             const distance = mEntity.distanceTo(otherEntity)
 
             if (distance < this.maxDistance)
-                this.entries.push({ distance, entity: otherEntity })
+                this.entries.push(new ProximityModel(distance, otherEntity))
         }
     }
 }
 
 // TODO iterate components of entity and forward entity attribute to be able to handle certain effects on component level
 export
-    class FOVComponent implements Component {
+    class FOVComponent implements Component, Updateable {
     static readonly tag = "core/FOVComponent";
 
     maxDistance;
@@ -270,7 +307,8 @@ export
         }
 
     }
-
-// TODO RayTraceComponent use raytracer from threejs to find elements in front 
+}
+// TODO RayTraceComponent use raytracer from threejs to find elements in front
 // ProximityComponent find ellements that are in proximity
-// use proximityComponent 
+// use proximityComponent
+
