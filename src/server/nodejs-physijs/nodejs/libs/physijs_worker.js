@@ -55,7 +55,7 @@ module.exports = function(workerToSceneMessageHandler, Ammo) {
 		WORLDREPORT_ITEMSIZE = 14, // how many float values each reported item needs
 		worldreport,
 
-		COLLISIONREPORT_ITEMSIZE = 2, // one float for each object id
+		COLLISIONREPORT_ITEMSIZE = 5, // one float for each object id, and a Vec3 contact normal
 		collisionreport,
 
 		VEHICLEREPORT_ITEMSIZE = 9, // vehicle id, wheel index, 3 for position, 4 for rotation
@@ -1210,6 +1210,12 @@ module.exports = function(workerToSceneMessageHandler, Ammo) {
 					offset = 2 + (collisionreport[1]++) * COLLISIONREPORT_ITEMSIZE;
 					collisionreport[ offset ] = _objects_ammo[ manifold.getBody0() ];
 					collisionreport[ offset + 1 ] = _objects_ammo[ manifold.getBody1() ];
+
+					
+					_vector = pt.get_m_normalWorldOnB();
+					collisionreport[ offset + 2 ] = _vector.x();
+					collisionreport[ offset + 3 ] = _vector.y();
+					collisionreport[ offset + 4 ] = _vector.z();
 					break;
 				//}
 				

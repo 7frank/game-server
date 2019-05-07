@@ -26,6 +26,7 @@ module.exports = function(THREE, Ammo) {
 			CONSTRAINTREPORT: 3
 		},
 		REPORT_ITEMSIZE = 14,
+		COLLISIONREPORT_ITEMSIZE = 5,
 		VEHICLEREPORT_ITEMSIZE = 9,
 		CONSTRAINTREPORT_ITEMSIZE = 6;
 
@@ -653,13 +654,16 @@ module.exports = function(THREE, Ammo) {
 		 */
 
 		var i, j, offset, object, object2,
-			collisions = {}, collided_with = [];
+			collisions = {}, collided_with = [], normal_offsets = {};
 
 		// Build collision manifest
 		for ( i = 0; i < data[1]; i++ ) {
-			offset = 2 + i * 2;
+			offset = 2 + i * COLLISIONREPORT_ITEMSIZE;
 			object = data[ offset ];
 			object2 = data[ offset + 1 ];
+
+			normal_offsets[ object + '-' + object2 ] = offset + 2;
+			normal_offsets[ object2 + '-' + object ] = -1 * ( offset + 2 );
 
 			if ( !collisions[ object ] ) collisions[ object ] = [];
 			collisions[ object ].push( object2 );
@@ -686,10 +690,27 @@ module.exports = function(THREE, Ammo) {
 							_temp1 = _temp_vector3_1.clone();
 
 							_temp_vector3_1.subVectors( object.getAngularVelocity(), object2.getAngularVelocity() );
-							_temp2 = _temp_vector3_1;
+							_temp2 = _temp_vector3_1.clone();
 
-							object.dispatchEvent( 'collision', object2, _temp1, _temp2 );
-							object2.dispatchEvent( 'collision', object, _temp1, _temp2 );
+							var normal_offset = normal_offsets[ object._physijs.id + '-' + object2._physijs.id ];
+							if ( normal_offset > 0 ) {
+								_temp_vector3_1.set(
+									-data[ normal_offset ],
+									-data[ normal_offset + 1 ],
+									-data[ normal_offset + 2 ]
+								);
+							} else {
+								normal_offset *= -1;
+								_temp_vector3_1.set(
+									data[ normal_offset ],
+									data[ normal_offset + 1 ],
+									data[ normal_offset + 2 ]
+								);
+							}
+
+							object.dispatchEvent( 'collision', object2, _temp1, _temp2, _temp_vector3_1 );
+							object2.dispatchEvent( 'collision', object, _temp1, _temp2, _temp_vector3_1.negate() );
+					
 						}
 
 						collided_with.push( object2._physijs.id );
