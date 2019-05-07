@@ -11,9 +11,6 @@ export
 
     family?: Family;
 
-
-
-
     // Constructors are free for your own implementation
     constructor() {
         super();
@@ -39,6 +36,13 @@ export
         for (let entity of engine.entities) {
 
             for (let component of entity.listComponents()) {
+
+
+                //TODO handle init differently
+                if (typeof component['init'] == 'function' && !component['__inited__']) {
+                    component['init'](entity)
+                    component['__inited__'] = true
+                }
 
                 if (typeof component['update'] == 'function')
                     component['update'](entity)

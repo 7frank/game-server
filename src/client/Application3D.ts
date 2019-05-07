@@ -444,9 +444,9 @@ export class Application3D {
 
 
         room.listen("entities/:id/PhysicsBody/collisions/:pos", (change: DataChange) => {
-          //  console.log("entities/:id/PhysicsBody", change)
+            console.log("entities/:id/PhysicsBody", change)
             const el = entitiesInRoom[change.value.id]
-            el.boxHelper.matierial
+           
 
             const hasCollisions = change.value.collisions.length != 0
 

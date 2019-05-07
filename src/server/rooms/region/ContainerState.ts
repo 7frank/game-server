@@ -1,6 +1,6 @@
 import * as nanoid from "nanoid";
 
-const NodePhysijs = require('nodejs-physijs');
+const NodePhysijs = require('../../nodejs-physijs');
 const THREE = NodePhysijs.THREE;
 
 import { nosync } from "colyseus";

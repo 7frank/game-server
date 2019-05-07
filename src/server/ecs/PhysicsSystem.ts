@@ -1,5 +1,5 @@
 
-const NodePhysijs = require('nodejs-physijs');
+const NodePhysijs = require('../nodejs-physijs');
 const THREE = NodePhysijs.THREE;
 const Ammo = NodePhysijs.Ammo;
 const Physijs = NodePhysijs.Physijs(THREE, Ammo);

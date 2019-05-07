@@ -1,7 +1,7 @@
 import { Component, Entity, Engine } from "@nova-engine/ecs";
 import { DynamicBody } from "./PhysicsSystem";
 
-const NodePhysijs = require('nodejs-physijs');
+const NodePhysijs = require('../nodejs-physijs');
 const THREE = NodePhysijs.THREE;
 
 import * as nanoid from 'nanoid'
@@ -117,7 +117,7 @@ export
 
         this.putComponent(Inventory)
         this.putComponent(DynamicBody)
-
+        this.putComponent(JumpComponent)   
 
     }
 
@@ -213,6 +213,12 @@ interface FOVEntry {
 }
 
 
+interface Initable {
+
+    init: Function;
+}
+
+
 interface Updateable {
     update: Function;
 }
@@ -235,6 +241,61 @@ class ProximityModel {
         // @ts-ignore
         this.name = entity.name
 
+    }
+
+}
+
+
+// TODO create character that may jump off of other objects 
+export
+    class JumpComponent implements Component, Initable {
+    static readonly tag = "core/JumpComponent";
+
+    @nosync
+    mEntity: SerializableEntity;
+
+    jump1 = false
+    jump2 = false
+    airborne=false
+
+    init(mEntity: SerializableEntity) {
+
+        this.mEntity = mEntity
+
+        const mBody = this.mEntity.getComponent(DynamicBody)
+
+        mBody.body.addEventListener('collision', (other_object, relative_velocity, relative_rotation, contact_normal) => {
+            if (contact_normal.y < -0.5) {
+                this.jump1 = false;
+                this.jump2 = false;
+                this.airborne = false;
+                if (relative_velocity.y < -14) {
+                    var damage = Math.abs(relative_velocity.y + 10) * 3;
+                    console.log("damage taken",damage)
+                    //takeDamage(damage);
+                }
+            }
+        });
+
+    }
+
+
+    jump() {
+
+        const mBody = this.mEntity.getComponent(DynamicBody)
+
+
+        if (!this.jump1) {
+            mBody.body.applyCentralImpulse(new THREE.Vector3(0, 120, 0));
+            this.jump1 = true;
+            // audioArray['jump'].play();
+            this.airborne = true;
+        }
+        else if (!this.jump2) {
+            mBody.body.applyCentralImpulse(new THREE.Vector3(0, 120, 0));
+            this.jump2 = true;
+            // audioArray['jump'].play();
+        }
     }
 
 }

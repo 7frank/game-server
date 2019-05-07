@@ -1,7 +1,7 @@
 import { nosync } from "colyseus";
 
 
-const NodePhysijs = require('nodejs-physijs');
+const NodePhysijs = require('../../nodejs-physijs');
 const THREE = NodePhysijs.THREE;
 
 
