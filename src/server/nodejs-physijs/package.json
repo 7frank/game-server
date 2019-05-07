@@ -1,0 +1,66 @@
+{
+  "_from": "nodejs-physijs",
+  "_id": "nodejs-physijs@0.1.5",
+  "_inBundle": false,
+  "_integrity": "sha1-CojIRSKUZ4o6K991CA/8sSqF52Q=",
+  "_location": "/nodejs-physijs",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "nodejs-physijs",
+    "name": "nodejs-physijs",
+    "escapedName": "nodejs-physijs",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/nodejs-physijs/-/nodejs-physijs-0.1.5.tgz",
+  "_shasum": "0a88c8452294678a3a2bdf75080ffcb12a85e764",
+  "_spec": "nodejs-physijs",
+  "_where": "C:\\0Git\\testproject\\aframe-physics-server",
+  "bugs": {
+    "url": "https://github.com/namel/nodejs-physijs/issues"
+  },
+  "bundleDependencies": false,
+  "contributors": [
+    {
+      "name": "Jonas Gehring",
+      "email": "g.jjoe64@googlemail.com",
+      "url": "http://www.jjoe64.com"
+    },
+    {
+      "name": "Gary Weiss",
+      "email": "garyweiss74@googlemail.com"
+    }
+  ],
+  "dependencies": {
+    "socket.io": "^1.4.6"
+  },
+  "deprecated": false,
+  "description": "the physijs physics engine, running server-side on nodejs",
+  "files": [
+    "package.json",
+    "README",
+    "nodejs"
+  ],
+  "homepage": "https://github.com/namel/nodejs-physijs#readme",
+  "keywords": [
+    "physijs",
+    "threejs",
+    "three",
+    "physics"
+  ],
+  "license": "Apache-2.0",
+  "main": "main.js",
+  "name": "nodejs-physijs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/namel/nodejs-physijs.git"
+  },
+  "version": "0.1.5"
+}
