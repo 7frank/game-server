@@ -1,7 +1,7 @@
 import { Room, Client } from "colyseus";
 
 import { MessageTypes } from "../../../common/types"
-import { Player, BaseProperties3D } from "../../ecs/TestComponents";
+import { Player, BaseProperties3D, JumpComponent } from "../../ecs/TestComponents";
 import { DynamicBody } from "../../ecs/PhysicsSystem";
 import { ContainerState, PhysicsContainerState } from "../region/ContainerState";
 
@@ -61,17 +61,17 @@ export class ContainerRoom extends Room<PhysicsContainerState> {
       // player.body.rotation.copy(data)
     })
 
-    // TODO example state machine if (onground||jump1) => jump
+
     this.addListener(MessageTypes.playerJump, (player, data) => {
-      //TODO
+      const c = player.getComponent(JumpComponent)
+      c.jump()
     })
 
-      // TODO example state machine if (onground||jump1) => jump
-      this.addListener(MessageTypes.playerInteractWith, (player, data) => {
-      
-        
-      })
-  
+    // TODO example state machine if (onground||jump1) => jump
+    this.addListener(MessageTypes.playerInteractWith, (player, data) => {
+
+    })
+
 
 
   }
@@ -98,7 +98,7 @@ export class ContainerRoom extends Room<PhysicsContainerState> {
 
 
     const mState = new PhysicsContainerState()
-   // mState.maxFoodCount = options.boxCount || mState.maxFoodCount
+    // mState.maxFoodCount = options.boxCount || mState.maxFoodCount
     mState.data = options.data //|| mState.data
     if (options.position)
       mState.position.copy(options.position)

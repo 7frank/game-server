@@ -286,13 +286,13 @@ export
 
 
         if (!this.jump1) {
-            mBody.body.applyCentralImpulse(new THREE.Vector3(0, 120, 0));
+            mBody.body.applyCentralImpulse(new THREE.Vector3(0, 6, 0));
             this.jump1 = true;
             // audioArray['jump'].play();
             this.airborne = true;
         }
         else if (!this.jump2) {
-            mBody.body.applyCentralImpulse(new THREE.Vector3(0, 120, 0));
+            mBody.body.applyCentralImpulse(new THREE.Vector3(0, 6, 0));
             this.jump2 = true;
             // audioArray['jump'].play();
         }
