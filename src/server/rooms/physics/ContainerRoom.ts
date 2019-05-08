@@ -1,9 +1,13 @@
 import { Room, Client } from "colyseus";
 
 import { MessageTypes } from "../../../common/types"
-import { Player, BaseProperties3D, JumpComponent } from "../../ecs/TestComponents";
+import { Player, BaseProperties3D, JumpComponent, ControllerComponent } from "../../ecs/TestComponents";
 import { DynamicBody } from "../../ecs/PhysicsSystem";
 import { ContainerState, PhysicsContainerState } from "../region/ContainerState";
+
+
+const NodePhysijs = require('../../nodejs-physijs');
+const THREE = NodePhysijs.THREE;
 
 const roomTemplate = `
 <a-scene physics="debug: true">
@@ -39,19 +43,8 @@ export class ContainerRoom extends Room<PhysicsContainerState> {
     this.addListener(MessageTypes.playerMove, (player: Player, data) => {
 
 
-      if (player.hasComponent(DynamicBody)) {
-        const body = player.getComponent(DynamicBody).body
-        if (!body) return // waiting for physics to init body
-        // console.log(player,data)
-        body.__dirtyPosition = true;
-        body.position.copy(data)
-      }
-      else if (player.hasComponent(BaseProperties3D)) {
-        const position = player.getComponent(BaseProperties3D).position
-
-        position.copy(data)
-      }
-
+      const direction = new THREE.Vector3().copy(data)
+      player.getComponent(ControllerComponent).direction.copy(direction.normalize())
 
     })
 
@@ -69,6 +62,9 @@ export class ContainerRoom extends Room<PhysicsContainerState> {
 
     // TODO example state machine if (onground||jump1) => jump
     this.addListener(MessageTypes.playerInteractWith, (player, data) => {
+
+      // TODO get closest element in front & if it's pickable/item do something with it
+      //  player.getComponent(RaytracerComponent)
 
     })
 

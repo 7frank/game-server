@@ -132,22 +132,84 @@ export class Application3D {
 
 
         // TODO send direction vector instead & only update positions based on direction * current speed
-        //  let lastPosition;
-        camera.addEventListener('positionChanged', (evt) => {
-            if (this.currentPlayerEntity) {
+        
+        const keys = { w: 0, a: 0, s: 0, d: 0 }
+ 
+        
+        let lastPosition;
+            camera.addEventListener('positionChanged', (evt) => {
+                if (keys.w+keys.a+keys.s+keys.d ==0) return 
+                
+                if (this.currentPlayerEntity) {
+    
+                       if (!lastPosition) {
+                           lastPosition=evt.detail.clone()
+                           return
+                       }
+       
+                       let direction=evt.detail.clone().sub(lastPosition)
+                     //  console.log("lastPosition",lastPosition)
+                     //  console.log("currPosition",evt.detail)
+                       console.log("direction",direction)
+                       lastPosition=evt.detail.clone()
+                       
+    
+                    this.activeRoom.send([MessageTypes.playerMove, direction]);
+                }
+            });
 
-                /*   if (!lastPosition) {
-                       lastPosition=evt.detail
-                       return
-                   }
-   
-                   let direction=evt.detail.clone().sub(lastPosition)
-                   console.log(direction,evt.detail)
-                   lastPosition=evt.detail
-                   */
+      
+        const movePlayer = () => {
 
-                this.activeRoom.send([MessageTypes.playerMove, evt.detail]);
-            }
+            const direction = new THREE.Vector3(keys.d - keys.a, 0, keys.w - keys.s)
+           // this.activeRoom.send([MessageTypes.playerMove, direction]);
+
+        }
+  
+        Hotkeys.register(MessageTypes.playerMove + "-forward", 'w', {
+            // category: 'HUD',
+            target: this.sceneEl
+        });
+
+        Hotkeys().on(MessageTypes.playerMove + "-forward", (evt) => {
+            keys.w = 1
+            movePlayer()
+        }, function () {
+            keys.w = 0
+        });
+
+
+        Hotkeys.register(MessageTypes.playerMove + "-backward", 'w', {
+            // category: 'HUD',
+            target: this.sceneEl
+        });
+        Hotkeys().on(MessageTypes.playerMove + "-backward", (evt) => {
+            keys.s = 1
+            movePlayer()
+        }, function () {
+            keys.s = 0
+        });
+
+        Hotkeys.register(MessageTypes.playerMove + "-left", 'w', {
+            // category: 'HUD',
+            target: this.sceneEl
+        });
+        Hotkeys().on(MessageTypes.playerMove + "-left", (evt) => {
+            keys.a = 1
+            movePlayer()
+        }, function () {
+            keys.a = 0
+        });
+
+        Hotkeys.register(MessageTypes.playerMove + "-right", 'w', {
+            // category: 'HUD',
+            target: this.sceneEl
+        });
+        Hotkeys().on(MessageTypes.playerMove + "-right", (evt) => {
+            keys.d = 1
+            movePlayer()
+        }, function () {
+            keys.d = 0
         });
 
 
@@ -305,8 +367,6 @@ export class Application3D {
 
         const entitiesInRoom = this.roomEntitiesMap[room.sessionId]
 
-
-
         // add / removal of entities
         room.listen("entities/:id", (change: DataChange) => {
             console.log("DataChange:", change)
@@ -433,14 +493,9 @@ export class Application3D {
 
 
 
-
-
-
-
             } else if (change.operation === "remove") {
 
                 let o = entitiesInRoom[change.path.id]
-
                 this.scene.remove(o);
                 if (o.geometry)
                     o.geometry.dispose();
@@ -453,35 +508,81 @@ export class Application3D {
         });
 
 
+
+        room.listen("entities/:id/BaseProperties3D/position/x", (change: DataChange) => {
+            const isCurrentPlayer = change.path.id === room.sessionId
+            const el = entitiesInRoom[change.path.id]
+            if (isCurrentPlayer && el) {
+                //  this.currentPlayerEntity = el.object3D;
+
+                // FIXME
+                // @ts-ignore
+                document.querySelector("[camera]").object3D.position.x = change.value
+              //  console.log("change cam", change.value)
+            }
+
+        })
+
+        room.listen("entities/:id/BaseProperties3D/position/y", (change: DataChange) => {
+            const isCurrentPlayer = change.path.id === room.sessionId
+            const el = entitiesInRoom[change.path.id]
+            if (isCurrentPlayer && el) {
+                //  this.currentPlayerEntity = el.object3D;
+
+                // FIXME
+                // @ts-ignore
+                document.querySelector("[camera]").object3D.position.y = change.value
+              //  console.log("change cam", change.value)
+            }
+
+        })
+
+        room.listen("entities/:id/BaseProperties3D/position/z", (change: DataChange) => {
+            const isCurrentPlayer = change.path.id === room.sessionId
+            const el = entitiesInRoom[change.path.id]
+            if (isCurrentPlayer && el) {
+                //  this.currentPlayerEntity = el.object3D;
+
+                // FIXME
+                // @ts-ignore
+                document.querySelector("[camera]").object3D.position.z = change.value
+              //  console.log("change cam", change.value)
+            }
+
+        })
+
+
+
+
         room.listen("entities/:id/PhysicsBody/collisions/:pos", (change: DataChange) => {
             console.log("entities/:id/PhysicsBody", change)
             const el = entitiesInRoom[change.path.id]
 
 
-           // const hasCollisions = change.value.collisions.length != 0
+            // const hasCollisions = change.value.collisions.length != 0
 
 
 
             if (!el.boxHelper._origColor) el.boxHelper._origColor = el.boxHelper.material.color
 
-            if (change.operation=="add")
+            if (change.operation == "add")
                 el.boxHelper.material.color.setHex(0xff0000);
             else
                 el.boxHelper.material.color.set(el.boxHelper._origColor);
 
         })
 
-      /*  room.listen("entities/:id/ProximityComponent/entries/:pos", (change: DataChange) => {
-            // const color = (change.value.distance<4) ? 0xff0000 : 0xFFFF0B;
-            const bVisible = change.value.distance < 4
-
-            console.log("entities/:id/ProximityComponent", change)
-           
-            const el = entitiesInRoom[change.value.id]
-            console.log(el,bVisible)
-            el.visible = bVisible
-
-        });*/
+        /*  room.listen("entities/:id/ProximityComponent/entries/:pos", (change: DataChange) => {
+              // const color = (change.value.distance<4) ? 0xff0000 : 0xFFFF0B;
+              const bVisible = change.value.distance < 4
+  
+              console.log("entities/:id/ProximityComponent", change)
+             
+              const el = entitiesInRoom[change.value.id]
+              console.log(el,bVisible)
+              el.visible = bVisible
+  
+          });*/
 
     }
 

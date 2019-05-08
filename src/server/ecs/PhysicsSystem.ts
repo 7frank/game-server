@@ -112,12 +112,18 @@ export
     class DynamicBody implements Component {
     static readonly tag = "core/DynamicBody";
 
-    mass: number = 0;
+    mass: number = 1;
     friction: number = 1;
     restitution: number = 0.1
 
     @nosync
+    linearFactor=new THREE.Vector3(1,1,0)
+
+    @nosync
     body: any = null // Physijs body
+
+
+
 }
 
 
@@ -221,7 +227,7 @@ export
         for (let entity of this.notInitializedEntities.entities) {
 
             const body = entity.putComponent(PhysicsBody);
-
+            const dynamicBody= entity.getComponent(DynamicBody)
             // You can create components on an entity easily.
 
             if (!entity.hasComponent(BaseProperties3D))
@@ -230,13 +236,20 @@ export
 
             const props = entity.getComponent(BaseProperties3D);
             props.position.y = 5
-            const physicsFU = this.addWorldEntity(props.position, [1, 1, 1], 1)
+            const physicsFU = this.addWorldEntity(props.position, [1, 1, 1], dynamicBody.mass)
             props.position = physicsFU.position
             props.rotation = physicsFU.rotation
+                       
+            physicsFU.setLinearFactor(dynamicBody.linearFactor)
+
+         
+            
+
 
             physicsFU._entity = entity
 
-            entity.getComponent(DynamicBody).body = physicsFU;
+           
+            dynamicBody.body = physicsFU;
 
 
 

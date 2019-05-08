@@ -5,7 +5,7 @@ const NodePhysijs = require('../nodejs-physijs');
 const THREE = NodePhysijs.THREE;
 
 import * as nanoid from 'nanoid'
-import { Vector3 } from "three";
+import { Vector3, BooleanKeyframeTrack } from "three";
 
 
 export
@@ -117,7 +117,8 @@ export
 
         this.putComponent(Inventory)
         this.putComponent(DynamicBody)
-        this.putComponent(JumpComponent)   
+        this.putComponent(JumpComponent)
+        this.putComponent(ControllerComponent)
 
     }
 
@@ -192,6 +193,7 @@ export
         else
             block.putComponent(AssetsComponent)
 
+        block.getComponent(DynamicBody).mass = 100
 
         this.engine.addEntity(block)
 
@@ -256,7 +258,7 @@ export
 
     jump1 = false
     jump2 = false
-    airborne=false
+    airborne = false
 
     init(mEntity: SerializableEntity) {
 
@@ -271,7 +273,7 @@ export
                 this.airborne = false;
                 if (relative_velocity.y < -14) {
                     var damage = Math.abs(relative_velocity.y + 10) * 3;
-                    console.log("damage taken",damage)
+                    console.log("damage taken", damage)
                     //takeDamage(damage);
                 }
             }
@@ -299,6 +301,65 @@ export
     }
 
 }
+
+
+
+export
+    class ControllerComponent implements Component, Updateable {
+    static readonly tag = "core/ControllerComponent";
+
+    maxSpeed = 1; // units per second
+
+    direction = new THREE.Vector3()
+    velocity = 0
+    update(mEntity: SerializableEntity) {
+
+
+        if (mEntity.hasComponent(JumpComponent)) {
+            const c = mEntity.getComponent(JumpComponent)
+            if (c.airborne) return //prevent change of direction if not on the ground
+        }
+
+        if (mEntity.hasComponent(DynamicBody)) {
+            this.moveCurrentDirection(mEntity)
+        }
+        else if (mEntity.hasComponent(BaseProperties3D)) {
+            const position = mEntity.getComponent(BaseProperties3D).position
+            var velocityVector = (this.direction).normalize().multiplyScalar(this.maxSpeed - this.velocity);
+            position.copy(velocityVector)
+        }
+
+    }
+
+
+    /*  moveForward(){
+          var box = this.component.entity.get('mesh').object;
+          //this.velocity = Math.abs(box.getLinearVelocity().z) + Math.abs(box.getLinearVelocity().x);
+          this.velocity = box.getLinearVelocity().length();
+          if (!this.isJumping && this.velocity < this.moveSpeed){
+              var matrix = (new THREE.Matrix4()).makeRotationFromEuler( box.rotation ); 
+              var velocity = (new THREE.Vector3( 0, 0, -1 ).applyMatrix4(matrix)).normalize().multiplyScalar(this.moveSpeed-this.velocity);
+              box.setLinearVelocity(box.getLinearVelocity().add(velocity));
+          }
+      }*/
+
+    moveCurrentDirection(mEntity: SerializableEntity) {
+        var box = mEntity.getComponent(DynamicBody).body//this.component.entity.get('mesh').object;
+        //this.velocity = Math.abs(box.getLinearVelocity().z) + Math.abs(box.getLinearVelocity().x);
+        this.velocity = box.getLinearVelocity().length();
+        if (
+            //!this.isJumping && 
+            this.velocity < this.maxSpeed) {
+            //  var matrix = (new THREE.Matrix4()).makeRotationFromEuler( box.rotation ); 
+            //  var velocityVector = (new THREE.Vector3( 0, 0, -1 ).applyMatrix4(matrix)).normalize().multiplyScalar(this.maxSpeed-this.velocity);
+            var velocityVector = (this.direction).normalize().multiplyScalar(this.maxSpeed - this.velocity);
+
+            box.setLinearVelocity(box.getLinearVelocity().add(velocityVector));
+        }
+    }
+
+}
+
 
 export
     class ProximityComponent implements Component, Updateable {
