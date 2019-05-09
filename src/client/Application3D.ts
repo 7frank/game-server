@@ -132,47 +132,45 @@ export class Application3D {
 
 
 
-   // @ts-ignore FIXME
-            setTimeout(() =>  document.querySelector("[camera]").removeAttribute("wasd-controls"), 2000)
+        // @ts-ignore FIXME
+        setTimeout(() => document.querySelector("[camera]").removeAttribute("wasd-controls"), 2000)
 
 
         // TODO send direction vector instead & only update positions based on direction * current speed
 
         const keys = { w: 0, a: 0, s: 0, d: 0 }
 
-
-        /*  let lastPosition;
-              camera.addEventListener('positionChanged', (evt) => {
-                  if (keys.w+keys.a+keys.s+keys.d ==0) return 
-                  console.log("!!!!!!!!!!!!!!!")
-                  if (this.currentPlayerEntity) {
-      
-                         if (!lastPosition) {
-                             lastPosition=evt.detail.clone()
-                             return
-                         }
-         
-                         let direction=evt.detail.clone().sub(lastPosition)
-                       //  console.log("lastPosition",lastPosition)
-                       //  console.log("currPosition",evt.detail)
-                         console.log("direction",direction)
-                         lastPosition=evt.detail.clone()
-                         
-      
-                      this.activeRoom.send([MessageTypes.playerMove, direction]);
-                  }
-              });
-  */
-
         const movePlayer = () => {
 
-            let  direction = new THREE.Vector3(keys.d - keys.a, 0, keys.w - keys.s)
-         
+            const mesh = sceneEl.camera.el.object3D
 
-            direction.applyMatrix4(sceneEl.camera.el.object3D.matrix)
-            console.log("direction",direction)
-           // this.activeRoom.send([MessageTypes.playerMove, direction]);
 
+            var direction0 = new THREE.Vector3(0, 0, -1).applyQuaternion(mesh.quaternion);
+
+
+            direction0.y = 0
+
+            let upVector = new THREE.Vector3(0, 1, 0)
+
+
+            const forward = direction0.clone()
+            const left = direction0.clone().applyAxisAngle(upVector, Math.PI / 2)
+            const right = direction0.clone().applyAxisAngle(upVector, -Math.PI / 2)
+            const backward = direction0.clone().applyAxisAngle(upVector, Math.PI)
+
+            const direction = new THREE.Vector3
+            if (keys.w) direction.add(forward)
+            if (keys.a) direction.add(left)
+            if (keys.d) direction.add(right)
+            if (keys.s) direction.add(backward)
+
+
+
+            direction.normalize().multiplyScalar(0.1)
+           
+             this.activeRoom.send([MessageTypes.playerMove, direction]);
+            // @ts-ignore
+           // document.querySelector("[camera]").object3D.position.add(direction)
         }
 
         Hotkeys.register(MessageTypes.playerMove + "-forward", 'w', {
@@ -185,6 +183,7 @@ export class Application3D {
             movePlayer()
         }, function () {
             keys.w = 0
+            movePlayer()
         });
 
 
@@ -197,6 +196,7 @@ export class Application3D {
             movePlayer()
         }, function () {
             keys.s = 0
+            movePlayer()
         });
 
         Hotkeys.register(MessageTypes.playerMove + "-left", 'a', {
@@ -208,6 +208,7 @@ export class Application3D {
             movePlayer()
         }, function () {
             keys.a = 0
+            movePlayer()
         });
 
         Hotkeys.register(MessageTypes.playerMove + "-right", 'd', {
@@ -219,6 +220,7 @@ export class Application3D {
             movePlayer()
         }, function () {
             keys.d = 0
+            movePlayer()
         });
 
 
@@ -516,50 +518,49 @@ export class Application3D {
 
         });
 
-
-
-        room.listen("entities/:id/BaseProperties3D/position/x", (change: DataChange) => {
-            const isCurrentPlayer = change.path.id === room.sessionId
-            const el = entitiesInRoom[change.path.id]
-            if (isCurrentPlayer && el) {
-                //  this.currentPlayerEntity = el.object3D;
-
-                // FIXME
-                // @ts-ignore
-                document.querySelector("[camera]").object3D.position.x = change.value
-                //  console.log("change cam", change.value)
-            }
-
-        })
-
-        room.listen("entities/:id/BaseProperties3D/position/y", (change: DataChange) => {
-            const isCurrentPlayer = change.path.id === room.sessionId
-            const el = entitiesInRoom[change.path.id]
-            if (isCurrentPlayer && el) {
-                //  this.currentPlayerEntity = el.object3D;
-
-                // FIXME
-                // @ts-ignore
-                document.querySelector("[camera]").object3D.position.y = change.value
-                //  console.log("change cam", change.value)
-            }
-
-        })
-
-        room.listen("entities/:id/BaseProperties3D/position/z", (change: DataChange) => {
-            const isCurrentPlayer = change.path.id === room.sessionId
-            const el = entitiesInRoom[change.path.id]
-            if (isCurrentPlayer && el) {
-                //  this.currentPlayerEntity = el.object3D;
-
-                // FIXME
-                // @ts-ignore
-                document.querySelector("[camera]").object3D.position.z = change.value
-                //  console.log("change cam", change.value)
-            }
-
-        })
-
+  
+                room.listen("entities/:id/BaseProperties3D/position/x", (change: DataChange) => {
+                    const isCurrentPlayer = change.path.id === room.sessionId
+                    const el = entitiesInRoom[change.path.id]
+                    if (isCurrentPlayer && el) {
+                        //  this.currentPlayerEntity = el.object3D;
+        
+                        // FIXME
+                        // @ts-ignore
+                        document.querySelector("[camera]").object3D.position.x = change.value
+                        //  console.log("change cam", change.value)
+                    }
+        
+                })
+        
+                room.listen("entities/:id/BaseProperties3D/position/y", (change: DataChange) => {
+                    const isCurrentPlayer = change.path.id === room.sessionId
+                    const el = entitiesInRoom[change.path.id]
+                    if (isCurrentPlayer && el) {
+                        //  this.currentPlayerEntity = el.object3D;
+        
+                        // FIXME
+                        // @ts-ignore
+                        document.querySelector("[camera]").object3D.position.y = change.value
+                        //  console.log("change cam", change.value)
+                    }
+        
+                })
+        
+                room.listen("entities/:id/BaseProperties3D/position/z", (change: DataChange) => {
+                    const isCurrentPlayer = change.path.id === room.sessionId
+                    const el = entitiesInRoom[change.path.id]
+                    if (isCurrentPlayer && el) {
+                        //  this.currentPlayerEntity = el.object3D;
+        
+                        // FIXME
+                        // @ts-ignore
+                        document.querySelector("[camera]").object3D.position.z = change.value
+                        //  console.log("change cam", change.value)
+                    }
+        
+                })
+        
 
 
 

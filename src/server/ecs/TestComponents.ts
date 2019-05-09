@@ -315,11 +315,11 @@ export
     update(mEntity: SerializableEntity) {
 
 
-        if (mEntity.hasComponent(JumpComponent)) {
+      /*  if (mEntity.hasComponent(JumpComponent)) {
             const c = mEntity.getComponent(JumpComponent)
             if (c.airborne) return //prevent change of direction if not on the ground
         }
-
+*/
         if (mEntity.hasComponent(DynamicBody)) {
             this.moveCurrentDirection(mEntity)
         }
