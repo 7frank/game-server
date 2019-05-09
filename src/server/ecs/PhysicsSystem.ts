@@ -18,8 +18,8 @@ import { FPSCtrl } from "../../common/FPSCtrl";
 
 export
     function roomPlanesFromBoundingBox(boundingBox: THREE.Box3) {
-    Object.values(boundingBox.min)
-    Object.values(boundingBox.max)
+   // Object.values(boundingBox.min)
+   // Object.values(boundingBox.max)
 
 
     var material = createBasicPhysicsMaterial()
@@ -47,7 +47,8 @@ export
         planeGeometry,
         material
     );
-    //top.rotation.x = Math.PI / 2
+
+    back.rotation.y = 0
     back.position.z = boundingBox.min.z;
 
     const front = new Physijs.PlaneMesh(
@@ -77,7 +78,11 @@ export
 
 
 
-    planes.push(ground, top, front, back, left, right)
+    planes.push(
+        ground, top,
+        front, back,
+        left, right
+    )
 
 
     return planes
@@ -117,7 +122,7 @@ export
     restitution: number = 0.1
 
     @nosync
-    linearFactor=new THREE.Vector3(1,1,0)
+    linearFactor = new THREE.Vector3(1, 1, 0)
 
     @nosync
     body: any = null // Physijs body
@@ -227,7 +232,7 @@ export
         for (let entity of this.notInitializedEntities.entities) {
 
             const body = entity.putComponent(PhysicsBody);
-            const dynamicBody= entity.getComponent(DynamicBody)
+            const dynamicBody = entity.getComponent(DynamicBody)
             // You can create components on an entity easily.
 
             if (!entity.hasComponent(BaseProperties3D))
@@ -239,16 +244,16 @@ export
             const physicsFU = this.addWorldEntity(props.position, [1, 1, 1], dynamicBody.mass)
             props.position = physicsFU.position
             props.rotation = physicsFU.rotation
-                       
+
             physicsFU.setLinearFactor(dynamicBody.linearFactor)
 
-         
-            
+
+
 
 
             physicsFU._entity = entity
 
-           
+
             dynamicBody.body = physicsFU;
 
 
@@ -266,8 +271,8 @@ export
             physicsFU.addEventListener('collision', function (other_object, relative_velocity, relative_rotation, contact_normal) {
                 // `this` has collided with `other_object` with an impact speed of `relative_velocity` and a rotational force of `relative_rotation` and at normal `contact_normal`
                 //    console.log(other_object, relative_velocity, relative_rotation, contact_normal )
-               if (!other_object._entity) return //TODO handle room and collisions for jumping from ground e.g.
-               
+                if (!other_object._entity) return //TODO handle room and collisions for jumping from ground e.g.
+
                 tempCollisions.push({
                     id: other_object._entity.id,
                     name: other_object._entity.name,

@@ -451,10 +451,12 @@ export class Application3D {
                     const asset = change.value.AssetsComponent
                     let el;
                     if (asset) {
-                        const assetEl = parseHTML(` <a-asset-item id="#${asset.id}" src="${asset.src}" animation-mixer="clip: *"></a-asset-item>`)
+                        const assetEl = parseHTML(` <a-asset-item id="${asset.id}" src="${asset.src}" animation-mixer="clip: *"></a-asset-item>`)
                         sceneEl.append(assetEl)
+                
                         el = createEntityHTML(`#${asset.id}`)
                         sceneEl.append(el)
+window['oo']={assetEl,el}
                     }
                     else {
                         el = change.value.TemplateComponent ? createEntityFromData(change.value.TemplateComponent.data) : createEntity()
@@ -768,10 +770,10 @@ function createEntityHTML(selector = "#steve", text = "Hello") {
 
 
 
-    var htmlSnippet = `<a-entity   >
+    var htmlSnippet = `<a-entity  position="0 ${-PLAYER_SIZE} 0">
     
     <a-text position="0 2.5 0" scale="3 3 3" color="black" align='center' value=" ${text}"></a-text>
-    <a-entity position="0 ${-PLAYER_SIZE} 0" gltf-model="${selector}" shadow="cast: true;receive: true"></a-entity>
+    <a-entity gltf-model="${selector}" shadow="cast: true;receive: true"></a-entity>
     </a-entity>`,
         html = parseHTML(htmlSnippet);
 

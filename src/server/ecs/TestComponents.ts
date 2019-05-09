@@ -31,8 +31,8 @@ export
     static readonly tag = "core/TemplateComponent";
 
 
-    id = "pineTree"
-    src: string = "https://github.com/waverider404/game-assets/raw/master/Pine_Tree.glb";
+    id = "pinetree"
+    src: string = "/assets/bunny.glb";
 
 }
 
@@ -286,15 +286,18 @@ export
 
         const mBody = this.mEntity.getComponent(DynamicBody)
 
+            const force=new THREE.Vector3(0, 6, 0)
+        var newForce =   force.applyMatrix4(mBody.body.matrix);
+        mBody.body.applyCentralImpulse(newForce);
 
         if (!this.jump1) {
-            mBody.body.applyCentralImpulse(new THREE.Vector3(0, 6, 0));
+            mBody.body.applyCentralImpulse(newForce);
             this.jump1 = true;
             // audioArray['jump'].play();
             this.airborne = true;
         }
         else if (!this.jump2) {
-            mBody.body.applyCentralImpulse(new THREE.Vector3(0, 6, 0));
+            mBody.body.applyCentralImpulse(newForce);
             this.jump2 = true;
             // audioArray['jump'].play();
         }
@@ -308,18 +311,18 @@ export
     class ControllerComponent implements Component, Updateable {
     static readonly tag = "core/ControllerComponent";
 
-    maxSpeed = 1; // units per second
+    maxSpeed = 3; // units per second
 
     direction = new THREE.Vector3()
     velocity = 0
     update(mEntity: SerializableEntity) {
 
 
-      /*  if (mEntity.hasComponent(JumpComponent)) {
-            const c = mEntity.getComponent(JumpComponent)
-            if (c.airborne) return //prevent change of direction if not on the ground
-        }
-*/
+        /*  if (mEntity.hasComponent(JumpComponent)) {
+              const c = mEntity.getComponent(JumpComponent)
+              if (c.airborne) return //prevent change of direction if not on the ground
+          }
+  */
         if (mEntity.hasComponent(DynamicBody)) {
             this.moveCurrentDirection(mEntity)
         }
@@ -347,20 +350,20 @@ export
         var box = mEntity.getComponent(DynamicBody).body//this.component.entity.get('mesh').object;
 
         // FIXME either diret position or setting velocity should create decent movement
-        //box.setLinearFactor(new THREE.Vector3(1,1,1))
-      
-        const fps=30
-        box.__dirtyPosition = true;
+        box.setLinearFactor(new THREE.Vector3(1, 1, 1))
 
-        box.position.add((this.direction).normalize().multiplyScalar(this.maxSpeed/fps))
+        /*   const fps=30
+           box.__dirtyPosition = true;
+   
+           box.position.add((this.direction).normalize().multiplyScalar(this.maxSpeed/fps))
+   
+           // FIXME physics based movement
+           return;
+   */
 
-        // FIXME physics based movement
-        return;
-
-
-
-        this.velocity = box.getLinearVelocity().length();
-        if ( this.velocity < this.maxSpeed) {
+        const lenV = box.getLinearVelocity()
+        this.velocity = lenV.length();
+        if (this.velocity < this.maxSpeed) {
             //  var matrix = (new THREE.Matrix4()).makeRotationFromEuler( box.rotation ); 
             //  var velocityVector = (new THREE.Vector3( 0, 0, -1 ).applyMatrix4(matrix)).normalize().multiplyScalar(this.maxSpeed-this.velocity);
             var velocityVector = (this.direction).normalize().multiplyScalar(this.maxSpeed - this.velocity);
