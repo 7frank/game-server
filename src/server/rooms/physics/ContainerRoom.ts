@@ -1,7 +1,7 @@
 import { Room, Client } from "colyseus";
 
 import { MessageTypes } from "../../../common/types"
-import { Player, BaseProperties3D, JumpComponent, ControllerComponent } from "../../ecs/TestComponents";
+import { Player, BaseProperties3D, JumpComponent, ControllerComponent, InteractControllerComponent } from "../../ecs/TestComponents";
 import { DynamicBody } from "../../ecs/PhysicsSystem";
 import { ContainerState, PhysicsContainerState } from "../region/ContainerState";
 
@@ -65,6 +65,10 @@ export class ContainerRoom extends Room<PhysicsContainerState> {
 
       // TODO get closest element in front & if it's pickable/item do something with it
       //  player.getComponent(RaytracerComponent)
+      player.getComponent(InteractControllerComponent).interact()
+    
+
+
 
     })
 

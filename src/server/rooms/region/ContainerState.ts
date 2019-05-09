@@ -129,7 +129,7 @@ export class ContainerState extends THREE.Object3D {
 
   createEngine() {
 
-    const boundingBox = new THREE.Box3(new THREE.Vector3(-5, 0, -5), new THREE.Vector3(5, 10, 5))
+    const boundingBox = new THREE.Box3(new THREE.Vector3(-5, 0, -5), new THREE.Vector3(5, 15, 5))
     this._engine = new StaticECSEngine(boundingBox,10)
     this.entities = this._engine._entities
 
@@ -137,7 +137,7 @@ export class ContainerState extends THREE.Object3D {
 
   createPlayer(sessionId: string) {
 
-    const pos = new THREE.Vector3(getRandomInt(this.boundingBox.min.x, this.boundingBox.max.x), 2, getRandomInt(this.boundingBox.min.z, this.boundingBox.max.z))
+    const pos = new THREE.Vector3(getRandomInt(this.boundingBox.min.x, this.boundingBox.max.x), 9, 0)
     const player = new Player(sessionId);
 
     const props = player.getComponent(BaseProperties3D)

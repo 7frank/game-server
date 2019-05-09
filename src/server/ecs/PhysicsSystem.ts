@@ -246,18 +246,9 @@ export
             props.rotation = physicsFU.rotation
 
             physicsFU.setLinearFactor(dynamicBody.linearFactor)
-
-
-
-
-
             physicsFU._entity = entity
 
-
             dynamicBody.body = physicsFU;
-
-
-
 
 
             let tempCollisions = []
@@ -288,12 +279,5 @@ export
 
 
         }
-
-
-
-
-
-        //  this.updateWorld()
-
     }
 }

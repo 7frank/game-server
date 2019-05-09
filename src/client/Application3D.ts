@@ -76,46 +76,7 @@ export class Application3D {
         this.scene = sceneEl.object3D// init3DScene(scene)
 
 
-        /*   super({
-               width: window.innerWidth,
-               height: window.innerHeight,
-               backgroundColor: 0x0c0c0c
-           });
-   
-           this.viewport = new Viewport({
-               screenWidth: window.innerWidth,
-               screenHeight: window.innerHeight,
-               worldWidth: WORLD_SIZE,
-               worldHeight: WORLD_SIZE,
-           });
-   
-           // draw boundaries of the world
-           const boundaries = new PIXI.Graphics();
-           boundaries.beginFill(0x000000);
-           boundaries.drawRoundedRect(0, 0, WORLD_SIZE, WORLD_SIZE, 30);
-           this.viewport.addChild(boundaries);
-   
-           // add viewport to stage
-           this.stage.addChild(this.viewport);
-   
-           this.initialize();
-           this.interpolation = false;
-   
-           this.viewport.on("mousemove", (e) => {
-               if (this.currentPlayerEntity) {
-                   const point = this.viewport.toLocal(e.data.global);
-                   this.room.send(['mouse', { x: point.x, y: point.y }]);
-               }
-           });
-   */
-
-        /*  document.addEventListener("mousemove", (evt:any) => {
-            console.log("mouse",evt.detail)
-                this.room.send(['mouse', { x: 1, y:1 }]);
-         
-        });*/
-
-
+     
 
         var camera = sceneEl.camera.el;
         camera.addEventListener('rotationChanged', (evt) => {
@@ -132,8 +93,31 @@ export class Application3D {
 
 
 
+
+
+
         // @ts-ignore FIXME
         setTimeout(() => document.querySelector("[camera]").removeAttribute("wasd-controls"), 2000)
+
+
+       let cameraDistance=0
+        sceneEl.addEventListener("wheel", event => {
+            
+            const el= this.currentPlayerEntity.el
+
+            el.setAttribute("visible", true);
+            cameraDistance+=event.deltaY>0?1:-1
+            if (cameraDistance<0)cameraDistance=0
+            if (cameraDistance>10)cameraDistance=10
+
+            sceneEl.camera.position.set(0,0,cameraDistance);    
+            this.currentPlayerEntity.traverse( c=>  {if (c.material) {c.material.opacity=cameraDistance>3?1:(cameraDistance/10);c.material.transparent=true  }} )
+             console.info(event.deltaY)
+         
+         
+         });
+ 
+
 
 
         // TODO send direction vector instead & only update positions based on direction * current speed
@@ -434,12 +418,18 @@ export class Application3D {
                     })
 
 
+                 
+
+
                     // FIXME Dimensions
                     change.value.dimensions = { x: 1, y: 2, z: 1 }
 
                     //bounding box
                     var box = new THREE.Box3();
-                    box.setFromCenterAndSize(new THREE.Vector3(0, -PLAYER_SIZE / 2, 0), new THREE.Vector3().copy(change.value.dimensions));
+                    //box.setFromCenterAndSize(new THREE.Vector3(0, -PLAYER_SIZE / 2, 0), new THREE.Vector3().copy(change.value.dimensions));
+                    box.setFromCenterAndSize(new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 1, 1));
+
+                   
                     var helper = new THREE.Box3Helper(box, 0xffff00);
                     entitiesInRoom[change.path.id].add(helper);
                     entitiesInRoom[change.path.id].boxHelper = helper
@@ -454,7 +444,7 @@ export class Application3D {
                         const assetEl = parseHTML(` <a-asset-item id="${asset.id}" src="${asset.src}" animation-mixer="clip: *"></a-asset-item>`)
                         sceneEl.append(assetEl)
                 
-                        el = createEntityHTML(`#${asset.id}`)
+                        el = createEntityHTML(`#${asset.id}`,"asset")
                         sceneEl.append(el)
 window['oo']={assetEl,el}
                     }
@@ -575,7 +565,7 @@ window['oo']={assetEl,el}
 
 
 
-            if (!el.boxHelper._origColor) el.boxHelper._origColor = el.boxHelper.material.color
+            if (!el.boxHelper._origColor) el.boxHelper._origColor = el.boxHelper.material.color.clone()
 
             if (change.operation == "add")
                 el.boxHelper.material.color.setHex(0xff0000);
@@ -767,8 +757,6 @@ function createEntityFromData(data) {
 
 
 function createEntityHTML(selector = "#steve", text = "Hello") {
-
-
 
     var htmlSnippet = `<a-entity  position="0 ${-PLAYER_SIZE} 0">
     

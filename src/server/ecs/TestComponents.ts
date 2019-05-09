@@ -120,6 +120,9 @@ export
         this.putComponent(JumpComponent)
         this.putComponent(ControllerComponent)
 
+        this.putComponent(InteractControllerComponent)
+
+
     }
 
 
@@ -146,15 +149,24 @@ export
 
 
 export
-    class Item extends Entity {
+    class Item extends SerializableEntity {
+
+    title: string = "Item"
+    description: string = "Item is an item."
 
     constructor() {
         super()
 
+        this.putComponent(TemplateComponent).data = `<a-box src="/assets/crate1.jpg"></a-box>`;
+        this.putComponent(DynamicBody)
+
+
+
     }
-
-
 }
+
+
+
 
 /**
  * spawn points should be used to spawn players & players
@@ -171,9 +183,7 @@ export
         super()
         this.putComponent(BaseProperties3D)
 
-
         this.script = new FPSCtrl(5).start()
-
         this.script.on('frame', () => this.update())
 
     }
@@ -185,6 +195,15 @@ export
 
         if (this.current > 20) return
         const block = new NPC()
+
+
+        if (this.current > 17) {
+            const item = new Item()
+            item.title = "Item " + this.current
+            this.engine.addEntity(item)
+            return
+        }
+
 
         const color = '#' + new THREE.Color(Math.random() * 255 * 255 * 255).getHex().toString(16)
 
@@ -286,8 +305,8 @@ export
 
         const mBody = this.mEntity.getComponent(DynamicBody)
 
-            const force=new THREE.Vector3(0, 6, 0)
-        var newForce =   force.applyMatrix4(mBody.body.matrix);
+        const force = new THREE.Vector3(0, 6, 0)
+        var newForce = force.applyMatrix4(mBody.body.matrix);
         mBody.body.applyCentralImpulse(newForce);
 
         if (!this.jump1) {
@@ -315,14 +334,20 @@ export
 
     direction = new THREE.Vector3()
     velocity = 0
+
+
+    restrict2D = true
+    airWalk = true
     update(mEntity: SerializableEntity) {
 
 
-        /*  if (mEntity.hasComponent(JumpComponent)) {
-              const c = mEntity.getComponent(JumpComponent)
-              if (c.airborne) return //prevent change of direction if not on the ground
-          }
-  */
+        // enable/disable moving while jumping
+        if (!this.airWalk)
+            if (mEntity.hasComponent(JumpComponent)) {
+                const c = mEntity.getComponent(JumpComponent)
+                if (c.airborne) return //prevent change of direction if not on the ground
+            }
+
         if (mEntity.hasComponent(DynamicBody)) {
             this.moveCurrentDirection(mEntity)
         }
@@ -334,32 +359,15 @@ export
 
     }
 
-
-    /*  moveForward(){
-          var box = this.component.entity.get('mesh').object;
-          //this.velocity = Math.abs(box.getLinearVelocity().z) + Math.abs(box.getLinearVelocity().x);
-          this.velocity = box.getLinearVelocity().length();
-          if (!this.isJumping && this.velocity < this.moveSpeed){
-              var matrix = (new THREE.Matrix4()).makeRotationFromEuler( box.rotation ); 
-              var velocity = (new THREE.Vector3( 0, 0, -1 ).applyMatrix4(matrix)).normalize().multiplyScalar(this.moveSpeed-this.velocity);
-              box.setLinearVelocity(box.getLinearVelocity().add(velocity));
-          }
-      }*/
-
     moveCurrentDirection(mEntity: SerializableEntity) {
         var box = mEntity.getComponent(DynamicBody).body//this.component.entity.get('mesh').object;
 
         // FIXME either diret position or setting velocity should create decent movement
-        box.setLinearFactor(new THREE.Vector3(1, 1, 1))
+        if (this.restrict2D)
+            box.setLinearFactor(new THREE.Vector3(1, 1, 0))
+        else
+            box.setLinearFactor(new THREE.Vector3(1, 1, 1))
 
-        /*   const fps=30
-           box.__dirtyPosition = true;
-   
-           box.position.add((this.direction).normalize().multiplyScalar(this.maxSpeed/fps))
-   
-           // FIXME physics based movement
-           return;
-   */
 
         const lenV = box.getLinearVelocity()
         this.velocity = lenV.length();
@@ -368,12 +376,84 @@ export
             //  var velocityVector = (new THREE.Vector3( 0, 0, -1 ).applyMatrix4(matrix)).normalize().multiplyScalar(this.maxSpeed-this.velocity);
             var velocityVector = (this.direction).normalize().multiplyScalar(this.maxSpeed - this.velocity);
 
-            box.setLinearVelocity(box.getLinearVelocity().add(velocityVector));
+            const newVelocity = box.getLinearVelocity().add(velocityVector)
+
+            if (this.restrict2D)
+                newVelocity.z = 0
+
+            box.setLinearVelocity(newVelocity);
+
+
+
+
         }
     }
 
 }
 
+
+
+
+
+// pick up closest item and put into player inventory
+export
+    class InteractControllerComponent implements Component, Updateable {
+    static readonly tag = "core/InteractControllerComponent";
+
+
+    interact() {
+        console.log("interact TODO ")
+
+
+    }
+
+
+    update(mEntity: SerializableEntity) {
+        let entries = mEntity.getComponent(ProximityComponent).entries
+
+        entries = entries.sort((a, b) => b.distance - a.distance).filter(v => v.entity instanceof Item)
+
+        const closest = entries[0]
+        if (closest && closest.distance < 2) {
+            const inventory = mEntity.getComponent(Inventory)
+
+            mEntity.engine.removeEntity(closest.entity)
+
+            inventory.items.push(closest.entity as Item)
+
+            console.log("Picked up Item")
+
+        }
+
+    }
+}
+
+
+export
+    class RaycastComponent implements Component, Updateable {
+    static readonly tag = "core/RayTraceComponent";
+
+    update(mEntity: SerializableEntity) {
+
+        // retrieve direction of ray from wasd controller
+        const direction = mEntity.getComponent(ControllerComponent).direction
+        // TODO use FOVComponent
+        const entries = mEntity.getComponent(ProximityComponent).entries
+
+
+        // retrieve objects for the raycaster (initially the physics objects will be sufficient)
+        entries.map(v => v.entity.getComponent(BaseProperties3D))
+
+
+        /*
+        var raycaster = new THREE.Raycaster();
+        raycaster.setFromCamera( mouse, camera );
+        raycaster.setFromMatrix(...)
+        var intersects = raycaster.intersectObjects( scene.children );
+         */
+    }
+
+}
 
 export
     class ProximityComponent implements Component, Updateable {
