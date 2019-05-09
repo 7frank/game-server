@@ -131,41 +131,50 @@ export class Application3D {
         });
 
 
-        // TODO send direction vector instead & only update positions based on direction * current speed
-        
-        const keys = { w: 0, a: 0, s: 0, d: 0 }
- 
-        
-        let lastPosition;
-            camera.addEventListener('positionChanged', (evt) => {
-                if (keys.w+keys.a+keys.s+keys.d ==0) return 
-                
-                if (this.currentPlayerEntity) {
-    
-                       if (!lastPosition) {
-                           lastPosition=evt.detail.clone()
-                           return
-                       }
-       
-                       let direction=evt.detail.clone().sub(lastPosition)
-                     //  console.log("lastPosition",lastPosition)
-                     //  console.log("currPosition",evt.detail)
-                       console.log("direction",direction)
-                       lastPosition=evt.detail.clone()
-                       
-    
-                    this.activeRoom.send([MessageTypes.playerMove, direction]);
-                }
-            });
 
+   // @ts-ignore FIXME
+            setTimeout(() =>  document.querySelector("[camera]").removeAttribute("wasd-controls"), 2000)
+
+
+        // TODO send direction vector instead & only update positions based on direction * current speed
+
+        const keys = { w: 0, a: 0, s: 0, d: 0 }
+
+
+        /*  let lastPosition;
+              camera.addEventListener('positionChanged', (evt) => {
+                  if (keys.w+keys.a+keys.s+keys.d ==0) return 
+                  console.log("!!!!!!!!!!!!!!!")
+                  if (this.currentPlayerEntity) {
       
+                         if (!lastPosition) {
+                             lastPosition=evt.detail.clone()
+                             return
+                         }
+         
+                         let direction=evt.detail.clone().sub(lastPosition)
+                       //  console.log("lastPosition",lastPosition)
+                       //  console.log("currPosition",evt.detail)
+                         console.log("direction",direction)
+                         lastPosition=evt.detail.clone()
+                         
+      
+                      this.activeRoom.send([MessageTypes.playerMove, direction]);
+                  }
+              });
+  */
+
         const movePlayer = () => {
 
-            const direction = new THREE.Vector3(keys.d - keys.a, 0, keys.w - keys.s)
+            let  direction = new THREE.Vector3(keys.d - keys.a, 0, keys.w - keys.s)
+         
+
+            direction.applyMatrix4(sceneEl.camera.el.object3D.matrix)
+            console.log("direction",direction)
            // this.activeRoom.send([MessageTypes.playerMove, direction]);
 
         }
-  
+
         Hotkeys.register(MessageTypes.playerMove + "-forward", 'w', {
             // category: 'HUD',
             target: this.sceneEl
@@ -179,7 +188,7 @@ export class Application3D {
         });
 
 
-        Hotkeys.register(MessageTypes.playerMove + "-backward", 'w', {
+        Hotkeys.register(MessageTypes.playerMove + "-backward", 's', {
             // category: 'HUD',
             target: this.sceneEl
         });
@@ -190,7 +199,7 @@ export class Application3D {
             keys.s = 0
         });
 
-        Hotkeys.register(MessageTypes.playerMove + "-left", 'w', {
+        Hotkeys.register(MessageTypes.playerMove + "-left", 'a', {
             // category: 'HUD',
             target: this.sceneEl
         });
@@ -201,7 +210,7 @@ export class Application3D {
             keys.a = 0
         });
 
-        Hotkeys.register(MessageTypes.playerMove + "-right", 'w', {
+        Hotkeys.register(MessageTypes.playerMove + "-right", 'd', {
             // category: 'HUD',
             target: this.sceneEl
         });
@@ -518,7 +527,7 @@ export class Application3D {
                 // FIXME
                 // @ts-ignore
                 document.querySelector("[camera]").object3D.position.x = change.value
-              //  console.log("change cam", change.value)
+                //  console.log("change cam", change.value)
             }
 
         })
@@ -532,7 +541,7 @@ export class Application3D {
                 // FIXME
                 // @ts-ignore
                 document.querySelector("[camera]").object3D.position.y = change.value
-              //  console.log("change cam", change.value)
+                //  console.log("change cam", change.value)
             }
 
         })
@@ -546,7 +555,7 @@ export class Application3D {
                 // FIXME
                 // @ts-ignore
                 document.querySelector("[camera]").object3D.position.z = change.value
-              //  console.log("change cam", change.value)
+                //  console.log("change cam", change.value)
             }
 
         })

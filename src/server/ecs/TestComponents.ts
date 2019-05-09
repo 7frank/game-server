@@ -345,11 +345,22 @@ export
 
     moveCurrentDirection(mEntity: SerializableEntity) {
         var box = mEntity.getComponent(DynamicBody).body//this.component.entity.get('mesh').object;
-        //this.velocity = Math.abs(box.getLinearVelocity().z) + Math.abs(box.getLinearVelocity().x);
+
+        // FIXME either diret position or setting velocity should create decent movement
+        //box.setLinearFactor(new THREE.Vector3(1,1,1))
+      
+        const fps=30
+        box.__dirtyPosition = true;
+
+        box.position.add((this.direction).normalize().multiplyScalar(this.maxSpeed/fps))
+
+        // FIXME physics based movement
+        return;
+
+
+
         this.velocity = box.getLinearVelocity().length();
-        if (
-            //!this.isJumping && 
-            this.velocity < this.maxSpeed) {
+        if ( this.velocity < this.maxSpeed) {
             //  var matrix = (new THREE.Matrix4()).makeRotationFromEuler( box.rotation ); 
             //  var velocityVector = (new THREE.Vector3( 0, 0, -1 ).applyMatrix4(matrix)).normalize().multiplyScalar(this.maxSpeed-this.velocity);
             var velocityVector = (this.direction).normalize().multiplyScalar(this.maxSpeed - this.velocity);
