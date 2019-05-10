@@ -621,6 +621,9 @@ export class Application3D {
 
                 if (change.operation === "add") {
               
+                    if (this.activeChat.sessionId==change.value.author)
+                    change.value.author="me";
+
                     (document.querySelector("#chat") as any).__vue__.messageList.push(change.value)
   
                 }

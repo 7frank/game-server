@@ -85,6 +85,7 @@ export class ChatRoom extends Room<ChatState> {
 
 
         if (this.state.participants.length <= 2) {
+            if ( message.data.text)
             setTimeout(() => {
                 this.state.addMessage({
                     type: 'text',
