@@ -92,5 +92,5 @@ app.use("/", express.static(STATIC_DIR));
 const auth = basicAuth({ users: { 'admin': 'admin' }, challenge: true });
 app.use("/colyseus", auth, monitor(gameServer));
 
-gameServer.listen(port);
+gameServer.listen(port,'0.0.0.0');
 console.log(`Listening on http://${endpoint}:${port}`);

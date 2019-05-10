@@ -8,6 +8,10 @@ import { MessageTypes, ChatMessageTypes } from "../common/types";
 import { Hotkeys } from "@nk11/keyboard-interactions";
 import { FPSCtrl } from "./FPSCtrl";
 import { BaseProperties3D } from "../server/ecs/TestComponents";
+import { createRegion,createEntity,createEntityFromData,createEntityHTML } from "./dom-utils";
+
+var parseHTML = require('parsehtml');
+
 
 const PLAYER_SIZE = 1.8
 // @ts-ignore
@@ -396,8 +400,6 @@ export class Application3D {
                     console.log("isCurrentPlayer", isCurrentPlayer)
 
 
-
-                    //FIXME using models will break phyics sync
                     const el = createEntityHTML("#steve", "Player " + room.sessionId)
                     sceneEl.append(el)
 
@@ -406,16 +408,9 @@ export class Application3D {
                     if (change.value.BaseProperties3D)
                         el.object3D.position.copy(change.value.BaseProperties3D.position);
 
-
-
-
                     if (isCurrentPlayer) {
                         this.currentPlayerEntity = el.object3D;
-
-                        //el.object3D.visible = false    
                         el.setAttribute("visible", false);
-
-
                     }
 
                     el.addEventListener('model-loaded', () => {
@@ -611,8 +606,18 @@ export class Application3D {
             this.activeChat = newRoom
 
 
+            this.activeChat.listen("participants/:id", (change: DataChange) => {
+              
+                if (change.operation === "add") {
+              
+                    (document.querySelector("#chat") as any).__vue__.participants.push(change.value)
+  
+                }
+
+            })
+
             this.activeChat.listen("messages/:id", (change: DataChange) => {
-                console.log("DataChange chat:", change)
+               // console.log("DataChange chat:", change)
 
                 if (change.operation === "add") {
               
@@ -761,57 +766,5 @@ export class Application3D {
 
 }
 
-
-
-var parseHTML = require('parsehtml');
-
-
-function createRegion(color = "#7BC8A4") {
-
-
-    //const tpl = `<a-box position="0 1 0"  width="10.5" height="1" depth="10.5" color="green" custom-shadow></a-box>`
-
-    const tpl = `<a-entity class="region"></a-entity> `
-    const el = parseHTML(tpl)
-    return el
-}
-
-function createEntity() {
-
-    // Create a Cube Mesh with basic material
-    /*var geometry = new THREE.BoxGeometry(1, 1, 1);
-    var material = new THREE.MeshStandardMaterial({ color: "#433F81",transparent:true, opacity:0.5 });
-    var cube = new THREE.Mesh(geometry, material);
-    return cube
-*/
-
-    const el = parseHTML(`<a-box  color="#433F81" shadow="cast: true;receive: true"></a-box>`)
-
-    return el
-}
-
-
-function createEntityFromData(data) {
-
-    const el = parseHTML(`<a-entity></a-entity>`)
-    const dataEl = parseHTML(data)
-    el.append(dataEl)
-
-    return el
-}
-
-
-function createEntityHTML(selector = "#steve", text = "Hello") {
-
-    var htmlSnippet = `<a-entity  position="0 ${-PLAYER_SIZE} 0">
-    
-    <a-text position="0 2.5 0" scale="3 3 3" color="black" align='center' value=" ${text}"></a-text>
-    <a-entity gltf-model="${selector}" shadow="cast: true;receive: true"></a-entity>
-    </a-entity>`,
-        html = parseHTML(htmlSnippet);
-
-    return html
-
-}
 
 

@@ -182,7 +182,7 @@ export
     constructor() {
         super()
         this.putComponent(BaseProperties3D)
-
+        this.putComponent(TemplateComponent).data = `<a-box scale="0.5 0.5 0.5" src="/assets/crate1.jpg"></a-box>`;
         this.script = new FPSCtrl(5).start()
         this.script.on('frame', () => this.update())
 
