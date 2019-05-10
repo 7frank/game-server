@@ -1,4 +1,5 @@
 import { Application3D } from "./Application3D";
+//import { createViews } from "./chat/chat";
 
 document.querySelector('a-scene').addEventListener('loaded', function (e) {
 
@@ -7,5 +8,10 @@ document.querySelector('a-scene').addEventListener('loaded', function (e) {
     window['app']=app
   //  app.interpolation = true;
 
+
+  //createViews()
+
+
+  
 
 })

@@ -54,6 +54,8 @@
     "gl": "^4.2.2",
     "jsdom-wc": "^11.0.0-alpha-1",
     "nodejs-physijs": "^0.1.5",
-    "parsehtml": "^1.0.0"
+    "parsehtml": "^1.0.0",
+    "vue": "^2.6.10",
+    "vue-beautiful-chat": "^2.2.0"
   }
 }
