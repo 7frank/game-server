@@ -499,6 +499,11 @@ window['oo']={assetEl,el}
             } else if (change.operation === "remove") {
 
                 let o = entitiesInRoom[change.path.id]
+
+
+                if (o.el)
+                o.el.parentNode.removeChild(o.el);
+
                 this.scene.remove(o);
                 if (o.geometry)
                     o.geometry.dispose();

@@ -65,7 +65,7 @@ export
 export
     class Inventory implements Component {
     static readonly tag = "core/Inventory";
-    items: Item[];
+    items: Item[]=[];
 
 }
 
@@ -411,7 +411,9 @@ export
     update(mEntity: SerializableEntity) {
         let entries = mEntity.getComponent(ProximityComponent).entries
 
-        entries = entries.sort((a, b) => b.distance - a.distance).filter(v => v.entity instanceof Item)
+        entries = entries.sort((a, b) => a.distance - b.distance).filter(v => v.entity instanceof Item)
+
+        if (entries.length==0) return
 
         const closest = entries[0]
         if (closest && closest.distance < 2) {
@@ -420,11 +422,10 @@ export
             mEntity.engine.removeEntity(closest.entity)
 
             inventory.items.push(closest.entity as Item)
-
+  
             console.log("Picked up Item")
 
         }
-
     }
 }
 
