@@ -18,6 +18,7 @@ import { monitor } from "@colyseus/monitor";
 
 import { ContainerRoom } from "./rooms/physics/ContainerRoom";
 import { PhysicsContainerState } from "./rooms/region/ContainerState";
+import { ChatRoom } from "./rooms/ChatRoom";
 
 
 export const port = Number(process.env.PORT || 8080);
@@ -64,6 +65,7 @@ gameServer.register("aframe-region-2", ContainerRoom, {
     data: `<a-box  width="10.5" height="0.1" depth="10.5" color="green" shadow></a-box> `
 });
 
+gameServer.register("global-chat", ChatRoom, {});
 
 
 // TODO add regions to world at position x

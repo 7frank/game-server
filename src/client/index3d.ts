@@ -1,5 +1,5 @@
 import { Application3D } from "./Application3D";
-//import { createViews } from "./chat/chat";
+import { createViews } from "./chat/chat";
 
 document.querySelector('a-scene').addEventListener('loaded', function (e) {
 
@@ -9,9 +9,12 @@ document.querySelector('a-scene').addEventListener('loaded', function (e) {
   //  app.interpolation = true;
 
 
-  //createViews()
+  createViews();
 
+  (document.querySelector("#chat") as any).__vue__.$on("chat-message",(e)=> app.sendToChatRoom(e.detail))
+  
 
+  
   
 
 })

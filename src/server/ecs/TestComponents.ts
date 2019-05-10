@@ -212,7 +212,7 @@ export
         else
             block.putComponent(AssetsComponent)
 
-        block.getComponent(DynamicBody).mass = 100
+        block.getComponent(DynamicBody).mass = 10
 
         this.engine.addEntity(block)
 

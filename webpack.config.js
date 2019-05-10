@@ -3,6 +3,9 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
+const VueLoaderPlugin = require('vue-loader/lib/plugin')
+
+
 module.exports = function (options) {
   return {
     mode: process.env.NODE_ENV || "development",
@@ -15,10 +18,40 @@ module.exports = function (options) {
       rules: [
         { test: /\.tsx?$/, use: 'ts-loader?configFile=tsconfig-client.json', exclude: /node_modules/ },
         { test: /\.(png|woff|woff2|eot|ttf|svg)$/, use: 'file-loader?limit=1024&name=[path][name].[ext]' },
+        {
+          test: /\.vue$/,
+          loader: 'vue-loader'
+        },
+        // this will apply to both plain `.js` files
+        // AND `<script>` blocks in `.vue` files
+        {
+          test: /\.js$/,
+          exclude: /node_modules/,
+          loader: 'babel-loader'
+        },
+        // this will apply to both plain `.css` files
+        // AND `<style>` blocks in `.vue` files
+        {
+          test: /\.css$/,
+          use: [
+            'vue-style-loader',
+            'css-loader'
+          ]
+        },
+        {
+          test: /\.scss$/,
+          use: [
+              "style-loader", // creates style nodes from JS strings
+              "css-loader", // translates CSS into CommonJS
+              "sass-loader" // compiles Sass to CSS, using Node Sass by default
+          ]
+      }
       ]
     },
     plugins: [
       new webpack.HotModuleReplacementPlugin(),
+
+      new VueLoaderPlugin(),
 
       new HtmlWebpackPlugin({
         template: path.resolve("src", "client", "index3d.html")

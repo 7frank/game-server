@@ -8,3 +8,10 @@ enum MessageTypes
    playerTalkTo="playerTalkTo"
 
 }
+
+export
+enum ChatMessageTypes
+{
+   send="send"
+ 
+}

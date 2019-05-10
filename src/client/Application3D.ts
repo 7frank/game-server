@@ -4,7 +4,7 @@ import { Client, DataChange } from "colyseus.js";
 
 import { Room } from "colyseus";
 import { create } from "domain";
-import { MessageTypes } from "../common/types";
+import { MessageTypes, ChatMessageTypes } from "../common/types";
 import { Hotkeys } from "@nk11/keyboard-interactions";
 import { FPSCtrl } from "./FPSCtrl";
 import { BaseProperties3D } from "../server/ecs/TestComponents";
@@ -49,6 +49,7 @@ type RoomEntityMap = { [id: string]: EntityMap }
 
 
 
+
 export class Application3D {
     //entities: EntityMap = {};
 
@@ -60,6 +61,9 @@ export class Application3D {
     client = new Client(ENDPOINT);
 
     activeRoom;
+
+    activeChat;
+
     connectedRooms: Room[] = []
 
 
@@ -76,7 +80,7 @@ export class Application3D {
         this.scene = sceneEl.object3D// init3DScene(scene)
 
 
-     
+
 
         var camera = sceneEl.camera.el;
         camera.addEventListener('rotationChanged', (evt) => {
@@ -100,23 +104,23 @@ export class Application3D {
         setTimeout(() => document.querySelector("[camera]").removeAttribute("wasd-controls"), 2000)
 
 
-       let cameraDistance=0
+        let cameraDistance = 0
         sceneEl.addEventListener("wheel", event => {
-            
-            const el= this.currentPlayerEntity.el
+
+            const el = this.currentPlayerEntity.el
 
             el.setAttribute("visible", true);
-            cameraDistance+=event.deltaY>0?1:-1
-            if (cameraDistance<0)cameraDistance=0
-            if (cameraDistance>10)cameraDistance=10
+            cameraDistance += event.deltaY > 0 ? 1 : -1
+            if (cameraDistance < 0) cameraDistance = 0
+            if (cameraDistance > 10) cameraDistance = 10
 
-            sceneEl.camera.position.set(0,0,cameraDistance);    
-            this.currentPlayerEntity.traverse( c=>  {if (c.material) {c.material.opacity=cameraDistance>3?1:(cameraDistance/10);c.material.transparent=true  }} )
-             console.info(event.deltaY)
-         
-         
-         });
- 
+            sceneEl.camera.position.set(0, 0, cameraDistance);
+            this.currentPlayerEntity.traverse(c => { if (c.material) { c.material.opacity = cameraDistance > 3 ? 1 : (cameraDistance / 10); c.material.transparent = true } })
+            console.info(event.deltaY)
+
+
+        });
+
 
 
 
@@ -151,10 +155,10 @@ export class Application3D {
 
 
             direction.normalize().multiplyScalar(0.1)
-           
-             this.activeRoom.send([MessageTypes.playerMove, direction]);
+
+            this.activeRoom.send([MessageTypes.playerMove, direction]);
             // @ts-ignore
-           // document.querySelector("[camera]").object3D.position.add(direction)
+            // document.querySelector("[camera]").object3D.position.add(direction)
         }
 
         Hotkeys.register(MessageTypes.playerMove + "-forward", 'w', {
@@ -350,6 +354,7 @@ export class Application3D {
 
 
         this.joinRoom("aframe-region-1")
+        this.joinChat("global-chat")
 
         //    this.interpolation = true;
 
@@ -418,7 +423,7 @@ export class Application3D {
                     })
 
 
-                 
+
 
 
                     // FIXME Dimensions
@@ -429,7 +434,7 @@ export class Application3D {
                     //box.setFromCenterAndSize(new THREE.Vector3(0, -PLAYER_SIZE / 2, 0), new THREE.Vector3().copy(change.value.dimensions));
                     box.setFromCenterAndSize(new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 1, 1));
 
-                   
+
                     var helper = new THREE.Box3Helper(box, 0xffff00);
                     entitiesInRoom[change.path.id].add(helper);
                     entitiesInRoom[change.path.id].boxHelper = helper
@@ -443,10 +448,10 @@ export class Application3D {
                     if (asset) {
                         const assetEl = parseHTML(` <a-asset-item id="${asset.id}" src="${asset.src}" animation-mixer="clip: *"></a-asset-item>`)
                         sceneEl.append(assetEl)
-                
-                        el = createEntityHTML(`#${asset.id}`,"asset")
+
+                        el = createEntityHTML(`#${asset.id}`, "asset")
                         sceneEl.append(el)
-window['oo']={assetEl,el}
+                        window['oo'] = { assetEl, el }
                     }
                     else {
                         el = change.value.TemplateComponent ? createEntityFromData(change.value.TemplateComponent.data) : createEntity()
@@ -502,7 +507,7 @@ window['oo']={assetEl,el}
 
 
                 if (o.el)
-                o.el.parentNode.removeChild(o.el);
+                    o.el.parentNode.removeChild(o.el);
 
                 this.scene.remove(o);
                 if (o.geometry)
@@ -515,49 +520,49 @@ window['oo']={assetEl,el}
 
         });
 
-  
-                room.listen("entities/:id/BaseProperties3D/position/x", (change: DataChange) => {
-                    const isCurrentPlayer = change.path.id === room.sessionId
-                    const el = entitiesInRoom[change.path.id]
-                    if (isCurrentPlayer && el) {
-                        //  this.currentPlayerEntity = el.object3D;
-        
-                        // FIXME
-                        // @ts-ignore
-                        document.querySelector("[camera]").object3D.position.x = change.value
-                        //  console.log("change cam", change.value)
-                    }
-        
-                })
-        
-                room.listen("entities/:id/BaseProperties3D/position/y", (change: DataChange) => {
-                    const isCurrentPlayer = change.path.id === room.sessionId
-                    const el = entitiesInRoom[change.path.id]
-                    if (isCurrentPlayer && el) {
-                        //  this.currentPlayerEntity = el.object3D;
-        
-                        // FIXME
-                        // @ts-ignore
-                        document.querySelector("[camera]").object3D.position.y = change.value
-                        //  console.log("change cam", change.value)
-                    }
-        
-                })
-        
-                room.listen("entities/:id/BaseProperties3D/position/z", (change: DataChange) => {
-                    const isCurrentPlayer = change.path.id === room.sessionId
-                    const el = entitiesInRoom[change.path.id]
-                    if (isCurrentPlayer && el) {
-                        //  this.currentPlayerEntity = el.object3D;
-        
-                        // FIXME
-                        // @ts-ignore
-                        document.querySelector("[camera]").object3D.position.z = change.value
-                        //  console.log("change cam", change.value)
-                    }
-        
-                })
-        
+
+        room.listen("entities/:id/BaseProperties3D/position/x", (change: DataChange) => {
+            const isCurrentPlayer = change.path.id === room.sessionId
+            const el = entitiesInRoom[change.path.id]
+            if (isCurrentPlayer && el) {
+                //  this.currentPlayerEntity = el.object3D;
+
+                // FIXME
+                // @ts-ignore
+                document.querySelector("[camera]").object3D.position.x = change.value
+                //  console.log("change cam", change.value)
+            }
+
+        })
+
+        room.listen("entities/:id/BaseProperties3D/position/y", (change: DataChange) => {
+            const isCurrentPlayer = change.path.id === room.sessionId
+            const el = entitiesInRoom[change.path.id]
+            if (isCurrentPlayer && el) {
+                //  this.currentPlayerEntity = el.object3D;
+
+                // FIXME
+                // @ts-ignore
+                document.querySelector("[camera]").object3D.position.y = change.value
+                //  console.log("change cam", change.value)
+            }
+
+        })
+
+        room.listen("entities/:id/BaseProperties3D/position/z", (change: DataChange) => {
+            const isCurrentPlayer = change.path.id === room.sessionId
+            const el = entitiesInRoom[change.path.id]
+            if (isCurrentPlayer && el) {
+                //  this.currentPlayerEntity = el.object3D;
+
+                // FIXME
+                // @ts-ignore
+                document.querySelector("[camera]").object3D.position.z = change.value
+                //  console.log("change cam", change.value)
+            }
+
+        })
+
 
 
 
@@ -591,8 +596,34 @@ window['oo']={assetEl,el}
   
           });*/
 
+
+         
+
     }
 
+    joinChat(name) {
+
+        const newRoom = this.client.join(name);
+        newRoom.onJoin.add(() => {
+            console.log("connected to chat ", name, newRoom)
+
+
+            this.activeChat = newRoom
+
+
+            this.activeChat.listen("messages/:id", (change: DataChange) => {
+                console.log("DataChange chat:", change)
+
+                if (change.operation === "add") {
+              
+                    (document.querySelector("#chat") as any).__vue__.messageList.push(change.value)
+  
+                }
+
+            })
+
+        })
+    }
 
 
     joinRoom(name, color?, position?) {
@@ -719,6 +750,15 @@ window['oo']={assetEl,el}
             requestAnimationFrame(() => this.loop(room));
         }
     }
+
+
+    sendToChatRoom(message) {
+
+
+        this.activeChat.send([ChatMessageTypes.send, message]);
+
+    }
+
 }
 
 

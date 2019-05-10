@@ -4,10 +4,6 @@ Vue.use(Chat)
 var parseHTML = require('parsehtml');
 
 
-
-
-
-
 Vue.component('chat-window', {
     template: `<template>
     <div>
@@ -35,6 +31,11 @@ Vue.component('chat-window', {
     data() {
       return {
         participants: [
+          {
+            id: 'Bot-Admin',
+            name: 'Bot-Admin',
+            imageUrl: 'https://avatars3.githubusercontent.com/u/1915989?s=230&v=4'
+          },
           {
             id: 'user1',
             name: 'Matteo',
@@ -86,10 +87,18 @@ Vue.component('chat-window', {
       sendMessage (text) {
         if (text.length > 0) {
           this.newMessagesCount = this.isChatOpen ? this.newMessagesCount : this.newMessagesCount + 1
-          this.onMessageWasSent({ author: 'support', type: 'text', data: { text } })
+          const message={ author: 'me', type: 'text', data: { text } }
+          this.onMessageWasSent(message)
+
+    
+       
+     
         }
       },
       onMessageWasSent (message) {
+        this.$emit("chat-message", {
+            detail: message
+          })
         // called when the user sends a message
         this.messageList = [ ...this.messageList, message ]
       },
@@ -120,8 +129,8 @@ Vue.component('chat-window', {
 export
     function createViews() {
     const el = parseHTML(`
-<div id="app">
-    {{ message }}
+<div id="app" style="z-index: 9999;position: absolute;">
+    {{ message }}<chat-window id='chat'></chat-window>
   </div>
 `)
     document.querySelector('body').append(el)
