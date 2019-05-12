@@ -176,6 +176,9 @@ export class Application3D {
 
 
 
+        const getTarget=()=> (document.querySelector("#test") as any)
+        //const getTarget=()=> (document.querySelector("#local-player-model") as any)
+       
         Hotkeys.register("test", 'F1', {
             // category: 'HUD',
             target: this.sceneEl
@@ -203,15 +206,15 @@ export class Application3D {
         Hotkeys().on("test2", (evt) => {
             console.log("aaa test2")
 
-            var helper = new THREE.SkeletonHelper((document.querySelector("#test") as any).object3D);
+            var helper = new THREE.SkeletonHelper(getTarget().object3D);
             helper.material.linewidth = 3;
             this.scene.add(helper);
-
-            document.querySelector("#test").setAttribute("fbx-animation__2", "name: walk;src: url(/assets/animations/Samba Dancing.fbx);")
+            getTarget().setAttribute("fbx-animation__1", "name: idle;src: url(/assets/animations/Idle.fbx);")
+            getTarget().setAttribute("fbx-animation__2", "name: dance;src: url(/assets/animations/Samba Dancing.fbx);")
         });
         Hotkeys().on("test3", (evt) => {
             console.log("aaa test3")
-            document.querySelector("#test").setAttribute("animation-mixer", "clip: walk;crossFadeDuration: 1; useSkinnedMeshRoot: true;")
+            getTarget().setAttribute("animation-mixer", "clip: idle;crossFadeDuration: 1; useSkinnedMeshRoot: true;")
         });
 
 
