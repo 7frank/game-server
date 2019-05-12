@@ -28,6 +28,10 @@ window.Zlib = Zlib.Zlib;
 
 import fbx_animation from './components/fbx-animation'
 AFRAME.registerComponent("fbx-animation", fbx_animation)
+
+import gltf_animation from './components/gltf-animation'
+AFRAME.registerComponent("gltf-animation", gltf_animation)
+
 import './components/animation-mixer'
 
 
@@ -199,9 +203,15 @@ export class Application3D {
             var helper = new THREE.SkeletonHelper(getTarget().object3D);
             helper.material.linewidth = 3;
             this.scene.add(helper);
-            getTarget().setAttribute("fbx-animation__1", "name: idle;src: url(/assets/animations/Idle.fbx);")
+          /*  getTarget().setAttribute("fbx-animation__1", "name: idle;src: url(/assets/animations/Idle.fbx);")
             getTarget().setAttribute("fbx-animation__2", "name: dance;src: url(/assets/animations/Samba Dancing.fbx);")
             getTarget().setAttribute("fbx-animation__3", "name: dance;src: url(/assets/animations/Running.fbx);")
+*/
+
+
+            getTarget().setAttribute("gltf-animation__1", "name: idle;src: url(/assets/animations/Idle.glb);")
+            getTarget().setAttribute("gltf-animation__2", "name: dance;src: url(/assets/animations/Samba Dancing.glb);")
+            getTarget().setAttribute("gltf-animation__3", "name: dance;src: url(/assets/animations/Running.glb);")
 
       
         });

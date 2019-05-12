@@ -26,17 +26,11 @@ if (argv._.length == 1) argv._.push(argv._[0].split('.').slice(0, -1).join('.') 
 console.log("convert =>", argv._[0], argv._[1])
 
 glob(argv._[0], {}, function (err, files) {
-    // files is an array of filenames.
-    // If the `nonull` option is set, and nothing
-    // was found, then files is ["**/*.js"]
-    // er is an error object or null.
-    console.log(files)
-
 
     files.forEach(inputFile => {
         const outputFile = inputFile.split('.').slice(0, -1).join('.') + ".glb"
         checkFileExists(outputFile)
-            .then(() => console.log('does already exist:', outputFile))
+            .then(() => console.log('skipping file (exist):', outputFile))
             .catch(() => {
 
                 convert(inputFile, outputFile, []).then(
@@ -49,12 +43,7 @@ glob(argv._[0], {}, function (err, files) {
                         // ack, conversion failed: inspect 'error' for details
                     }
                 );
-
-
             })
-
     });
-
-
 });
 
