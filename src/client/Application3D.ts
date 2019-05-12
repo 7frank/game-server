@@ -176,13 +176,10 @@ export class Application3D {
 
 
 
-        const getTarget=()=> (document.querySelector("#test") as any)
-        //const getTarget=()=> (document.querySelector("#local-player-model") as any)
+        //const getTarget=()=> (document.querySelector("#test") as any)
+        const getTarget=()=> (document.querySelector("#local-player-model") as any)
        
-        Hotkeys.register("test", 'F1', {
-            // category: 'HUD',
-            target: this.sceneEl
-        });
+       
 
         Hotkeys.register("test2", 'F2', {
             // category: 'HUD',
@@ -194,14 +191,7 @@ export class Application3D {
             target: this.sceneEl
         });
 
-        Hotkeys().on("test", (evt) => {
-            console.log("aaa test")
-            const el = parseHTML(`<a-entity id="test" position="0 1 2" gltf-model="src: url(/assets/claire.glb);"></a-entity>`)
-
-            sceneEl.append(el)
-
-        });
-
+    
 
         Hotkeys().on("test2", (evt) => {
             console.log("aaa test2")
@@ -211,10 +201,16 @@ export class Application3D {
             this.scene.add(helper);
             getTarget().setAttribute("fbx-animation__1", "name: idle;src: url(/assets/animations/Idle.fbx);")
             getTarget().setAttribute("fbx-animation__2", "name: dance;src: url(/assets/animations/Samba Dancing.fbx);")
+            getTarget().setAttribute("fbx-animation__3", "name: dance;src: url(/assets/animations/Running.fbx);")
+
+      
         });
         Hotkeys().on("test3", (evt) => {
             console.log("aaa test3")
-            getTarget().setAttribute("animation-mixer", "clip: idle;crossFadeDuration: 1; useSkinnedMeshRoot: true;")
+            getTarget().setAttribute("animation-mixer", "clip: dance;crossFadeDuration: 1; useSkinnedMeshRoot: true;")
+
+            getTarget().emit('dance', {}, false);
+
         });
 
 
