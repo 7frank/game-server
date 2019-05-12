@@ -8,21 +8,28 @@ import { MessageTypes, ChatMessageTypes } from "../common/types";
 import { Hotkeys } from "@nk11/keyboard-interactions";
 import { FPSCtrl } from "./FPSCtrl";
 import { BaseProperties3D } from "../server/ecs/TestComponents";
-import { createRegion,createEntity,createEntityFromData,createEntityHTML } from "./dom-utils";
+import { createRegion, createEntity, createEntityFromData, createEntityHTML } from "./dom-utils";
 
 var parseHTML = require('parsehtml');
 
-
+//import 'aframe-extras'
+import "three/examples/js/loaders/FBXLoader.js"
+//import 'aframe-extras/src/loaders/animation-mixer.js'
 
 
 const PLAYER_SIZE = 1.8
 // @ts-ignore
 const THREE = window.THREE
-
-
-
 // @ts-ignore
 const AFRAME = window.AFRAME
+const Zlib = require("three/examples/js/libs/inflate.min");
+// @ts-ignore
+window.Zlib = Zlib.Zlib;
+
+import fbx_animation from './components/fbx-animation'
+AFRAME.registerComponent("fbx-animation", fbx_animation)
+import './components/animation-mixer'
+
 
 
 AFRAME.registerComponent('wireframe', {
@@ -41,7 +48,7 @@ AFRAME.registerComponent('wireframe', {
 
 
 const ENDPOINT = (process.env.NODE_ENV === "development")
-    ? "ws://"+window.location.host
+    ? "ws://" + window.location.host
     : "wss://colyseus-pixijs-boilerplate.herokuapp.com";
 
 const WORLD_SIZE = 20;
@@ -166,6 +173,48 @@ export class Application3D {
             // @ts-ignore
             // document.querySelector("[camera]").object3D.position.add(direction)
         }
+
+
+
+        Hotkeys.register("test", 'F1', {
+            // category: 'HUD',
+            target: this.sceneEl
+        });
+
+        Hotkeys.register("test2", 'F2', {
+            // category: 'HUD',
+            target: this.sceneEl
+        });
+
+        Hotkeys.register("test3", 'F3', {
+            // category: 'HUD',
+            target: this.sceneEl
+        });
+
+        Hotkeys().on("test", (evt) => {
+            console.log("aaa test")
+            const el = parseHTML(`<a-entity id="test" position="0 1 2" gltf-model="src: url(/assets/claire.glb);"></a-entity>`)
+
+            sceneEl.append(el)
+
+        });
+
+
+        Hotkeys().on("test2", (evt) => {
+            console.log("aaa test2")
+
+            var helper = new THREE.SkeletonHelper((document.querySelector("#test") as any).object3D);
+            helper.material.linewidth = 3;
+            this.scene.add(helper);
+
+            document.querySelector("#test").setAttribute("fbx-animation__2", "name: walk;src: url(/assets/animations/Samba Dancing.fbx);")
+        });
+        Hotkeys().on("test3", (evt) => {
+            console.log("aaa test3")
+            document.querySelector("#test").setAttribute("animation-mixer", "clip: walk;crossFadeDuration: 1; useSkinnedMeshRoot: true;")
+        });
+
+
 
         Hotkeys.register(MessageTypes.playerMove + "-forward", 'w', {
             // category: 'HUD',
@@ -375,7 +424,7 @@ export class Application3D {
 
         // add / removal of entities
         room.listen("entities/:id", (change: DataChange) => {
-            console.log("DataChange:", change)
+            //console.log("DataChange:", change)
 
             if (change.operation === "add") {
 
@@ -564,7 +613,7 @@ export class Application3D {
 
 
         room.listen("entities/:id/PhysicsBody/collisions/:pos", (change: DataChange) => {
-            console.log("entities/:id/PhysicsBody", change)
+            //console.log("entities/:id/PhysicsBody", change)
             const el = entitiesInRoom[change.path.id]
 
 
@@ -594,7 +643,7 @@ export class Application3D {
           });*/
 
 
-         
+
 
     }
 
@@ -609,25 +658,25 @@ export class Application3D {
 
 
             this.activeChat.listen("participants/:id", (change: DataChange) => {
-              
+
                 if (change.operation === "add") {
-              
+
                     (document.querySelector("#chat") as any).__vue__.participants.push(change.value)
-  
+
                 }
 
             })
 
             this.activeChat.listen("messages/:id", (change: DataChange) => {
-               // console.log("DataChange chat:", change)
+                // console.log("DataChange chat:", change)
 
                 if (change.operation === "add") {
-              
-                    if (this.activeChat.sessionId==change.value.author)
-                    change.value.author="me";
+
+                    if (this.activeChat.sessionId == change.value.author)
+                        change.value.author = "me";
 
                     (document.querySelector("#chat") as any).__vue__.messageList.push(change.value)
-  
+
                 }
 
             })

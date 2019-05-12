@@ -38,12 +38,13 @@ function createEntityHTML(selector = "#steve", text = "Hello",PLAYER_SIZE=1.8) {
     var htmlSnippet = `<a-entity  position="0 ${-PLAYER_SIZE} 0">
     
     <a-text position="0 2.5 0" scale="3 3 3" color="black" align='center' value=" ${text}"></a-text>
-    <a-entity gltf-model="${selector}" shadow="cast: true;receive: true"></a-entity>
+    <a-entity id="local-player-model" gltf-model="${selector}" shadow="cast: true;receive: true"></a-entity>
     </a-entity>`,
         html = parseHTML(htmlSnippet);
 
     return html
 
 }
+
 
 

@@ -33,6 +33,7 @@
     "sass-loader": "^7.1.0",
     "scss-loader": "0.0.1",
     "style-loader": "^0.23.1",
+    "three": "^0.104.0",
     "ts-loader": "^5.3.3",
     "ts-node": "^8.0.2",
     "typescript": "^3.3.1",
@@ -52,6 +53,7 @@
     "@types/ammo.js": "github:osman-turan/ammo.js-typings",
     "@types/three": "^0.93.28",
     "aframe": "^0.9.0",
+    "aframe-extras": "github:donmccurdy/aframe-extras#feat-mixamo",
     "ammo-node": "^1.0.0",
     "ammojs": "0.0.2",
     "canvas": "^2.4.1",
@@ -67,6 +69,7 @@
     "parsehtml": "^1.0.0",
     "vue": "^2.6.10",
     "vue-beautiful-chat": "^2.2.0",
-    "vue-style-loader": "^4.1.2"
+    "vue-style-loader": "^4.1.2",
+    "zlibjs": "^0.3.1"
   }
 }
