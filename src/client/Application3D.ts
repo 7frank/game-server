@@ -13,6 +13,8 @@ import { createRegion,createEntity,createEntityFromData,createEntityHTML } from 
 var parseHTML = require('parsehtml');
 
 
+
+
 const PLAYER_SIZE = 1.8
 // @ts-ignore
 const THREE = window.THREE
@@ -39,7 +41,7 @@ AFRAME.registerComponent('wireframe', {
 
 
 const ENDPOINT = (process.env.NODE_ENV === "development")
-    ? "ws://localhost:8080"
+    ? "ws://"+window.location.host
     : "wss://colyseus-pixijs-boilerplate.herokuapp.com";
 
 const WORLD_SIZE = 20;
@@ -400,7 +402,7 @@ export class Application3D {
                     console.log("isCurrentPlayer", isCurrentPlayer)
 
 
-                    const el = createEntityHTML("#steve", "Player " + room.sessionId)
+                    const el = createEntityHTML("#claire", "Player " + room.sessionId)
                     sceneEl.append(el)
 
                     entitiesInRoom[change.path.id] = el.object3D
