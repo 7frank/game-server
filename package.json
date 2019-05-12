@@ -10,6 +10,9 @@
     "debug": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "bin": {
+    "fbx2gltf": "bin/index.js"
+  },
   "author": "Endel Dreyer",
   "license": "MIT",
   "devDependencies": {
@@ -21,10 +24,13 @@
     "babel-loader": "^8.0.5",
     "colyseus.js": "^0.9.16",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
+    "fbx2gltf": "^0.9.5",
     "file-loader": "^3.0.1",
+    "glob": "^7.1.4",
     "html-webpack-plugin": "^3.2.0",
     "jsdom": "14.0.0",
     "jsdom-global": "^3.0.2",
+    "minimist": "^1.2.0",
     "node-sass": "^4.12.0",
     "nodemon": "^1.18.9",
     "pixi-viewport": "^3.17.0",
@@ -62,7 +68,6 @@
     "eventemitter3": "^3.1.2",
     "express": "^4.16.4",
     "express-basic-auth": "^1.1.6",
-    "fbx2gltf": "^0.9.5",
     "gl": "^4.2.2",
     "jsdom-wc": "^11.0.0-alpha-1",
     "nodejs-physijs": "^0.1.5",
