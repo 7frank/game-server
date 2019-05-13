@@ -72,6 +72,7 @@
     "jsdom-wc": "^11.0.0-alpha-1",
     "nodejs-physijs": "^0.1.5",
     "parsehtml": "^1.0.0",
+    "three-steer": "github:AlexusBlack/three-steer#master",
     "vue": "^2.6.10",
     "vue-beautiful-chat": "^2.2.0",
     "vue-style-loader": "^4.1.2",

@@ -32,12 +32,13 @@ export
     update(mEntity: SerializableEntity): void {
 
 
+        const command=mEntity.getComponent(LastPlayerCommand).command as MessageTypes
 
 
-        if (mEntity.getComponent(LastPlayerCommand).command == MessageTypes.playerDance) {
+        if (command==MessageTypes.playerRotate) return // TODO enable rotate and dance as long as only camera is rotating
 
+        if (command==MessageTypes.playerDance) {
             this.state = PlayerAnimationStateMessage.dance
-
         }
         else if (mEntity.hasComponent(JumpComponent) && mEntity.getComponent(JumpComponent).airborne) {
 

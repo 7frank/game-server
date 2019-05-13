@@ -181,8 +181,15 @@ export class Application3D {
 
 
 
+        Hotkeys.register("change player model", 'F1', {
+            // category: 'HUD',
+            target: this.sceneEl
+        });
 
+        Hotkeys().on("change player model", (evt) => {
+           document.querySelector("#local-player-model").setAttribute("gltf-model","#jasper")
 
+        });
 
 
 
@@ -238,7 +245,7 @@ export class Application3D {
 
 
 
-        // @ts-ignore
+
         Hotkeys.register(MessageTypes.playerJump, 'space', {
             // category: 'HUD',
             target: this.sceneEl
@@ -365,8 +372,8 @@ export class Application3D {
 
 
                     this.addPlayerAnimations(el.querySelector("#local-player-model"))
-              
-                
+
+
 
                     entitiesInRoom[change.path.id] = el.object3D
 
@@ -733,8 +740,8 @@ export class Application3D {
         }
     }
 
-    
-    addPlayerAnimations(targetEl){
+
+    addPlayerAnimations(targetEl) {
         var helper = new THREE.SkeletonHelper(targetEl.object3D);
         helper.material.linewidth = 3;
         this.scene.add(helper);
