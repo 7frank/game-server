@@ -2,16 +2,11 @@ export
 enum MessageTypes
 {
    playerMove="playerMove",
-
-
-   playerRun="playerRun",
-   playerIdle="playerIdle",
-   
-   
    playerRotate="playerRotate",
    playerJump="playerJump",
    playerInteractWith="playerInteractWith",
-   playerTalkTo="playerTalkTo"
+   playerTalkTo="playerTalkTo",
+   playerDance="playerDance"
 
 }
 export

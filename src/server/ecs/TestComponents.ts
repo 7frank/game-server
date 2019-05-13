@@ -16,15 +16,30 @@ export
 }
 
 
+export
+    class LastPlayerCommand implements Component {
+    static readonly tag = "core/LastPlayerCommand";
+    command: string = "" //MessageTypes.playerDance
+}
+
+
 
 export
     class AnimationState implements Component, Updateable {
     static readonly tag = "core/AnimationState";
-    state: string = 'idle'
+    state: string = PlayerAnimationStateMessage.idle
 
     update(mEntity: SerializableEntity): void {
 
-        if (mEntity.hasComponent(JumpComponent) && mEntity.getComponent(JumpComponent).airborne) {
+
+
+
+        if (mEntity.getComponent(LastPlayerCommand).command == MessageTypes.playerDance) {
+
+            this.state = PlayerAnimationStateMessage.dance
+
+        }
+        else if (mEntity.hasComponent(JumpComponent) && mEntity.getComponent(JumpComponent).airborne) {
 
             this.state = PlayerAnimationStateMessage.jump
 
@@ -151,6 +166,7 @@ export
 
     constructor(id: string) {
         super(id)
+        this.putComponent(LastPlayerCommand)
         this.putComponent(BaseProperties3D)
         this.putComponent(ProximityComponent)
 
@@ -253,7 +269,7 @@ export
         else
             block.putComponent(AssetsComponent)
 
-        block.getComponent(DynamicBody).mass = 10
+        block.getComponent(DynamicBody).mass = 2
 
         this.engine.addEntity(block)
 

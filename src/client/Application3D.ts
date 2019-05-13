@@ -181,55 +181,8 @@ export class Application3D {
 
 
 
-        //const getTarget=()=> (document.querySelector("#test") as any)
-        const getTarget=()=> (document.querySelector("#local-player-model") as any)
-       
-       
-
-        Hotkeys.register("test2", 'F2', {
-            // category: 'HUD',
-            target: this.sceneEl
-        });
-
-        Hotkeys.register("test3", 'F3', {
-            // category: 'HUD',
-            target: this.sceneEl
-        });
-
-    
-
-        Hotkeys().on("test2", (evt) => {
-         
-            var helper = new THREE.SkeletonHelper(getTarget().object3D);
-            helper.material.linewidth = 3;
-            this.scene.add(helper);
-
-            const getAnimation=(id,filename)=> `name:${id};src: url(${filename});`
-
-    
-
-            getTarget().setAttribute("gltf-animation__1", getAnimation(PlayerAnimationStateMessage.idle,"/assets/animations/Idle.glb"))
-            getTarget().setAttribute("gltf-animation__2", getAnimation(PlayerAnimationStateMessage.jump,"/assets/animations/Jump.glb"))
-            getTarget().setAttribute("gltf-animation__3", getAnimation(PlayerAnimationStateMessage.walk,"/assets/animations/Walking.glb"))
-            getTarget().setAttribute("gltf-animation__4", getAnimation(PlayerAnimationStateMessage.run,"/assets/animations/Running.glb"))
-            getTarget().setAttribute("gltf-animation__5", getAnimation(PlayerAnimationStateMessage.dance,"/assets/animations/Samba Dancing.glb"))
-            getTarget().setAttribute("gltf-animation__6", getAnimation(PlayerAnimationStateMessage.crouch,"/assets/animations/Crouching Idle.glb"))
-            getTarget().setAttribute("gltf-animation__7", getAnimation(PlayerAnimationStateMessage.ducking,"/assets/animations/Crouched Walking.glb"))
-            getTarget().setAttribute("gltf-animation__8", getAnimation(PlayerAnimationStateMessage.interact,"/assets/animations/Shaking Hands 1.glb"))
-            getTarget().setAttribute("gltf-animation__9", getAnimation(PlayerAnimationStateMessage.talk,"/assets/animations/Talking.glb"))
-          
-         
 
 
-      
-        });
-        Hotkeys().on("test3", (evt) => {
-            console.log("aaa test3")
-            getTarget().setAttribute("animation-mixer", "clip: walking;crossFadeDuration: 1; useSkinnedMeshRoot: true;")
-
-            getTarget().emit('dance', {}, false);
-
-        });
 
 
 
@@ -409,6 +362,11 @@ export class Application3D {
 
                     const el = createEntityHTML("#claire", "Player " + room.sessionId)
                     sceneEl.append(el)
+
+
+                    this.addPlayerAnimations(el.querySelector("#local-player-model"))
+              
+                
 
                     entitiesInRoom[change.path.id] = el.object3D
 
@@ -600,10 +558,10 @@ export class Application3D {
 
 
 
-          room.listen("entities/:id/AnimationState/state", (change: DataChange) => {
+        room.listen("entities/:id/AnimationState/state", (change: DataChange) => {
             console.log("AnimationState", change)
             const el = entitiesInRoom[change.path.id].el
-           el.setAttribute("animation-mixer", "clip: "+change.value+";crossFadeDuration: 1; useSkinnedMeshRoot: true;")
+            el.setAttribute("animation-mixer", "clip: " + change.value + ";crossFadeDuration: 1; useSkinnedMeshRoot: true;")
 
         })
 
@@ -775,6 +733,27 @@ export class Application3D {
         }
     }
 
+    
+    addPlayerAnimations(targetEl){
+        var helper = new THREE.SkeletonHelper(targetEl.object3D);
+        helper.material.linewidth = 3;
+        this.scene.add(helper);
+
+        const getAnimation = (id, filename) => `name:${id};src: url(${filename});`
+
+
+        targetEl.setAttribute("gltf-animation__1", getAnimation(PlayerAnimationStateMessage.idle, "/assets/animations/Idle.glb"))
+        targetEl.setAttribute("gltf-animation__2", getAnimation(PlayerAnimationStateMessage.jump, "/assets/animations/Jump.glb"))
+        targetEl.setAttribute("gltf-animation__3", getAnimation(PlayerAnimationStateMessage.walk, "/assets/animations/Walking.glb"))
+        targetEl.setAttribute("gltf-animation__4", getAnimation(PlayerAnimationStateMessage.run, "/assets/animations/Running.glb"))
+        targetEl.setAttribute("gltf-animation__5", getAnimation(PlayerAnimationStateMessage.dance, "/assets/animations/Samba Dancing.glb"))
+        targetEl.setAttribute("gltf-animation__6", getAnimation(PlayerAnimationStateMessage.crouch, "/assets/animations/Crouching Idle.glb"))
+        targetEl.setAttribute("gltf-animation__7", getAnimation(PlayerAnimationStateMessage.ducking, "/assets/animations/Crouched Walking.glb"))
+        targetEl.setAttribute("gltf-animation__8", getAnimation(PlayerAnimationStateMessage.interact, "/assets/animations/Shaking Hands 1.glb"))
+        targetEl.setAttribute("gltf-animation__9", getAnimation(PlayerAnimationStateMessage.talk, "/assets/animations/Talking.glb"))
+
+
+    }
 
     sendToChatRoom(message) {
 

@@ -1,7 +1,7 @@
 import { Room, Client } from "colyseus";
 
-import { MessageTypes } from "../../../common/types"
-import { Player, BaseProperties3D, JumpComponent, ControllerComponent, InteractControllerComponent } from "../../ecs/TestComponents";
+import { MessageTypes, PlayerAnimationStateMessage } from "../../../common/types"
+import { Player, BaseProperties3D, JumpComponent, ControllerComponent, InteractControllerComponent, AnimationState, LastPlayerCommand } from "../../ecs/TestComponents";
 import { DynamicBody } from "../../ecs/PhysicsSystem";
 import { ContainerState, PhysicsContainerState } from "../region/ContainerState";
 
@@ -66,11 +66,17 @@ export class ContainerRoom extends Room<PhysicsContainerState> {
       // TODO get closest element in front & if it's pickable/item do something with it
       //  player.getComponent(RaytracerComponent)
       player.getComponent(InteractControllerComponent).interact()
-    
-
-
 
     })
+
+   /* this.addListener(MessageTypes.playerDance, (player, data) => {
+
+      const animState = player.getComponent(AnimationState)
+     // if (animState.state == PlayerAnimationStateMessage.idle)
+        animState.state = PlayerAnimationStateMessage.dance
+
+    })*/
+
 
 
 
@@ -128,6 +134,9 @@ export class ContainerRoom extends Room<PhysicsContainerState> {
       return;
     }
     const [command, data] = message;
+
+
+    entity.getComponent(LastPlayerCommand).command=command
 
     this.emit(command, entity, data)
   }
