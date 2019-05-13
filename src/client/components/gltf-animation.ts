@@ -84,13 +84,7 @@ export default {
             mesh.animations = mesh.animations || [];
 
 
-            //TODO The position data in the fbx files are scaled by factor 100 and need to be alered to match those within the glb file (afaik)
-         /*   this.clip.tracks.forEach(track => {
-                for (let len = track.values.length, i = 0; i < len; i++) {
-                    if (track.name.indexOf('.position') > -1)
-                        track.values[i] = track.values[i] / 100
-                }
-            })*/
+
 
             mesh.animations.push(this.clip);
             console.log("aaa3", mesh)

@@ -15,6 +15,45 @@ export
     rotation = { x: 0, y: 0, z: 0, order: "XYZ" }
 }
 
+
+
+export
+    class AnimationState implements Component, Updateable {
+    static readonly tag = "core/AnimationState";
+    state: string = 'idle'
+
+    update(mEntity: SerializableEntity): void {
+
+        if (mEntity.hasComponent(JumpComponent) && mEntity.getComponent(JumpComponent).airborne) {
+
+            this.state = PlayerAnimationStateMessage.jump
+
+        }
+        else if (mEntity.hasComponent(ControllerComponent)) {
+            const playerController = mEntity.getComponent(ControllerComponent)
+
+            const p = playerController.velocity / playerController.maxSpeed
+            if (p > 0.5)
+                this.state = PlayerAnimationStateMessage.run
+            else if (p > 0.1)
+                this.state = PlayerAnimationStateMessage.walk
+            else if (p <= 0.1)
+                this.state = PlayerAnimationStateMessage.idle
+
+            // if idle && pose/special => dance
+            // if speed && ducking => crouch or crouch-idle
+
+
+        }
+
+
+    }
+
+
+
+}
+
+
 // TODO
 export
     class TemplateComponent implements Component {
@@ -65,7 +104,7 @@ export
 export
     class Inventory implements Component {
     static readonly tag = "core/Inventory";
-    items: Item[]=[];
+    items: Item[] = [];
 
 }
 
@@ -121,6 +160,8 @@ export
         this.putComponent(ControllerComponent)
 
         this.putComponent(InteractControllerComponent)
+        this.putComponent(AnimationState)
+
 
 
     }
@@ -225,6 +266,7 @@ export
 import { FPSCtrl } from '../../common/FPSCtrl'
 import { ComponentUpdateSystem } from "./ComponentUpdateSystem";
 import { nosync } from "colyseus";
+import { MessageTypes, PlayerAnimationStateMessage } from "../../common/types";
 
 
 
@@ -241,7 +283,7 @@ interface Initable {
 
 
 interface Updateable {
-    update: Function;
+    update(mEntity: SerializableEntity): void;
 }
 
 
@@ -330,7 +372,7 @@ export
     class ControllerComponent implements Component, Updateable {
     static readonly tag = "core/ControllerComponent";
 
-    maxSpeed = 3; // units per second
+    maxSpeed = 6; // units per second
 
     direction = new THREE.Vector3()
     velocity = 0
@@ -413,7 +455,7 @@ export
 
         entries = entries.sort((a, b) => a.distance - b.distance).filter(v => v.entity instanceof Item)
 
-        if (entries.length==0) return
+        if (entries.length == 0) return
 
         const closest = entries[0]
         if (closest && closest.distance < 2) {
@@ -422,7 +464,7 @@ export
             mEntity.engine.removeEntity(closest.entity)
 
             inventory.items.push(closest.entity as Item)
-  
+
             console.log("Picked up Item")
 
         }

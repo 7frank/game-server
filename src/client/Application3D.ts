@@ -4,7 +4,7 @@ import { Client, DataChange } from "colyseus.js";
 
 import { Room } from "colyseus";
 import { create } from "domain";
-import { MessageTypes, ChatMessageTypes } from "../common/types";
+import { MessageTypes, ChatMessageTypes, PlayerAnimationStateMessage } from "../common/types";
 import { Hotkeys } from "@nk11/keyboard-interactions";
 import { FPSCtrl } from "./FPSCtrl";
 import { BaseProperties3D } from "../server/ecs/TestComponents";
@@ -33,6 +33,7 @@ import gltf_animation from './components/gltf-animation'
 AFRAME.registerComponent("gltf-animation", gltf_animation)
 
 import './components/animation-mixer'
+import animationMixer from "./components/animation-mixer";
 
 
 
@@ -198,26 +199,33 @@ export class Application3D {
     
 
         Hotkeys().on("test2", (evt) => {
-            console.log("aaa test2")
-
+         
             var helper = new THREE.SkeletonHelper(getTarget().object3D);
             helper.material.linewidth = 3;
             this.scene.add(helper);
-          /*  getTarget().setAttribute("fbx-animation__1", "name: idle;src: url(/assets/animations/Idle.fbx);")
-            getTarget().setAttribute("fbx-animation__2", "name: dance;src: url(/assets/animations/Samba Dancing.fbx);")
-            getTarget().setAttribute("fbx-animation__3", "name: dance;src: url(/assets/animations/Running.fbx);")
-*/
 
+            const getAnimation=(id,filename)=> `name:${id};src: url(${filename});`
 
-            getTarget().setAttribute("gltf-animation__1", "name: idle;src: url(/assets/animations/Idle.glb);")
-            getTarget().setAttribute("gltf-animation__2", "name: dance;src: url(/assets/animations/Samba Dancing.glb);")
-            getTarget().setAttribute("gltf-animation__3", "name: dance;src: url(/assets/animations/Running.glb);")
+    
+
+            getTarget().setAttribute("gltf-animation__1", getAnimation(PlayerAnimationStateMessage.idle,"/assets/animations/Idle.glb"))
+            getTarget().setAttribute("gltf-animation__2", getAnimation(PlayerAnimationStateMessage.jump,"/assets/animations/Jump.glb"))
+            getTarget().setAttribute("gltf-animation__3", getAnimation(PlayerAnimationStateMessage.walk,"/assets/animations/Walking.glb"))
+            getTarget().setAttribute("gltf-animation__4", getAnimation(PlayerAnimationStateMessage.run,"/assets/animations/Running.glb"))
+            getTarget().setAttribute("gltf-animation__5", getAnimation(PlayerAnimationStateMessage.dance,"/assets/animations/Samba Dancing.glb"))
+            getTarget().setAttribute("gltf-animation__6", getAnimation(PlayerAnimationStateMessage.crouch,"/assets/animations/Crouching Idle.glb"))
+            getTarget().setAttribute("gltf-animation__7", getAnimation(PlayerAnimationStateMessage.ducking,"/assets/animations/Crouched Walking.glb"))
+            getTarget().setAttribute("gltf-animation__8", getAnimation(PlayerAnimationStateMessage.interact,"/assets/animations/Shaking Hands 1.glb"))
+            getTarget().setAttribute("gltf-animation__9", getAnimation(PlayerAnimationStateMessage.talk,"/assets/animations/Talking.glb"))
+          
+         
+
 
       
         });
         Hotkeys().on("test3", (evt) => {
             console.log("aaa test3")
-            getTarget().setAttribute("animation-mixer", "clip: dance;crossFadeDuration: 1; useSkinnedMeshRoot: true;")
+            getTarget().setAttribute("animation-mixer", "clip: walking;crossFadeDuration: 1; useSkinnedMeshRoot: true;")
 
             getTarget().emit('dance', {}, false);
 
@@ -650,6 +658,15 @@ export class Application3D {
               el.visible = bVisible
   
           });*/
+
+
+
+          room.listen("entities/:id/AnimationState/state", (change: DataChange) => {
+            console.log("AnimationState", change)
+            const el = entitiesInRoom[change.path.id].el
+           el.setAttribute("animation-mixer", "clip: "+change.value+";crossFadeDuration: 1; useSkinnedMeshRoot: true;")
+
+        })
 
 
 
