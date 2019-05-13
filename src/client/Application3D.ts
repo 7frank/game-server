@@ -291,76 +291,6 @@ export class Application3D {
             target: this.sceneEl
         });
 
-        /*    // TODO use animation lib to create the path via functions
-            function createJumpCurve(entity) {
-                const dir = entity.getWorldDirection();
-                const pos = entity.position.clone()
-    
-                // Create a sine-like wave
-                var curve = new THREE.SplineCurve([
-                    pos,
-                    pos.clone().add(dir),
-                    new THREE.Vector2(0, 0),
-                    new THREE.Vector2(5, -5),
-                    new THREE.Vector2(10, 0)
-                ]);
-    
-    
-                return curve
-    
-    
-            }
-    */
-
-        // FIXME implement server side phyiscs based jumping and see where that leads us
-        // https://github.com/chandlerprall/Physijs/issues/147
-
-        /*   let jumpCurve
-           let downForce = 0
-           let jumping = false
-           const jumpScript = new FPSCtrl(50)
-           jumpScript.start()
-           jumpScript.on('frame', () => {
-   
-               //  if (!jumpCurve)  jumpCurve= createJumpCurve(this.currentPlayerEntity)
-                    
-                     
-   
-   
-               // TODO jump should block all move commands while jumping
-               //this.room.send([MessageTypes.playerJump, {}]);
-   
-               var camera = sceneEl.camera.el.object3D;
-               let pos = camera.position//this.currentPlayerEntity.position
-               let posBefore = pos.clone()
-   
-               if (jumping)
-                   pos.y += 0.06
-               else if (pos.y > PLAYER_SIZE)
-                   pos.y -= (downForce += 0.01)
-   
-               if (pos.distanceTo(posBefore) > 0.05) {
-                   this.activeRoom.send([MessageTypes.playerMove, pos]);
-                   console.log("jumping")
-               }
-           })
-   */
-
-        /*  Hotkeys().on(MessageTypes.playerJump, (evt) => {
-  
-              if (this.currentPlayerEntity && !jumping) {
-                  // console.log("jump on")
-                  //  jumpScript.start()
-                  jumping = true
-                  downForce = 0
-              }
-          }, function () {
-              //  jumpScript.stop()
-              //  console.log("jump off")
-              jumping = false
-          });
-  */
-
         Hotkeys().on(MessageTypes.playerJump, (evt) => {
 
             this.activeRoom.send([MessageTypes.playerJump, {}]);
@@ -381,6 +311,15 @@ export class Application3D {
             this.activeRoom.send([MessageTypes.playerInteractWith, {}]);
             console.log("interactWith")
         });
+
+        Hotkeys.register(MessageTypes.playerDance, 'q', {
+            target: this.sceneEl
+        });
+        Hotkeys().on(MessageTypes.playerDance, (evt) => {
+            this.activeRoom.send([MessageTypes.playerDance, {}]);
+            console.log("playerDance")
+        });
+
 
 
 
