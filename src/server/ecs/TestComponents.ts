@@ -298,7 +298,7 @@ interface Initable {
     init: Function;
 }
 
-
+export
 interface Updateable {
     update(mEntity: SerializableEntity): void;
 }

@@ -9,6 +9,7 @@ import { SerializableEntity, BaseProperties3D, BaseEngine, NPC, Player, SpawnPoi
 
 import { Engine, Entity } from "@nova-engine/ecs";
 import { PhysicsSystem } from "../../ecs/PhysicsSystem";
+import { AssetTypes } from "../../../common/types";
 
 
 
@@ -27,23 +28,23 @@ import { PhysicsSystem } from "../../ecs/PhysicsSystem";
 
 class PhysicsECSEngine extends BaseEngine {
 
-  constructor(boundingBox:THREE.Box3,npcCount = 20) {
+  constructor(boundingBox: THREE.Box3, npcCount = 20) {
 
     super(boundingBox)
 
 
 
     const physics = new PhysicsSystem();
-     
-   
+
+
     this.addSystem(physics)
     const spawnPoint = new SpawnPoint()
-  
-    spawnPoint.getComponent(BaseProperties3D).position.y=boundingBox.max.y
-  
+
+    spawnPoint.getComponent(BaseProperties3D).position.y = boundingBox.max.y
+
     spawnPoint.max = npcCount
     this.addEntity(spawnPoint)
-  
+
 
   }
 
@@ -55,17 +56,17 @@ class PhysicsECSEngine extends BaseEngine {
 
 class StaticECSEngine extends BaseEngine {
 
-  constructor(boundingBox:THREE.Box3,npcCount = 20) {
+  constructor(boundingBox: THREE.Box3, npcCount = 20) {
 
     super(boundingBox)
 
     const spawnPoint = new SpawnPoint()
-  
-    spawnPoint.getComponent(BaseProperties3D).position.y=1
-  
+
+    spawnPoint.getComponent(BaseProperties3D).position.y = 1
+
     spawnPoint.max = npcCount
     this.addEntity(spawnPoint)
-  
+
 
   }
 
@@ -75,18 +76,40 @@ class StaticECSEngine extends BaseEngine {
 
 
 
+class Asset {
+
+  title: string;
+  description: string;
+
+  constructor(public id: number | string, public type: AssetTypes, public src: string) {
+
+  }
+}
 
 
+interface AssetsSetInterface {
+  [id: string]: Asset;
 
+}
+
+class Assets {
+
+  _assets: AssetsSetInterface = {}
+
+  add(asset: Asset) {
+    this._assets[asset.type] = asset;
+  }
+
+}
 
 
 export class ContainerState extends THREE.Object3D {
   position: THREE.Vector3;
   boundingBox: THREE.Box3;
 
+  assets: Assets = new Assets
 
   public entities: { [id: string]: SerializableEntity } = {};
-
 
   children: ContainerState[] = []
 
@@ -112,7 +135,8 @@ export class ContainerState extends THREE.Object3D {
     }, {
         data: this.data,
         // entities: this.entities,
-        entities: res
+        entities: res,
+        assets:this.assets._assets
       })
   }
 
@@ -124,13 +148,19 @@ export class ContainerState extends THREE.Object3D {
 
     this.createEngine();
 
+
+    this.assets.add(new Asset(0, AssetTypes.image, "/assets/test.png"))
+
+
+
+
   }
 
 
   createEngine() {
 
     const boundingBox = new THREE.Box3(new THREE.Vector3(-5, 0, -5), new THREE.Vector3(5, 15, 5))
-    this._engine = new StaticECSEngine(boundingBox,10)
+    this._engine = new StaticECSEngine(boundingBox, 10)
     this.entities = this._engine._entities
 
   }
@@ -167,9 +197,8 @@ export class ContainerState extends THREE.Object3D {
 
 
 
-export 
-class PhysicsContainerState extends ContainerState
-{
+export
+  class PhysicsContainerState extends ContainerState {
 
 
 
@@ -177,7 +206,7 @@ class PhysicsContainerState extends ContainerState
   createEngine() {
 
     const boundingBox = new THREE.Box3(new THREE.Vector3(-5, 0, -5), new THREE.Vector3(5, 10, 5))
-    this._engine = new PhysicsECSEngine(boundingBox,20)
+    this._engine = new PhysicsECSEngine(boundingBox, 20)
     this.entities = this._engine._entities
 
   }

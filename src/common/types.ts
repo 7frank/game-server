@@ -33,3 +33,17 @@ enum ChatMessageTypes
    send="send"
  
 }
+
+export
+enum AssetTypes
+{
+   audio="audio",
+   video="video",
+   image="image",
+   other="other",
+   archive="archive",
+   mesh="mesh"   
+}
+
+
+
