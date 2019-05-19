@@ -32,12 +32,12 @@ export
     update(mEntity: SerializableEntity): void {
 
 
-        const command=mEntity.getComponent(LastPlayerCommand).command as MessageTypes
+        const command = mEntity.getComponent(LastPlayerCommand).command as MessageTypes
 
 
-        if (command==MessageTypes.playerRotate) return // TODO enable rotate and dance as long as only camera is rotating
+        if (command == MessageTypes.playerRotate) return // TODO enable rotate and dance as long as only camera is rotating
 
-        if (command==MessageTypes.playerDance) {
+        if (command == MessageTypes.playerDance) {
             this.state = PlayerAnimationStateMessage.dance
         }
         else if (mEntity.hasComponent(JumpComponent) && mEntity.getComponent(JumpComponent).airborne) {
@@ -199,11 +199,10 @@ export
         this.putComponent(DynamicBody)
 
     }
-
-
-
-
 }
+
+
+
 
 
 export
@@ -217,6 +216,65 @@ export
 
         this.putComponent(TemplateComponent).data = `<a-box src="/assets/crate1.jpg"></a-box>`;
         this.putComponent(DynamicBody)
+
+
+
+    }
+}
+
+
+
+
+
+export
+    class Bomb extends SerializableEntity {
+
+    title: string = "ActiveBomb"
+
+    timer = 3
+
+    constructor() {
+        super()
+
+        this.putComponent(TemplateComponent).data = `
+        <a-entity>
+        <a-sphere radius="0.5" src="/assets/crate1.jpg"></a-sphere>
+        <a-text value="{{timer}}" align="center" color="#6a5acd" font="/assets/fonts/Federation TNG Title.fnt" negate="false" position="0 1 0"></a-text>
+        </a-entity>
+        `;
+        this.putComponent(DynamicBody)
+        this.putComponent(ProximityComponent)
+
+
+
+        setTimeout(() => {
+
+            let entries = this.getComponent(ProximityComponent).entries
+
+            entries = entries.sort((a, b) => a.distance - b.distance).filter(v => v.entity instanceof Item)
+
+            if (entries.length == 0) return
+
+            /*  const closest = entries[0]
+              if (closest && closest.distance < 2) {
+                  this.engine.removeEntity(closest.entity)
+                  console.log("boom")
+              }
+  
+            */
+            
+            entries.forEach(closest => {
+                console.log(closest)
+                if (closest.distance < 3) {
+                    this.engine.removeEntity(closest.entity)
+                    console.log("boom")
+                }
+            })
+
+
+            this.engine.removeEntity(this)
+        }, this.timer * 1000)
+
 
 
 
@@ -295,11 +353,11 @@ interface FOVEntry {
 
 interface Initable {
 
-    init: Function;
+    init(mEntity: SerializableEntity): void;
 }
 
 export
-interface Updateable {
+    interface Updateable {
     update(mEntity: SerializableEntity): void;
 }
 
@@ -459,10 +517,17 @@ export
     class InteractControllerComponent implements Component, Updateable {
     static readonly tag = "core/InteractControllerComponent";
 
-
-    interact() {
+    // creating and placing a bomb should not be handled with the interactcomponent
+    interact(entity: SerializableEntity) {
         console.log("interact TODO ")
 
+
+
+        const bomb = new Bomb()
+
+        //bomb.getComponent(BaseProperties3D)
+
+        entity.engine.addEntity(bomb)
 
     }
 

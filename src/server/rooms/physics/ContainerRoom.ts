@@ -65,7 +65,8 @@ export class ContainerRoom extends Room<PhysicsContainerState> {
 
       // TODO get closest element in front & if it's pickable/item do something with it
       //  player.getComponent(RaytracerComponent)
-      player.getComponent(InteractControllerComponent).interact()
+      player.getComponent(InteractControllerComponent).interact(player)
+
 
     })
 
