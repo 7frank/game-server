@@ -7,26 +7,44 @@
   <meta name="description" content="Physics micro service • A-Frame">
   <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
   <script src="https://rawgit.com/urish/aframe-camera-events/master/index.js"></script>
-  <script src="https://rawgit.com/dbradleyfl/aframe-gridhelper/master/dist/aframe-gridhelper-component.min.js"></script> 
+  <script src="https://rawgit.com/dbradleyfl/aframe-gridhelper/master/dist/aframe-gridhelper-component.min.js"></script>
 </head>
 
 <body>
-  <a-scene background="color: #eee" gridhelper="size:100;divisions:100;colorCenterLine:red;colorGrid:grey;">
-    <a-assets>   
+  <a-scene renderer-listener background="color: #eee"
+    gridhelper="size:100;divisions:100;colorCenterLine:red;colorGrid:grey;">
+    <a-assets>
       <a-asset-item id="steve" src="/assets/characters/minecraft-steve.glb" animation-mixer="clip: *"></a-asset-item>
       <a-asset-item id="jasper" src="/assets/characters/jasper.glb" animation-mixer="clip: *"></a-asset-item>
       <a-asset-item id="claire" src="/assets/characters/claire.glb" animation-mixer="clip: *"></a-asset-item>
     </a-assets>
 
-
+ 
+    <a-text value="Bombergirl" font="/assets/fonts/Federation TNG Title.fnt" color="#6a5acd" negate="false" scale="4 4 4" position="0 6 0"></a-text>
+    <a-text value="- The next Generation -" color="#6a5acd"  font="/assets/fonts/Federation TNG Title.fnt" negate="false" scale="2 2 2" position="0 5 0"></a-text>
+  
     <a-entity camera position-listener rotation-listener look-controls wasd-controls position="0 1.8 0">
+        <a-hud id="mainHUD" aspect="16 9" hud-raycaster>
+
+            <a-plane visible="true" id="m-main-menu" gui-border click-drag compass position="0 0.4 0" scale="1 1 1" height="0.02"
+              width="0.2" src="#compass-texture" material="transparent:true;opacity:0.7;repeat:0.25 1">
+      
+              <a-box color="red"></a-box>
+              <a-entity class="the-world-map" position="0 -.1 0" scale="0.02 0.02 0.02" height="0.2" width="0.2"
+                rotation="0 0 90"></a-entity>
+      
+      
+              <a-text class="player-count" value="Player Online 1" position="-0.95 .05 0" width=".6"></a-text>
+      
+            </a-plane>
+          </a-hud>
     </a-entity>
 
 
-    
+
 
     <a-entity light="type:directional; castShadow:true;" position="0 20 0"></a-entity>
-    <a-entity light="type:ambient;" ></a-entity>
+    <a-entity light="type:ambient;"></a-entity>
   </a-scene>
 </body>
 
