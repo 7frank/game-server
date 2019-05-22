@@ -5,7 +5,7 @@ const THREE = NodePhysijs.THREE;
 
 import { nosync } from "colyseus";
 import { getRandomInt } from "../../util";
-import { SerializableEntity, BaseProperties3D, BaseEngine, NPC, Player, SpawnPoint } from "../../ecs/TestComponents";
+import { SerializableEntity, GenericBody, BaseEngine, NPC, Player, SpawnPoint } from "../../ecs/TestComponents";
 
 import { Engine, Entity } from "@nova-engine/ecs";
 import { PhysicsSystem } from "../../ecs/PhysicsSystem";
@@ -40,7 +40,7 @@ class PhysicsECSEngine extends BaseEngine {
     this.addSystem(physics)
     const spawnPoint = new SpawnPoint()
 
-    spawnPoint.getComponent(BaseProperties3D).position.y = boundingBox.max.y
+    spawnPoint.getComponent(GenericBody).position.y = boundingBox.max.y
 
     spawnPoint.max = npcCount
     this.addEntity(spawnPoint)
@@ -62,7 +62,7 @@ class StaticECSEngine extends BaseEngine {
 
     const spawnPoint = new SpawnPoint()
 
-    spawnPoint.getComponent(BaseProperties3D).position.y = 1
+    spawnPoint.getComponent(GenericBody).position.y = 1
 
     spawnPoint.max = npcCount
     this.addEntity(spawnPoint)
@@ -170,7 +170,7 @@ export class ContainerState extends THREE.Object3D {
     const pos = new THREE.Vector3(getRandomInt(this.boundingBox.min.x, this.boundingBox.max.x), 9, 0)
     const player = new Player(sessionId);
 
-    const props = player.getComponent(BaseProperties3D)
+    const props = player.getComponent(GenericBody)
 
     props.position.copy(pos)
 

@@ -1,5 +1,5 @@
 {
-  "name": "colyseus-pixijs-boilerplate",
+  "name": "game-server",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -13,7 +13,7 @@
   "bin": {
     "fbx2gltf": "bin/index.js"
   },
-  "author": "Endel Dreyer",
+  "author": "Frank Reimann (github.com/7frank)",
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.4.4",

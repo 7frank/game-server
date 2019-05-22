@@ -1,7 +1,7 @@
 import { Room, Client } from "colyseus";
 
 import { MessageTypes } from "../../../common/types"
-import { Player, BaseProperties3D } from "../../ecs/TestComponents";
+import { Player, GenericBody } from "../../ecs/TestComponents";
 import { DynamicBody } from "../../ecs/PhysicsSystem";
 import { ContainerState } from "../region/ContainerState";
 
@@ -30,8 +30,8 @@ export class RegionRoom extends Room<ContainerState> {
         body.__dirtyPosition = true;
         body.position.copy(data)
       }
-      else if (player.hasComponent(BaseProperties3D)) {
-        const position = player.getComponent(BaseProperties3D).position
+      else if (player.hasComponent(GenericBody)) {
+        const position = player.getComponent(GenericBody).position
 
         position.copy(data)
       }

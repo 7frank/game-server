@@ -1,3 +1,6 @@
+
+import './hud/sample'
+
 import * as PIXI from "pixi.js";
 import * as Viewport from "pixi-viewport";
 import { Client, DataChange } from "colyseus.js";
@@ -7,7 +10,7 @@ import { create } from "domain";
 import { MessageTypes, ChatMessageTypes, PlayerAnimationStateMessage } from "../common/types";
 import { Hotkeys } from "@nk11/keyboard-interactions";
 import { FPSCtrl } from "./FPSCtrl";
-import { BaseProperties3D } from "../server/ecs/TestComponents";
+import { GenericBody } from "../server/ecs/TestComponents";
 import { createRegion, createEntity, createEntityFromData, createEntityHTML } from "./dom-utils";
 
 var parseHTML = require('parsehtml');
@@ -377,8 +380,8 @@ export class Application3D {
 
                     entitiesInRoom[change.path.id] = el.object3D
 
-                    if (change.value.BaseProperties3D)
-                        el.object3D.position.copy(change.value.BaseProperties3D.position);
+                    if (change.value.GenericBody)
+                        el.object3D.position.copy(change.value.GenericBody.position);
 
                     if (isCurrentPlayer) {
                         this.currentPlayerEntity = el.object3D;
@@ -433,8 +436,8 @@ export class Application3D {
                     // have timeout so that lerp later does work as intended
                     setTimeout(() => {
 
-                        if (change.value.BaseProperties3D)
-                            graphics.position.copy(change.value.BaseProperties3D.position);
+                        if (change.value.GenericBody)
+                            graphics.position.copy(change.value.GenericBody.position);
 
 
 
@@ -488,7 +491,7 @@ export class Application3D {
         });
 
 
-        room.listen("entities/:id/BaseProperties3D/position/x", (change: DataChange) => {
+        room.listen("entities/:id/GenericBody/position/x", (change: DataChange) => {
             const isCurrentPlayer = change.path.id === room.sessionId
             const el = entitiesInRoom[change.path.id]
             if (isCurrentPlayer && el) {
@@ -502,7 +505,7 @@ export class Application3D {
 
         })
 
-        room.listen("entities/:id/BaseProperties3D/position/y", (change: DataChange) => {
+        room.listen("entities/:id/GenericBody/position/y", (change: DataChange) => {
             const isCurrentPlayer = change.path.id === room.sessionId
             const el = entitiesInRoom[change.path.id]
             if (isCurrentPlayer && el) {
@@ -516,7 +519,7 @@ export class Application3D {
 
         })
 
-        room.listen("entities/:id/BaseProperties3D/position/z", (change: DataChange) => {
+        room.listen("entities/:id/GenericBody/position/z", (change: DataChange) => {
             const isCurrentPlayer = change.path.id === room.sessionId
             const el = entitiesInRoom[change.path.id]
             if (isCurrentPlayer && el) {
@@ -705,13 +708,13 @@ export class Application3D {
             const entity = entitiesInRoom[id]
             const new_entity = room.state.entities[id]
 
-            if (!new_entity.BaseProperties3D) break
+            if (!new_entity.GenericBody) break
 
-            //  console.log("entitiesInRoom",new_entity,!new_entity.BaseProperties3D)
+            //  console.log("entitiesInRoom",new_entity,!new_entity.GenericBody)
 
 
-            const newPosition = new_entity.BaseProperties3D.position
-            const newRotation = new_entity.BaseProperties3D.rotation
+            const newPosition = new_entity.GenericBody.position
+            const newRotation = new_entity.GenericBody.rotation
 
             entity.position.x = lerp(entity.position.x, newPosition.x, 0.2);
             entity.position.y = lerp(entity.position.y, newPosition.y, 0.2);

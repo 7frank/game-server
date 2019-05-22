@@ -7,7 +7,7 @@ const Physijs = NodePhysijs.Physijs(THREE, Ammo);
 
 
 import { Engine, Family, System, FamilyBuilder, Component } from "@nova-engine/ecs";
-import { BaseEngine, BaseProperties3D } from "./TestComponents";
+import { BaseEngine, GenericBody } from "./TestComponents";
 import { nosync } from "colyseus";
 import { FPSCtrl } from "../../common/FPSCtrl";
 
@@ -125,7 +125,7 @@ export
     linearFactor = new THREE.Vector3(1, 1, 0)
 
     @nosync
-    body: any = null // Physijs body
+    body:any|THREE.Object3D = null // Physijs body
 
 
 
@@ -187,7 +187,7 @@ export
 
     }
 
-    // TODO addEntity(entity:BaseProperties3D,bb:BoundingBox, props: DynamicBody)
+    // TODO addEntity(entity:GenericBody,bb:BoundingBox, props: DynamicBody)
     addWorldEntity(position, dimensions = [1, 1, 1], mass?: number) {
 
         const material = createBasicPhysicsMaterial()
@@ -218,48 +218,70 @@ export
 
         for (let entity of this.family.entities) {
 
-            const prop = entity.getComponent(BaseProperties3D)
-            const position = prop.position;
-            const rotation = entity.getComponent(BaseProperties3D).rotation;
+            const prop = entity.getComponent(GenericBody)
+      
+
+            const dynamicBody = entity.getComponent(DynamicBody);
+          //  prop.position.copy(dynamicBody.body.position)
+           // prop.position.copy(dynamicBody.body.rotation)
 
             //  if (entity==this.family.entities[0])
             //  {
             //  console.log("physics first entry", rotation, this.world.children[0].rotation)
-            //  entity.getComponent(BaseProperties3D).rotation=prop.rotation
+            //  entity.getComponent(GenericBody).rotation=prop.rotation
             //  }
         }
 
         for (let entity of this.notInitializedEntities.entities) {
 
-            const body = entity.putComponent(PhysicsBody);
+            const physicsBody = entity.putComponent(PhysicsBody);
             const dynamicBody = entity.getComponent(DynamicBody)
             // You can create components on an entity easily.
 
-            if (!entity.hasComponent(BaseProperties3D))
-                entity.putComponent(BaseProperties3D)
+            if (!entity.hasComponent(GenericBody))
+                entity.putComponent(GenericBody)
 
 
-            const props = entity.getComponent(BaseProperties3D);
+            const props = entity.getComponent(GenericBody);
             props.position.y = 5
-            const physicsFU = this.addWorldEntity(props.position, [1, 1, 1], dynamicBody.mass)
-            props.position = physicsFU.position
-            props.rotation = physicsFU.rotation
+            const _body = this.addWorldEntity(props.position, [1, 1, 1], dynamicBody.mass)
+          
+          
+            props.position = _body.position
+            props.rotation = _body.rotation
+/*
+ delete  physicsBody.position
+ delete  physicsBody.rotation
+            Object.defineProperty(physicsBody, 'position', {
+                configurable: true,
+                enumerable: true,
+                value: props.position  
+            });
 
-            physicsFU.setLinearFactor(dynamicBody.linearFactor)
-            physicsFU._entity = entity
 
-            dynamicBody.body = physicsFU;
+            Object.defineProperty(physicsBody, 'rotation', {
+                configurable: true,
+                enumerable: true,
+                value: props.rotation  
+            });
+*/
+
+
+            _body.setLinearFactor(dynamicBody.linearFactor)
+            _body._entity = entity
+
+            dynamicBody.body = _body;
 
 
             let tempCollisions = []
             // called whenever "simulate" really triggered a simulation step
             this.world.addEventListener('update', function () {
-                body.collisions = []
-                body.collisions.push(...tempCollisions)
+                physicsBody.collisions = []
+                physicsBody.collisions.push(...tempCollisions)
                 tempCollisions = []
             });
 
-            physicsFU.addEventListener('collision', function (other_object, relative_velocity, relative_rotation, contact_normal) {
+            _body.addEventListener('collision', function (other_object, relative_velocity, relative_rotation, contact_normal) {
                 // `this` has collided with `other_object` with an impact speed of `relative_velocity` and a rotational force of `relative_rotation` and at normal `contact_normal`
                 //    console.log(other_object, relative_velocity, relative_rotation, contact_normal )
                 if (!other_object._entity) return //TODO handle room and collisions for jumping from ground e.g.

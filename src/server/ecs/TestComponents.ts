@@ -1,18 +1,22 @@
 import { Component, Entity, Engine } from "@nova-engine/ecs";
 import { DynamicBody } from "./PhysicsSystem";
 
-const NodePhysijs = require('../nodejs-physijs');
-const THREE = NodePhysijs.THREE;
+//const NodePhysijs = require('../nodejs-physijs');
+//const THREE = NodePhysijs.THREE;
+import * as THREE from  "three"
+
 
 import * as nanoid from 'nanoid'
 import { Vector3, BooleanKeyframeTrack } from "three";
 
 
 export
-    class BaseProperties3D implements Component {
-    static readonly tag = "core/BaseProperties3D";
+    class GenericBody implements Component {
+    static readonly tag = "core/GenericBody";
     position: THREE.Vector3 = new THREE.Vector3
-    rotation = { x: 0, y: 0, z: 0, order: "XYZ" }
+    rotation:THREE.Euler = new THREE.Euler //{ x: 0, y: 0, z: 0, order: "XYZ" }
+    dimensions:THREE.Box3 = new THREE.Box3
+    velocity:THREE.Vector3 = new THREE.Vector3
 }
 
 
@@ -148,8 +152,8 @@ export
     }
 
     distanceTo(otherEntity: Entity) {
-        let mProp = this.getComponent(BaseProperties3D)
-        let oProp = otherEntity.getComponent(BaseProperties3D)
+        let mProp = this.getComponent(GenericBody)
+        let oProp = otherEntity.getComponent(GenericBody)
 
         if (!mProp || !oProp) return Infinity // as no position, distance can't be evaluated
 
@@ -168,7 +172,7 @@ export
     constructor(id: string) {
         super(id)
         this.putComponent(LastPlayerCommand)
-        this.putComponent(BaseProperties3D)
+        this.putComponent(GenericBody)
         this.putComponent(ProximityComponent)
 
         this.putComponent(Inventory)
@@ -194,7 +198,7 @@ export
 
     constructor() {
         super()
-        // this.putComponent(BaseProperties3D)
+        // this.putComponent(GenericBody)
         this.putComponent(Inventory)
         this.putComponent(DynamicBody)
 
@@ -225,7 +229,7 @@ export
 
 
 
-
+// TODO alternatively have a ExplodeComponent? which is more flexible and can be placed on anything
 export
     class Bomb extends SerializableEntity {
 
@@ -297,7 +301,7 @@ export
 
     constructor() {
         super()
-        this.putComponent(BaseProperties3D)
+        this.putComponent(GenericBody)
         this.putComponent(TemplateComponent).data = `<a-box scale="0.5 0.5 0.5" src="/assets/crate1.jpg"></a-box>`;
         this.script = new FPSCtrl(5).start()
         this.script.on('frame', () => this.update())
@@ -350,7 +354,7 @@ interface FOVEntry {
     entity: Entity;
 }
 
-
+export
 interface Initable {
 
     init(mEntity: SerializableEntity): void;
@@ -468,8 +472,8 @@ export
         if (mEntity.hasComponent(DynamicBody)) {
             this.moveCurrentDirection(mEntity)
         }
-        else if (mEntity.hasComponent(BaseProperties3D)) {
-            const position = mEntity.getComponent(BaseProperties3D).position
+        else if (mEntity.hasComponent(GenericBody)) {
+            const position = mEntity.getComponent(GenericBody).position
             var velocityVector = (this.direction).normalize().multiplyScalar(this.maxSpeed - this.velocity);
             position.copy(velocityVector)
         }
@@ -525,7 +529,7 @@ export
 
         const bomb = new Bomb()
 
-        //bomb.getComponent(BaseProperties3D)
+        //bomb.getComponent(GenericBody)
 
         entity.engine.addEntity(bomb)
 
@@ -567,7 +571,7 @@ export
 
 
         // retrieve objects for the raycaster (initially the physics objects will be sufficient)
-        entries.map(v => v.entity.getComponent(BaseProperties3D))
+        entries.map(v => v.entity.getComponent(GenericBody))
 
 
         /*
@@ -613,17 +617,17 @@ export
     update(mEntity: SerializableEntity) {
 
         // TODO camera component? or calculate from basePorperties3d?
-        let camera = new THREE.PerpectiveCamera()
+        let camera = new THREE.PerspectiveCamera()
         camera.updateMatrix();
-        camera.updateMatrixWorld();
+        camera.updateMatrixWorld(false);
         var frustum = new THREE.Frustum();
         frustum.setFromMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
 
 
-        let props = mEntity.getComponent(BaseProperties3D)
+        let props = mEntity.getComponent(GenericBody)
 
-        camera.position.set(props.position)
-        camera.rotation.set(props.rotation)
+        camera.position.copy(props.position)
+        camera.rotation.copy(props.rotation)
 
 
         //get ProximityComponent and its elements
@@ -631,7 +635,7 @@ export
 
         //find elements within Field of view 
         for (let other of proximity.entries) {
-            let oProps = other.entity.getComponent(BaseProperties3D)
+            let oProps = other.entity.getComponent(GenericBody)
             // Your 3d point to check
             if (frustum.containsPoint(oProps.position)) {
 
@@ -653,3 +657,30 @@ export
 // ProximityComponent find ellements that are in proximity
 // use proximityComponent
 
+
+
+
+/*
+
+
+// an actor contains basic data about an entity in the nD world
+export
+    class Actor extends SerializableEntity {
+
+    constructor() {
+        super()
+        this.putComponent(GenericBody)
+            // position 
+            // rotation
+            // direction
+            // velocity
+
+        this.putComponent(Physics)
+        this.putComponent(Pathfinding)
+        this.putComponent(Steering)  // active, entity is steering in direction or following path
+    }
+}
+
+
+
+*/

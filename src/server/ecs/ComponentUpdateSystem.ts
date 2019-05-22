@@ -1,7 +1,7 @@
 
 
 import { Engine, Family, System, FamilyBuilder, Component } from "@nova-engine/ecs";
-import { BaseEngine, BaseProperties3D } from "./TestComponents";
+import { BaseEngine, GenericBody } from "./TestComponents";
 
 
 
