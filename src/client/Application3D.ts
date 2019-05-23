@@ -503,6 +503,21 @@ export class Application3D {
 
         })
 
+   
+        room.listen("entities/:id/Inventory/items/:idd", (change: DataChange) => {
+            const isCurrentPlayer = change.path.id === room.sessionId
+            const el = entitiesInRoom[change.path.id]
+            // TODO remove item again?
+            if (isCurrentPlayer && el && change.operation=="add") {
+              
+        
+                window['playerHUD'].$refs.hud.$data.inventory.push(change.value)
+                
+            }
+
+        })
+
+
 
         room.listen("entities/:id/GenericBody/position/x", (change: DataChange) => {
             const isCurrentPlayer = change.path.id === room.sessionId

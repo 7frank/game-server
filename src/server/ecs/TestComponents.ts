@@ -1,6 +1,8 @@
 import { Component, Entity, Engine } from "@nova-engine/ecs";
 import { DynamicBody, PhysicsBodyPlaceholder } from "./PhysicsSystem";
 
+import { nosync } from "colyseus";
+
 //const NodePhysijs = require('../nodejs-physijs');
 //const THREE = NodePhysijs.THREE;
 import * as THREE from  "three"
@@ -132,7 +134,12 @@ export
     class SerializableEntity extends Entity {
 
     // reference to the containing ecs engine/room 
+    @nosync
     engine: BaseEngine;
+
+    @nosync
+    serializable=["id","name"]
+    
     name: string;
     constructor(id?: string) {
         super()
@@ -146,6 +153,10 @@ export
 
         this.listComponents().forEach(c => res[c.constructor.name] = c)
 
+        this.serializable.forEach(prop=>{
+            // @ts-ignore
+            res[prop] =this[prop];
+          }) 
 
         return res
 
@@ -239,10 +250,11 @@ export
 
     title: string = "Item"
     description: string = "Item is an item."
+    amount:number=1
 
     constructor() {
         super()
-
+        this.serializable.push("title","description","amount")
         this.putComponent(TemplateComponent).data = `<a-box src="/assets/crate1.jpg"></a-box>`;
         this.putComponent(DynamicBody)
         this.putComponent(PhysicsBodyPlaceholder)
@@ -321,6 +333,7 @@ export
 export
     class SpawnPoint extends SerializableEntity {
 
+    @nosync
     script: FPSCtrl;
 
     current = 0;
@@ -371,7 +384,7 @@ export
 
 import { FPSCtrl } from '../../common/FPSCtrl'
 import { ComponentUpdateSystem } from "./ComponentUpdateSystem";
-import { nosync } from "colyseus";
+
 import { MessageTypes, PlayerAnimationStateMessage } from "../../common/types";
 import { SteeringBodyPlaceholder } from "./SteeringBehaviourSystem";
 
