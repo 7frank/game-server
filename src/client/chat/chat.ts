@@ -3,9 +3,16 @@ import Chat from 'vue-beautiful-chat'
 Vue.use(Chat)
 var parseHTML = require('parsehtml');
 
+import '../hud/my-hud'
+
+// FIXME create a proper vue app & use 
+// @ts-ignore
+import MyHud from '../samplehud.vue';
+
+
 
 Vue.component('chat-window', {
-    template: `<template>
+  template: `<template>
     <div>
       <beautiful-chat
         :participants="participants"
@@ -25,125 +32,140 @@ Vue.component('chat-window', {
         @onType="handleOnType" />
     </div>
   </template>`,
- 
-  
-    name: 'chat-window',
-    data() {
-      return {
-        me:"me",
 
-        participants: [
-          {
-            id: 'Bot-Admin',
-            name: 'Bot-Admin',
-            imageUrl: 'https://avatars3.githubusercontent.com/u/1915989?s=230&v=4'
-          },
+
+  name: 'chat-window',
+  data() {
+    return {
+      me: "me",
+
+      participants: [
+        {
+          id: 'Bot-Admin',
+          name: 'Bot-Admin',
+          imageUrl: 'https://avatars3.githubusercontent.com/u/1915989?s=230&v=4'
+        },
         /*  {
             id: 'user1',
             name: 'Matteo',
             imageUrl: 'https://avatars3.githubusercontent.com/u/1915989?s=230&v=4'
           },*/
-          {
-            id: 'user2',
-            name: 'Support',
-            imageUrl: 'https://avatars3.githubusercontent.com/u/37018832?s=200&v=4'
-          }
-        ], // the list of all the participant of the conversation. `name` is the user name, `id` is used to establish the author of a message, `imageUrl` is supposed to be the user avatar.
-        titleImageUrl: 'https://a.slack-edge.com/66f9/img/avatars-teams/ava_0001-34.png',
-        messageList: [
-           /* { type: 'text', author: `me`, data: { text: `Say yes!` } },
-            { type: 'text', author: `user1`, data: { text: `No.` } }*/
-        ], // the list of the messages to show, can be paginated and adjusted dynamically
-        newMessagesCount: 0,
-        isChatOpen: true, // to determine whether the chat window should be open or closed
-        showTypingIndicator: '', // when set to a value matching the participant.id it shows the typing indicator for the specific user
-        colors: {
-          header: {
-            bg: '#4e8cff',
-            text: '#ffffff'
-          },
-          launcher: {
-            bg: '#4e8cff'
-          },
-          messageList: {
-            bg: '#ffffff'
-          },
-          sentMessage: {
-            bg: '#4e8cff',
-            text: '#ffffff'
-          },
-          receivedMessage: {
-            bg: '#eaeaea',
-            text: '#222222'
-          },
-          userInput: {
-            bg: '#f4f7f9',
-            text: '#565867'
-          }
-        }, // specifies the color scheme for the component
-        alwaysScrollToBottom: false, // when set to true always scrolls the chat to the bottom when new events are in (new message, user starts typing...)
-        messageStyling: true // enables *bold* /emph/ _underline_ and such (more info at github.com/mattezza/msgdown)
+        {
+          id: 'user2',
+          name: 'Support',
+          imageUrl: 'https://avatars3.githubusercontent.com/u/37018832?s=200&v=4'
+        }
+      ], // the list of all the participant of the conversation. `name` is the user name, `id` is used to establish the author of a message, `imageUrl` is supposed to be the user avatar.
+      titleImageUrl: 'https://a.slack-edge.com/66f9/img/avatars-teams/ava_0001-34.png',
+      messageList: [
+        /* { type: 'text', author: `me`, data: { text: `Say yes!` } },
+         { type: 'text', author: `user1`, data: { text: `No.` } }*/
+      ], // the list of the messages to show, can be paginated and adjusted dynamically
+      newMessagesCount: 0,
+      isChatOpen: true, // to determine whether the chat window should be open or closed
+      showTypingIndicator: '', // when set to a value matching the participant.id it shows the typing indicator for the specific user
+      colors: {
+        header: {
+          bg: '#4e8cff',
+          text: '#ffffff'
+        },
+        launcher: {
+          bg: '#4e8cff'
+        },
+        messageList: {
+          bg: '#ffffff'
+        },
+        sentMessage: {
+          bg: '#4e8cff',
+          text: '#ffffff'
+        },
+        receivedMessage: {
+          bg: '#eaeaea',
+          text: '#222222'
+        },
+        userInput: {
+          bg: '#f4f7f9',
+          text: '#565867'
+        }
+      }, // specifies the color scheme for the component
+      alwaysScrollToBottom: false, // when set to true always scrolls the chat to the bottom when new events are in (new message, user starts typing...)
+      messageStyling: true // enables *bold* /emph/ _underline_ and such (more info at github.com/mattezza/msgdown)
+    }
+  },
+  methods: {
+    sendMessage(text) {
+      if (text.length > 0) {
+        this.newMessagesCount = this.isChatOpen ? this.newMessagesCount : this.newMessagesCount + 1
+        const message = { author: 'me', type: 'text', data: { text } }
+        this.onMessageWasSent(message)
+
+
+
+
       }
     },
-    methods: {
-      sendMessage (text) {
-        if (text.length > 0) {
-          this.newMessagesCount = this.isChatOpen ? this.newMessagesCount : this.newMessagesCount + 1
-          const message={ author: 'me', type: 'text', data: { text } }
-          this.onMessageWasSent(message)
-
-    
-       
-     
-        }
-      },
-      onMessageWasSent (message) {
-        this.$emit("chat-message", {
-            detail: message
-          })
-        // called when the user sends a message
-       // this.messageList = [ ...this.messageList, message ]
-      },
-      openChat () {
-        // called when the user clicks on the fab button to open the chat
-        this.isChatOpen = true
-        this.newMessagesCount = 0
-      },
-      closeChat () {
-        // called when the user clicks on the botton to close the chat
-        this.isChatOpen = false
-      },
-      handleScrollToTop () {
-        // called when the user scrolls message list to top
-        // leverage pagination for loading another page of messages
-        },
-      handleOnType () {
-        console.log('Emit typing event')
-      }
+    onMessageWasSent(message) {
+      this.$emit("chat-message", {
+        detail: message
+      })
+      // called when the user sends a message
+      // this.messageList = [ ...this.messageList, message ]
+    },
+    openChat() {
+      // called when the user clicks on the fab button to open the chat
+      this.isChatOpen = true
+      this.newMessagesCount = 0
+    },
+    closeChat() {
+      // called when the user clicks on the botton to close the chat
+      this.isChatOpen = false
+    },
+    handleScrollToTop() {
+      // called when the user scrolls message list to top
+      // leverage pagination for loading another page of messages
+    },
+    handleOnType() {
+      console.log('Emit typing event')
+    }
   }
 
 
 
-  });
+});
+
+
+
+
+//---------------------------------------------------------------------
+
+
+
 
 
 
 export
-    function createViews() {
-    const el = parseHTML(`
+  function createViews() {
+  const el = parseHTML(`
 <div id="app" style="z-index: 9999;position: absolute;">
     {{ message }}<chat-window id='chat'></chat-window>
   </div>
 `)
-    document.querySelector('body').append(el)
+  document.querySelector('body').append(el)
 
 
-    const vueApp = new Vue({
-        //el: '#app',
-        data: {
-            message: 'Hello Vue.js!'
-        }
-    }).$mount(el)
+  const vueApp = new Vue({
+    //el: '#app',
+    data: {
+      message: 'Hello Vue.js!'
+    }
+  }).$mount(el)
 
+
+  // add the hud ..
+  const playerEl = parseHTML(`<my-hud ref="hud"></my-hud>`)
+  document.querySelector("[camera]").append(playerEl)
+
+  const playerHUD = new Vue({}).$mount(playerEl)
+  window['playerHUD'] = playerHUD
 
 }

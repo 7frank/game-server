@@ -491,6 +491,18 @@ export class Application3D {
 
         });
 
+      
+        room.listen("entities/:id/HealthComponent/life/current", (change: DataChange) => {
+            const isCurrentPlayer = change.path.id === room.sessionId
+            const el = entitiesInRoom[change.path.id]
+            if (isCurrentPlayer && el) {
+              
+                window['playerHUD'].$refs.hud.$data.life.current=change.value
+                
+            }
+
+        })
+
 
         room.listen("entities/:id/GenericBody/position/x", (change: DataChange) => {
             const isCurrentPlayer = change.path.id === room.sessionId

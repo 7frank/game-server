@@ -173,6 +173,9 @@ export
         super(id)
         this.putComponent(LastPlayerCommand)
         this.putComponent(GenericBody)
+
+        this.putComponent(HealthComponent)
+
         this.putComponent(ProximityComponent)
 
         this.putComponent(Inventory)
@@ -413,6 +416,12 @@ class ProximityModel {
 }
 
 
+export
+    class HealthComponent implements Component{
+    life={current:80,maximum:100}
+    shield={current:80,maximum:100}
+}
+
 // TODO create character that may jump off of other objects 
 export
     class JumpComponent implements Component, Initable {
@@ -436,9 +445,16 @@ export
                 this.jump1 = false;
                 this.jump2 = false;
                 this.airborne = false;
-                if (relative_velocity.y < -14) {
+                if (relative_velocity.y < -4) {
                     var damage = Math.abs(relative_velocity.y + 10) * 3;
                     console.log("damage taken", damage)
+
+                    const healthcomponent = this.mEntity.getComponent(HealthComponent)
+                    healthcomponent.life.current-=4
+                    if (healthcomponent.life.current<0)
+                    healthcomponent.life.current=0
+
+
                     //takeDamage(damage);
                 }
             }
