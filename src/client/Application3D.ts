@@ -430,6 +430,7 @@ export class Application3D {
 
                     }
 
+
                     const graphics = el.object3D
                     //  graphics.material.color.setHex(color)
 
@@ -727,9 +728,13 @@ export class Application3D {
             */
 
 
+            //FIXME rotation in physics is not updated from internal state // euler is not stringified correctly 
+/*
             entity.rotation.x = newRotation.x// lerp(entity.rotation.x, newRotation.x, 0.2);
             entity.rotation.y = newRotation.y + Math.PI// lerp(entity.rotation.y, newRotation.y, 0.2);
             entity.rotation.z = newRotation.z //lerp(entity.rotation.z, newRotation.z, 0.2);
+*/
+           // entity.rotation.set(newRotation._x,newRotation._y,newRotation._z)
 
 
             //  entity.scale.set(new_entity.radius, new_entity.radius, new_entity.radius)

@@ -13,3 +13,32 @@
 * steering-behaviour
 * navmesh
 * raycasting for local 
+
+
+# feature-steering-physics-astar
+
+* the goal of the feature branch is to merge several movement related components to work together
+    * steering 
+    * physics
+    * pathfinding with astar
+        * nav-mesh
+
+
+```typescript
+export
+    class Actor extends SerializableEntity {
+
+    constructor() {
+        super()
+        this.putComponent(GenericBody)
+            // position 
+            // rotation
+            // direction
+            // velocity
+
+        this.putComponent(Physics)
+        this.putComponent(Pathfinding)
+        this.putComponent(Steering)  // active, entity is steering in direction or following path
+    }
+}
+```

@@ -1,5 +1,5 @@
 import { Component, Entity, Engine } from "@nova-engine/ecs";
-import { DynamicBody } from "./PhysicsSystem";
+import { DynamicBody, PhysicsBodyPlaceholder } from "./PhysicsSystem";
 
 //const NodePhysijs = require('../nodejs-physijs');
 //const THREE = NodePhysijs.THREE;
@@ -15,7 +15,7 @@ export
     static readonly tag = "core/GenericBody";
     position: THREE.Vector3 = new THREE.Vector3
     rotation:THREE.Euler = new THREE.Euler //{ x: 0, y: 0, z: 0, order: "XYZ" }
-    dimensions:THREE.Box3 = new THREE.Box3
+    dimensions:THREE.Box3 = new THREE.Box3(new THREE.Vector3(-.5,0.-.5),new THREE.Vector3(.5,1,.5))
     velocity:THREE.Vector3 = new THREE.Vector3
 }
 
@@ -177,6 +177,9 @@ export
 
         this.putComponent(Inventory)
         this.putComponent(DynamicBody)
+
+        this.putComponent(PhysicsBodyPlaceholder)
+
         this.putComponent(JumpComponent)
         this.putComponent(ControllerComponent)
 
@@ -202,10 +205,29 @@ export
         this.putComponent(Inventory)
         this.putComponent(DynamicBody)
 
+        
+        this.putComponent(PhysicsBodyPlaceholder)
+
     }
 }
 
 
+export
+    class NPCSteering extends SerializableEntity {
+
+    constructor() {
+        super()
+        
+        this.putComponent(Inventory)
+        this.putComponent(DynamicBody).linearFactor=new THREE.Vector3(1, 1, 1)
+        this.putComponent(SteeringBodyPlaceholder)
+
+        
+        this.putComponent(TemplateComponent).data = `<a-sphere color="blue" scale=".5 .5 .5" src="/assets/crate1.jpg"></a-sphere>`;
+        
+
+    }
+}
 
 
 
@@ -220,7 +242,7 @@ export
 
         this.putComponent(TemplateComponent).data = `<a-box src="/assets/crate1.jpg"></a-box>`;
         this.putComponent(DynamicBody)
-
+        this.putComponent(PhysicsBodyPlaceholder)
 
 
     }
@@ -247,6 +269,8 @@ export
         </a-entity>
         `;
         this.putComponent(DynamicBody)
+        this.putComponent(PhysicsBodyPlaceholder)
+
         this.putComponent(ProximityComponent)
 
 
@@ -346,6 +370,7 @@ import { FPSCtrl } from '../../common/FPSCtrl'
 import { ComponentUpdateSystem } from "./ComponentUpdateSystem";
 import { nosync } from "colyseus";
 import { MessageTypes, PlayerAnimationStateMessage } from "../../common/types";
+import { SteeringBodyPlaceholder } from "./SteeringBehaviourSystem";
 
 
 
@@ -659,28 +684,3 @@ export
 
 
 
-
-/*
-
-
-// an actor contains basic data about an entity in the nD world
-export
-    class Actor extends SerializableEntity {
-
-    constructor() {
-        super()
-        this.putComponent(GenericBody)
-            // position 
-            // rotation
-            // direction
-            // velocity
-
-        this.putComponent(Physics)
-        this.putComponent(Pathfinding)
-        this.putComponent(Steering)  // active, entity is steering in direction or following path
-    }
-}
-
-
-
-*/

@@ -103,7 +103,10 @@ export
 
 }
 
-
+export
+    class PhysicsBodyPlaceholder implements Component {
+  
+}
 
 export
     class PhysicsBody implements Component {
@@ -177,9 +180,9 @@ export
 
 
         // Families are an easy way to have groups of entities with some criteria.
-        this.family = new FamilyBuilder(engine).include(DynamicBody, PhysicsBody).build();
+        this.family = new FamilyBuilder(engine).include(DynamicBody,PhysicsBodyPlaceholder, PhysicsBody).build();
 
-        this.notInitializedEntities = new FamilyBuilder(engine).include(DynamicBody).exclude(PhysicsBody).build();
+        this.notInitializedEntities = new FamilyBuilder(engine).include(DynamicBody,PhysicsBodyPlaceholder).exclude(PhysicsBody).build();
 
 
 
@@ -249,22 +252,8 @@ export
           
             props.position = _body.position
             props.rotation = _body.rotation
-/*
- delete  physicsBody.position
- delete  physicsBody.rotation
-            Object.defineProperty(physicsBody, 'position', {
-                configurable: true,
-                enumerable: true,
-                value: props.position  
-            });
 
-
-            Object.defineProperty(physicsBody, 'rotation', {
-                configurable: true,
-                enumerable: true,
-                value: props.rotation  
-            });
-*/
+   
 
 
             _body.setLinearFactor(dynamicBody.linearFactor)

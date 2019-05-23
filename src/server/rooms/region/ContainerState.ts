@@ -5,11 +5,12 @@ const THREE = NodePhysijs.THREE;
 
 import { nosync } from "colyseus";
 import { getRandomInt } from "../../util";
-import { SerializableEntity, GenericBody, BaseEngine, NPC, Player, SpawnPoint } from "../../ecs/TestComponents";
+import { SerializableEntity, GenericBody, BaseEngine, NPC, Player, SpawnPoint, NPCSteering } from "../../ecs/TestComponents";
 
 import { Engine, Entity } from "@nova-engine/ecs";
 import { PhysicsSystem } from "../../ecs/PhysicsSystem";
 import { AssetTypes } from "../../../common/types";
+import { SteeringBehaviourSystem, SteeringBody, SteeringActions } from "../../ecs/SteeringBehaviourSystem";
 
 
 
@@ -35,15 +36,30 @@ class PhysicsECSEngine extends BaseEngine {
 
 
     const physics = new PhysicsSystem();
-
-
     this.addSystem(physics)
+
+    const steering = new SteeringBehaviourSystem();
+    this.addSystem(steering)
+
+
     const spawnPoint = new SpawnPoint()
 
     spawnPoint.getComponent(GenericBody).position.y = boundingBox.max.y
 
     spawnPoint.max = npcCount
     this.addEntity(spawnPoint)
+
+
+   const test= new NPCSteering()
+   this.addEntity(test)
+   this.addEntity(new NPCSteering())
+   this.addEntity(new NPCSteering())
+   this.addEntity(new NPCSteering())
+   this.addEntity(new NPCSteering())
+  // test.getComponent(SteeringBody).mode=SteeringActions.wander
+
+  
+
 
 
   }
