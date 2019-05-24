@@ -17,25 +17,7 @@ import { MessageTypes, PlayerAnimationStateMessage } from "../../common/types";
 import { SteeringBodyPlaceholder } from "./SteeringBehaviourSystem";
 import { EventEmitter } from "events";
 
-export
-    class ServerEvents extends EventEmitter implements Component {
-        eventnames:string[]=[]
-}
 
-export
-class InventoryServerEvents extends ServerEvents
-{
-    constructor()
-    {
-        super()
-        this.eventnames.push("hello-event")
-        this.on("hello-event",(...args)=>{
-
-                console.log("hello-event",...args)
-
-        })
-    }
-}
 
 /**
  * eg . ContainerRoom
@@ -169,6 +151,8 @@ export
 
 }
 
+
+
 export
     class SerializableEntity extends Entity {
 
@@ -176,8 +160,13 @@ export
     @nosync
     engine: BaseEngine;
 
+    @nosync 
+    events:EventEmitter = new EventEmitter();
+
+    eventnames:string[]=[]
+
     @nosync
-    serializable=["id","name"]
+    serializable=["id","name","eventnames"]
     
     name: string;
     constructor(id?: string) {
@@ -200,6 +189,34 @@ export
         return res
 
     }
+
+    on(event: string , listener: (...args: any[]) => void): this
+    {
+      if (this.eventnames.indexOf(event)<0)
+        this.eventnames.push(event)
+
+
+        this.events.on(event,listener)
+        return this
+    }
+
+    off(event: string , listener: (...args: any[]) => void): this
+    {
+        this.events.off(event,listener)
+        return this
+    }
+
+
+    emit(event: string , ...args: any[]): boolean
+    {
+        if (this.eventnames.indexOf(event)<0)
+        console.warn("Entity",this.name,"has no registered event:",event)
+
+       return this.events.emit(event,...args)  
+    }
+
+
+
 
     distanceTo(otherEntity: Entity) {
         let mProp = this.getComponent(GenericBody)
@@ -239,6 +256,13 @@ export
         this.putComponent(InteractControllerComponent)
         this.putComponent(AnimationState)
 
+
+     
+        this.on("hello-event",(...args)=>{
+
+                console.log("hello-event",...args)
+
+        })
 
 
     }
@@ -297,6 +321,29 @@ export
         this.putComponent(TemplateComponent).data = `<a-box src="/assets/crate1.jpg"></a-box>`;
         this.putComponent(DynamicBody)
         this.putComponent(PhysicsBodyPlaceholder)
+
+
+    }
+}
+
+
+
+export
+    class Medipac extends Item {
+
+    title: string = "Medipac"
+    description: string = "A standard Medipac restoring 10 HP."
+    amount:number=1
+
+    constructor() {
+        super()
+       
+        this.on("consume",()=>{
+
+                console.log("TODO consume medipac")
+
+
+        })
 
 
     }
@@ -397,8 +444,7 @@ export
 
 
         if (this.current > 17) {
-            const item = new Item()
-            item.title = "Item " + this.current
+            const item = new Medipac()
             this.engine.addEntity(item)
             return
         }

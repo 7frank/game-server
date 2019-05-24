@@ -182,6 +182,20 @@ export class Application3D {
 
 
 
+        Hotkeys.register("test events", 'T', {
+            // category: 'HUD',
+            target: this.sceneEl,
+            description:"TODO test out serverEvents and if it is feasable for entities to register their own events server side"
+        });
+
+        Hotkeys().on("test events", (evt) => {
+            console.log("currentPlayerEntity",this.currentPlayerEntity)
+            this.activeRoom.send([MessageTypes.serverEvent, { /* id:currentPlayerID,*/name:"hello-event" }]);
+        });
+
+
+     
+
         Hotkeys.register("change player model", 'F1', {
             // category: 'HUD',
             target: this.sceneEl
