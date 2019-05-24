@@ -5,6 +5,7 @@
         "experimentalDecorators": true,
         "lib": ["es6", "dom"],
         "jsx": "react",
+        "jsxFactory":"h",
         "target": "es5",
         "declaration": true,
         "noImplicitAny": false,

@@ -11,12 +11,34 @@ module.exports = function (options) {
     mode: process.env.NODE_ENV || "development",
     entry: [
       'webpack-hot-middleware/client?reload=true',
-     // './src/client/index.ts',
+      // './src/client/index.ts',
       './src/client/index3d.ts'
     ],
     module: {
       rules: [
-        { test: /\.tsx?$/, use: 'ts-loader?configFile=tsconfig-client.json', exclude: /node_modules/ },
+       // { test: /\.tsx?$/, use: 'ts-loader?configFile=tsconfig-client.json', exclude: /node_modules/ },
+        {
+          test: /\.tsx?$/,
+          exclude: /node_modules/,
+         
+          use: [
+            {
+
+              loader: 'ts-loader',
+              options:{
+                configFile: "tsconfig-client.json",
+                appendTsSuffixTo: [/\.vue$/],
+                appendTsxSuffixTo: [/\.vue$/]
+              }
+            
+            }
+
+
+
+          ]
+        },
+
+
         { test: /\.(png|woff|woff2|eot|ttf|svg)$/, use: 'file-loader?limit=1024&name=[path][name].[ext]' },
         {
           test: /\.vue$/,
@@ -41,11 +63,11 @@ module.exports = function (options) {
         {
           test: /\.scss$/,
           use: [
-              "style-loader", // creates style nodes from JS strings
-              "css-loader", // translates CSS into CommonJS
-              "sass-loader" // compiles Sass to CSS, using Node Sass by default
+            "style-loader", // creates style nodes from JS strings
+            "css-loader", // translates CSS into CommonJS
+            "sass-loader" // compiles Sass to CSS, using Node Sass by default
           ]
-      }
+        }
       ]
     },
     plugins: [
