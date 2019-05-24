@@ -7,12 +7,12 @@ import '../hud/my-hud'
 
 // FIXME create a proper vue app & use 
 // @ts-ignore
-import MyHud from '../samplehud.vue';
+import App from '../hud/HelloScene.vue';
 
 
 
 Vue.component('chat-window', {
-  template: `<template>
+  template: `
     <div>
       <beautiful-chat
         :participants="participants"
@@ -29,9 +29,9 @@ Vue.component('chat-window', {
         :colors="colors"
         :alwaysScrollToBottom="alwaysScrollToBottom"
         :messageStyling="messageStyling"
-        @onType="handleOnType" />
+        @onType="handleOnType"></beautiful-chat>
     </div>
-  </template>`,
+    `,
 
 
   name: 'chat-window',
@@ -167,5 +167,22 @@ export
 
   const playerHUD = new Vue({}).$mount(playerEl)
   window['playerHUD'] = playerHUD
+
+
+
+
+
+
+}
+
+export function createScene():Vue
+{
+  const appEl = parseHTML(`<div></div`)
+ 
+  let vm = new App()
+  .$mount(appEl)
+  document.querySelector("body").append(vm.$el)
+
+return vm
 
 }

@@ -22,6 +22,8 @@ Vue.component('my-hud', {
         :position="'-.45 '+(.35-index/10)+ ' 0'"
         color="#CCC" height= 0.05; width= 0.19
         @interaction-pick="onClick(item)"
+        @mouseenter="showTooltip(item)"
+        @mouseleave="showTooltip(false)"
         >
           <a-text
           :value="item.title+' '+item.amount" 
@@ -31,6 +33,29 @@ Vue.component('my-hud', {
           align="center"
           ></a-text>
       </a-plane>
+
+
+      <a-plane
+        v-if="selection"
+        position="0 0  0"
+        color="#CCC" height= 0.5; width= 0.39
+        >
+        <a-text
+        :value="selection.title+' '+selection.amount" 
+        width="0.6"
+        font="/assets/fonts/Federation TNG Title.fnt"
+        color="#6a5acd"
+        align="center"
+        ></a-text>
+          <a-text
+          :value="selection.description" 
+          width="0.6"
+          font="/assets/fonts/Federation TNG Title.fnt"
+          color="#6a5acd"
+          align="center"
+          ></a-text>
+      </a-plane>
+
 
         <a-entity position=".35 .35 .35" scale=".15 .15 .15">
             <a-ring color="teal" radius-inner=".8" radius-outer="1" :theta-length="shield.current/shield.maximum*360"></a-ring>
@@ -74,7 +99,8 @@ Vue.component('my-hud', {
         { title: "threejs", amount: 0 }
       ],
       life: { current: 70, maximum: 100 },
-      shield: { current: 70, maximum: 100 }
+      shield: { current: 70, maximum: 100 },
+      selection:false
 
     }
   },
@@ -86,6 +112,12 @@ Vue.component('my-hud', {
     // TODO use animation lib
     //  new FPSCtrl(30).start().on("frame",()=>{
     //  })
+
+
+    },
+    showTooltip(item)
+    {
+        this.selection=item
 
 
     }

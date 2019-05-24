@@ -9,7 +9,46 @@ import * as THREE from  "three"
 
 
 import * as nanoid from 'nanoid'
-import { Vector3, BooleanKeyframeTrack } from "three";
+
+import { FPSCtrl } from '../../common/FPSCtrl'
+import { ComponentUpdateSystem } from "./ComponentUpdateSystem";
+
+import { MessageTypes, PlayerAnimationStateMessage } from "../../common/types";
+import { SteeringBodyPlaceholder } from "./SteeringBehaviourSystem";
+import { EventEmitter } from "events";
+
+export
+    class ServerEvents extends EventEmitter implements Component {
+        eventnames:string[]=[]
+}
+
+export
+class InventoryServerEvents extends ServerEvents
+{
+    constructor()
+    {
+        super()
+        this.eventnames.push("hello-event")
+        this.on("hello-event",(...args)=>{
+
+                console.log("hello-event",...args)
+
+        })
+    }
+}
+
+/**
+ * eg . ContainerRoom
+   this.addListener(MessageTypes.serverEvent, (player, data) => {
+
+      const events = player.getComponent(ServerEvents)
+      events.emit(data)
+
+    })
+
+ */
+
+
 
 
 export
@@ -382,11 +421,7 @@ export
 }
 
 
-import { FPSCtrl } from '../../common/FPSCtrl'
-import { ComponentUpdateSystem } from "./ComponentUpdateSystem";
 
-import { MessageTypes, PlayerAnimationStateMessage } from "../../common/types";
-import { SteeringBodyPlaceholder } from "./SteeringBehaviourSystem";
 
 
 

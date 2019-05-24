@@ -137,9 +137,7 @@ export class Application3D {
 
             sceneEl.camera.position.set(0, 0, cameraDistance);
             this.currentPlayerEntity.traverse(c => { if (c.material) { c.material.opacity = cameraDistance > 3 ? 1 : (cameraDistance / 10); c.material.transparent = true } })
-            console.info(event.deltaY)
-
-
+          
         });
 
 
@@ -597,7 +595,7 @@ export class Application3D {
 
 
         room.listen("entities/:id/AnimationState/state", (change: DataChange) => {
-            console.log("AnimationState", change)
+           // console.log("AnimationState", change)
             const el = entitiesInRoom[change.path.id].el
             el.setAttribute("animation-mixer", "clip: " + change.value + ";crossFadeDuration: 1; useSkinnedMeshRoot: true;")
 

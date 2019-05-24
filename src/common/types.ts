@@ -6,7 +6,9 @@ enum MessageTypes
    playerJump="playerJump",
    playerInteractWith="playerInteractWith",
    playerTalkTo="playerTalkTo",
-   playerDance="playerDance"
+   playerDance="playerDance",
+
+   serverEvent="serverEvent"
 
 }
 export

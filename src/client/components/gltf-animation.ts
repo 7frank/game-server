@@ -43,7 +43,7 @@ export default {
         const el = this.el
 
         if (data.crossorigin) this.loader.setCrossOrigin(data.crossorigin);
-  
+
         this.loader.load(data.src, this.load.bind(this), undefined /* onProgress */, function gltfFailed(error) {
             var message = (error && error.message) ? error.message : 'Failed to load glTF model';
             console.warn(message);
@@ -63,13 +63,12 @@ export default {
 
         const clips = mesh.animations
 
-        console.log("aaa00", clips)
         if (clips.length > 1) {
             console.warn('[gltf-animation] Only 1 animation clip per file is supported.');
         }
         this.clip = clips[0];
 
-        console.log("gltf-animation clips", clips, this.data.name)
+      //  console.log("gltf-animation clips", clips, this.data.name)
 
         this.clip.name = this.data.name || this.clip.name;
         this.appendClip();
@@ -78,16 +77,13 @@ export default {
     appendClip: function () {
         var el = this.el;
         var mesh = el.getObject3D('mesh')//.children[0];
-        console.log("aaa1", mesh, this)
+
         if (mesh && this.clip) {
-            console.log("aaa2")
+
             mesh.animations = mesh.animations || [];
 
-
-
-
             mesh.animations.push(this.clip);
-            console.log("aaa3", mesh)
+
             el.emit('animation-loaded', { format: 'gltf', clip: this.clip });
         }
     }

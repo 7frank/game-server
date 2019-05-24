@@ -111,7 +111,6 @@ const LoopMode = {
       const model = this.model,
           data = this.data,
           clips = model.animations || (model.geometry || {}).animations || [];
-  console.log("animation mixer clips",clips)
       if (!clips.length) return;
   
       const re = wildcardToRegExp(data.clip);

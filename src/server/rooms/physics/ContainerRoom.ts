@@ -1,7 +1,7 @@
 import { Room, Client } from "colyseus";
 
 import { MessageTypes, PlayerAnimationStateMessage } from "../../../common/types"
-import { Player, GenericBody, JumpComponent, ControllerComponent, InteractControllerComponent, AnimationState, LastPlayerCommand } from "../../ecs/TestComponents";
+import { Player, GenericBody, JumpComponent, ControllerComponent, InteractControllerComponent, AnimationState, LastPlayerCommand, ServerEvents } from "../../ecs/TestComponents";
 import { DynamicBody } from "../../ecs/PhysicsSystem";
 import { ContainerState, PhysicsContainerState } from "../region/ContainerState";
 
@@ -78,6 +78,8 @@ export class ContainerRoom extends Room<PhysicsContainerState> {
 
     })*/
 
+
+ 
 
 
 

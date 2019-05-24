@@ -3,46 +3,13 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Physics micro service • A-Frame</title>
+  <title>game server & physics micro service • A-Frame</title>
   <meta name="description" content="Physics micro service • A-Frame">
   <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
   <script src="https://rawgit.com/urish/aframe-camera-events/master/index.js"></script>
   <script src="https://rawgit.com/dbradleyfl/aframe-gridhelper/master/dist/aframe-gridhelper-component.min.js"></script>
 </head>
 
-<body>
-  <a-scene renderer-listener cursor-focus background="color: #eee"
-    gridhelper="size:100;divisions:100;colorCenterLine:red;colorGrid:grey;">
-    <a-assets>
-      <a-asset-item id="steve" src="/assets/characters/minecraft-steve.glb" animation-mixer="clip: *"></a-asset-item>
-      <a-asset-item id="jasper" src="/assets/characters/jasper.glb" animation-mixer="clip: *"></a-asset-item>
-      <a-asset-item id="claire" src="/assets/characters/claire.glb" animation-mixer="clip: *"></a-asset-item>
-    </a-assets>
-
-
-    <a-text value="Bombergirl" font="/assets/fonts/Federation TNG Title.fnt" color="#6a5acd" negate="false"
-      scale="4 4 4" position="0 6 0"></a-text>
-    <a-text value="- The next Generation -" color="#6a5acd" font="/assets/fonts/Federation TNG Title.fnt" negate="false"
-      scale="2 2 2" position="0 5 0"></a-text>
-
-    <a-entity camera="far:20000" position-listener rotation-listener look-controls wasd-controls position="0 1.8 0">
-
-        <a-entity cursor="rayOrigin:mouse"
-        raycaster="interval: 50"
-        raycaster-listener
-        position="0 0 -1"
-        geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
-        material="color: black; shader: flat">
-        </a-entity>
-
-    </a-entity>
-
-
-
-
-    <a-entity light="type:directional; castShadow:true;" position="0 20 0"></a-entity>
-    <a-entity light="type:ambient;"></a-entity>
-  </a-scene>
-</body>
+<body></body>
 
 </html>
