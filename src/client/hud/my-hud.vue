@@ -1,8 +1,5 @@
-import Vue from 'vue/dist/vue.esm';
-import { FPSCtrl } from '../FPSCtrl';
-Vue.component('my-hud', {
-  template: `
-    <a-entity >
+<template>
+    <a-entity id="playerHUD" >
     <a-plane
       position="0 0 -1"
       
@@ -10,7 +7,7 @@ Vue.component('my-hud', {
       material="transparent:true;opacity:0.1;repeat:0.25 1"
     >
       <a-text
-      :value="text" 
+        :value="text" 
         position="-.45 .45 0"
         width="0.6"
         font="/assets/fonts/Federation TNG Title.fnt"
@@ -85,45 +82,52 @@ Vue.component('my-hud', {
       <!-- FIXME #1 above code should be inside here, also change hud-raycaster back -->
     </a-hud>
   </a-entity>
-  `,
+</template>
 
 
-  name: 'my-hud',
-  data() {
-    return {
-      text: "Welcome, the HUD is still in development",
-      inventory: [
+<script lang="ts">
+    import Vue from 'vue';
+    import Component from 'vue-class-component';
+
+    import { FPSCtrl } from '../FPSCtrl';
+
+    //TODO proper imports
+    import './hud-imports'
+
+    @Component
+    export default class HUD extends Vue {
+      text= "Welcome, the HUD is still in development";
+      inventory= [
         { title: "hello", amount: 0 },
         { title: "world", amount: 0 },
         { title: "vue", amount: 0 },
         { title: "threejs", amount: 0 }
-      ],
-      life: { current: 70, maximum: 100 },
-      shield: { current: 70, maximum: 100 },
-      selection:false
+      ];
+      life= { current: 70, maximum: 100 };
+      shield= { current: 70, maximum: 100 }
+      selection=false 
+
+      onClick (e) {
+        e.amount++
+        console.log("clicky clicky", e)
+  
+      // TODO use animation lib
+      //  new FPSCtrl(30).start().on("frame",()=>{
+      //  })
+  
+  
+      }
+
+      showTooltip(item)
+      {
+          this.selection=item
+  
+  
+      }
+
 
     }
-  },
-  methods: {
-    onClick: function (e) {
-      e.amount++
-      console.log("clicky clicky", e)
-
-    // TODO use animation lib
-    //  new FPSCtrl(30).start().on("frame",()=>{
-    //  })
-
-
-    },
-    showTooltip(item)
-    {
-        this.selection=item
-
-
-    }
-  }
-
-})
+</script>
 
 
 

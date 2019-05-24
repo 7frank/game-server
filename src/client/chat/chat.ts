@@ -3,14 +3,6 @@ import Chat from 'vue-beautiful-chat'
 Vue.use(Chat)
 var parseHTML = require('parsehtml');
 
-import '../hud/my-hud'
-
-// FIXME create a proper vue app & use 
-// @ts-ignore
-import App from '../hud/HelloScene.vue';
-
-
-
 Vue.component('chat-window', {
   template: `
     <div>
@@ -159,30 +151,5 @@ export
       message: 'Hello Vue.js!'
     }
   }).$mount(el)
-
-
-  // add the hud ..
-  const playerEl = parseHTML(`<my-hud ref="hud"></my-hud>`)
-  document.querySelector("[camera]").append(playerEl)
-
-  const playerHUD = new Vue({}).$mount(playerEl)
-  window['playerHUD'] = playerHUD
-
-
-
-
-
-
-}
-
-export function createScene():Vue
-{
-  const appEl = parseHTML(`<div></div`)
- 
-  let vm = new App()
-  .$mount(appEl)
-  document.querySelector("body").append(vm.$el)
-
-return vm
 
 }

@@ -1,10 +1,11 @@
 import { Application3D } from "./Application3D";
-import { createViews,createScene } from "./chat/chat";
+import { createViews } from "./chat/chat";
 
 import { IArticle } from "../../../strapi-backend-typescript/@strapi-types"
 import { ServerConfig } from '../../../strapi-backend-typescript/@strapi-sdk-typescript/sdk'
 const { strapiInstance, models } = new ServerConfig("http://localhost:1337");
 
+import { createScene } from "./createScene";
 
 createScene();
 

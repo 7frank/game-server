@@ -24,6 +24,9 @@
         material="color: black; shader: flat">
         </a-entity>
 
+      <MyHUD></MyHUD>
+
+
     </a-entity>
 
 
@@ -43,10 +46,10 @@
 <script lang="ts">
     import Vue from 'vue'
     import Component from 'vue-class-component'
-   // import Hello from "./components/hello.vue"
+    import MyHUD from "./hud/my-hud.vue"
 
     @Component({
-     //   components: {Hello}
+        components:{MyHUD}
     })
 
     export default class App extends Vue {

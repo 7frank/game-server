@@ -1,5 +1,5 @@
 
-import './hud/sample'
+
 
 import * as PIXI from "pixi.js";
 import * as Viewport from "pixi-viewport";
@@ -489,13 +489,15 @@ export class Application3D {
 
         });
 
+
+        const getHUD=()=> (document.querySelector("#playerHUD")as any).__vue__ ; 
       
         room.listen("entities/:id/HealthComponent/life/current", (change: DataChange) => {
             const isCurrentPlayer = change.path.id === room.sessionId
             const el = entitiesInRoom[change.path.id]
             if (isCurrentPlayer && el) {
               
-                window['playerHUD'].$refs.hud.$data.life.current=change.value
+                getHUD().$data.life.current=change.value
                 
             }
 
@@ -509,7 +511,7 @@ export class Application3D {
             if (isCurrentPlayer && el && change.operation=="add") {
               
         
-                window['playerHUD'].$refs.hud.$data.inventory.push(change.value)
+                getHUD().$data.inventory.push(change.value)
                 
             }
 
