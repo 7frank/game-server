@@ -36,6 +36,7 @@
         v-if="selection"
         position="0 0  0"
         color="#CCC" height= 0.5; width= 0.39
+        material="transparent:true;opacity:0.5;"
         >
         <a-text
         :value="selection.title+' '+selection.amount" 
@@ -45,7 +46,8 @@
         align="center"
         ></a-text>
           <a-text
-          :value="selection.description" 
+          position="0 -.1 0"
+          :value="'Description'+selection.description" 
           width="0.6"
           font="/assets/fonts/Federation TNG Title.fnt"
           color="#6a5acd"
