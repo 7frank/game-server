@@ -1,6 +1,6 @@
 <template>
 
-<a-scene renderer-listener cursor-focus background="color: #eee"
+  <a-scene renderer-listener cursor-focus background="color: #eee"
     gridhelper="size:100;divisions:100;colorCenterLine:red;colorGrid:grey;">
     <a-assets>
       <a-asset-item id="steve" src="/assets/characters/minecraft-steve.glb" animation-mixer="clip: *"></a-asset-item>
@@ -16,13 +16,13 @@
 
     <a-entity camera="far:20000" position-listener rotation-listener look-controls wasd-controls position="0 1.8 0">
 
-        <a-entity cursor="rayOrigin:mouse"
+      <a-entity cursor="rayOrigin:mouse"
         raycaster="interval: 50"
         raycaster-listener
         position="0 0 -1"
         geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
         material="color: black; shader: flat">
-        </a-entity>
+      </a-entity>
 
       <PlayerHUD></PlayerHUD>
 
@@ -35,26 +35,47 @@
     <a-entity light="type:directional; castShadow:true;" position="0 20 0"></a-entity>
     <a-entity light="type:ambient;"></a-entity>
 
-    <a-entity position="0 0 0" sound="src: url(/assets/audio/8-Bit Heroes/Daydream Anatomy - 8-Bit Heroes - 06 Dragon Slayer.mp3); autoplay: true;positional:false;volume:.6;"></a-entity>
+    <a-entity position="0 0 0" :sound="ambientSoundSettings()"></a-entity>
 
 
   </a-scene>
 
 
-</template>
+</template >
 
-<script lang="ts">
+  <script lang="ts">
     import Vue from 'vue'
     import Component from 'vue-class-component'
     import PlayerHUD from "./hud/PlayerHUD.vue"
 
     @Component({
-        components:{PlayerHUD}
+      components: {PlayerHUD}
     })
 
     export default class App extends Vue {
+
+
+
+      ambientSoundSettings(){
+
+    const available=[
+  "/assets/audio/8-Bit Heroes/Daydream Anatomy - 8-Bit Heroes - 01 Combat.mp3",
+  "/assets/audio/8-Bit Heroes/Daydream Anatomy - 8-Bit Heroes - 02 8-Bit Bomber.mp3",
+  "/assets/audio/8-Bit Heroes/Daydream Anatomy - 8-Bit Heroes - 03 Nin10day.mp3",
+  "/assets/audio/8-Bit Heroes/Daydream Anatomy - 8-Bit Heroes - 04 Struggle.mp3",
+  "/assets/audio/8-Bit Heroes/Daydream Anatomy - 8-Bit Heroes - 05 Our Hero's Funeral March.mp3",
+  "/assets/audio/8-Bit Heroes/Daydream Anatomy - 8-Bit Heroes - 06 Dragon Slayer.mp3"
+    ]
+  
+    var selected = available[Math.floor(Math.random()*available.length)];
+  
+  return `src: url(${selected});autoplay: true;positional:false;volume:.6`
+  
+  }   
+  
+  
         created() {
-            console.log("created the root instance")
-        }
+      console.log("created the root instance")
+    }
     }
 </script>
