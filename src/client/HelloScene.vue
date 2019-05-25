@@ -1,7 +1,10 @@
 <template>
 
   <a-scene renderer-listener cursor-focus background="color: #eee"
-    gridhelper="size:100;divisions:100;colorCenterLine:red;colorGrid:grey;">
+    gridhelper="size:100;divisions:100;colorCenterLine:red;colorGrid:grey;"
+    @click="loadAudio"
+    
+    >
     <a-assets>
       <a-asset-item id="steve" src="/assets/characters/minecraft-steve.glb" animation-mixer="clip: *"></a-asset-item>
       <a-asset-item id="jasper" src="/assets/characters/jasper.glb" animation-mixer="clip: *"></a-asset-item>
@@ -35,7 +38,7 @@
     <a-entity light="type:directional; castShadow:true;" position="0 20 0"></a-entity>
     <a-entity light="type:ambient;"></a-entity>
 
-    <a-entity position="0 0 0" :sound="ambientSoundSettings()"></a-entity>
+    <a-entity ref="backgroundMusic" v-if="soundEnabled" position="0 0 0" :sound="ambientSoundSettings()"></a-entity>
 
 
   </a-scene>
@@ -46,6 +49,8 @@
   <script lang="ts">
     import Vue from 'vue'
     import Component from 'vue-class-component'
+   // TODO
+   // import { Vue, Component, Prop,Watch } from 'vue-property-decorator'
     import PlayerHUD from "./hud/PlayerHUD.vue"
 
     @Component({
@@ -55,7 +60,8 @@
     export default class App extends Vue {
 
 
-
+      soundEnabled=false;
+    
       ambientSoundSettings(){
 
     const available=[
@@ -71,11 +77,24 @@
   
   return `src: url(${selected});autoplay: true;positional:false;volume:.6`
   
-  }   
+  }  
+  
+ loadAudio()
+ {
+  this.soundEnabled=true;
+
+  setTimeout(()=>{
+   const soundEl= (this.$refs.backgroundMusic as any)
+   soundEl.addEventListener('sound-ended',  () =>{
+    soundEl.setAttribute("sound",this.ambientSoundSettings())
+      });
   
   
-        created() {
-      console.log("created the root instance")
-    }
-    }
+
+  },1000)
+ 
+ }
+
+
+}
 </script>
