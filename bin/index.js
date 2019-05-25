@@ -25,6 +25,11 @@ var argv = mini(process.argv.slice(2));
 if (argv._.length == 1) argv._.push(argv._[0].split('.').slice(0, -1).join('.') + ".glb")
 console.log("convert =>", argv._[0], argv._[1])
 
+if (!argv._[0])
+{
+    console.log("insufficient commands:  fbx2gltf assets/animations/*.fbx")
+}
+
 glob(argv._[0], {}, function (err, files) {
 
     files.forEach(inputFile => {

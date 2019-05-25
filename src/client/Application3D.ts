@@ -807,7 +807,7 @@ export class Application3D {
         targetEl.setAttribute("gltf-animation__7", getAnimation(PlayerAnimationStateMessage.ducking, "/assets/animations/Crouched Walking.glb"))
         targetEl.setAttribute("gltf-animation__8", getAnimation(PlayerAnimationStateMessage.interact, "/assets/animations/Shaking Hands 1.glb"))
         targetEl.setAttribute("gltf-animation__9", getAnimation(PlayerAnimationStateMessage.talk, "/assets/animations/Talking.glb"))
-
+        targetEl.setAttribute("gltf-animation__9", getAnimation(PlayerAnimationStateMessage.dying, "/assets/animations/Dying.glb"))
 
     }
 

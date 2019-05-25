@@ -128,7 +128,7 @@ export
     // TODO addEntity(entity:GenericBody,bb:BoundingBox, props: DynamicBody)
     addWorldEntity(position, dimensions = [1, 1, 1], mass?: number) {
 
-       const  params = { maxSpeed: .1, maxForce: .5, lookAtDirection: true, wanderDistance: 3, wanderRadius: 5, wanderRange: 1, numEntities: 20, radius: 2, avoidDistance: 4 }
+       const  params = { maxSpeed: .05, maxForce: .5, lookAtDirection: true, wanderDistance: 3, wanderRadius: 5, wanderRange: 1, numEntities: 20, radius: 2, avoidDistance: 4 }
         //Plane boundaries (do not cross)
         const boundaries = new THREE.Box3(new THREE.Vector3(-50, -50, -50), new THREE.Vector3(50, 50, 50));
 
@@ -186,7 +186,7 @@ export
        
             const body: any =steeringBody.body
            
-            const boundaries = new THREE.Box3(new THREE.Vector3(-10, -10, -10), new THREE.Vector3(10, 10, 10));
+            const boundaries = new THREE.Box3(new THREE.Vector3(-5, -5, -5), new THREE.Vector3(5, 5, 5));
 
             body.wander()
             body.avoid(engine.entities.filter(v => v.hasComponent(SteeringBody)).map(v=>v.getComponent(SteeringBody).body))

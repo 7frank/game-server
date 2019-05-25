@@ -16,6 +16,7 @@ import { ComponentUpdateSystem } from "./ComponentUpdateSystem";
 import { MessageTypes, PlayerAnimationStateMessage } from "../../common/types";
 import { SteeringBodyPlaceholder } from "./SteeringBehaviourSystem";
 import { EventEmitter } from "events";
+import { AttackComponent } from "./DamageComponents";
 
 
 
@@ -58,6 +59,17 @@ export
 
     update(mEntity: SerializableEntity): void {
 
+
+        if (mEntity.hasComponent(HealthComponent))
+        {
+            const c = mEntity.getComponent(HealthComponent)
+            if (!c.isAlive)
+            {
+                this.state=PlayerAnimationStateMessage.dying
+                return
+            }
+
+        } 
 
         const command = mEntity.getComponent(LastPlayerCommand).command as MessageTypes
 
@@ -261,7 +273,13 @@ export
         this.on("hello-event",(...args)=>{
 
                 console.log("hello-event",...args)
-
+                //TODO  
+                /* 
+                this.getComponent(FOVComponent)
+                
+                
+                
+                */
         })
 
 
@@ -301,11 +319,13 @@ export
 
         
         this.putComponent(TemplateComponent).data = `<a-sphere color="blue" scale=".5 .5 .5" src="/assets/crate1.jpg"></a-sphere>`;
-        
+      
+        this.putComponent(ProximityComponent).maxDistance=2
+        this.putComponent(AttackComponent)
+
 
     }
 }
-
 
 
 export
@@ -511,7 +531,16 @@ class ProximityModel {
 
 
 export
-    class HealthComponent implements Component{
+    class HealthComponent implements Component,Updateable{
+    update(mEntity: SerializableEntity): void {
+      
+        if (this.life.current<0)
+        {
+        this.life.current=0
+        this.isAlive=false;
+        }
+    }
+    isAlive=true;
     life={current:80,maximum:100}
     shield={current:80,maximum:100}
 }
@@ -545,8 +574,7 @@ export
 
                     const healthcomponent = this.mEntity.getComponent(HealthComponent)
                     healthcomponent.life.current-=4
-                    if (healthcomponent.life.current<0)
-                    healthcomponent.life.current=0
+                  
 
 
                     //takeDamage(damage);
@@ -592,9 +620,19 @@ export
     velocity = 0
 
 
-    restrict2D = true
+    restrict2D = false
     airWalk = true
     update(mEntity: SerializableEntity) {
+
+        if (mEntity.hasComponent(HealthComponent))
+        {
+            const c = mEntity.getComponent(HealthComponent)
+            if (!c.isAlive)
+            {
+                return
+            }
+
+        } 
 
 
         // enable/disable moving while jumping

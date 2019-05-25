@@ -22,7 +22,9 @@ enum PlayerAnimationStateMessage
    interact="interact",
    talk="talk",
    dance="dance",
-   jump="jump"
+   jump="jump",
+   dying="dying",
+   dead="dead"
 
 }
 
