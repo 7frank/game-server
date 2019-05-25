@@ -125,7 +125,7 @@ export
     static readonly tag = "core/TemplateComponent";
 
 
-    id = "pinetree"
+    id = "bunny"
     src: string = "/assets/bunny.glb";
 
 }
@@ -314,12 +314,17 @@ export
         super()
         
         this.putComponent(Inventory)
-        this.putComponent(DynamicBody).linearFactor=new THREE.Vector3(1, 1, 1)
+       // this.putComponent(GenericBody).position.y=1.5
+        this.putComponent(DynamicBody).linearFactor=new THREE.Vector3(1, 1, 1)        
+        
         this.putComponent(SteeringBodyPlaceholder)
 
         
-        this.putComponent(TemplateComponent).data = `<a-sphere color="blue" scale=".5 .5 .5" src="/assets/crate1.jpg"></a-sphere>`;
-      
+        //this.putComponent(TemplateComponent).data = `<a-sphere color="blue" scale=".5 .5 .5" src="/assets/crate1.jpg"></a-sphere>`;
+        this.putComponent(AssetsComponent)
+
+
+
         this.putComponent(ProximityComponent).maxDistance=2
         this.putComponent(AttackComponent)
 
@@ -389,6 +394,7 @@ export
         <a-text value="{{timer}}" align="center" color="#6a5acd" font="/assets/fonts/Federation TNG Title.fnt" negate="false" position="0 1 0"></a-text>
         </a-entity>
         `;
+        this.putComponent(GenericBody)
         this.putComponent(DynamicBody)
         this.putComponent(PhysicsBodyPlaceholder)
 
@@ -624,16 +630,6 @@ export
     airWalk = true
     update(mEntity: SerializableEntity) {
 
-        if (mEntity.hasComponent(HealthComponent))
-        {
-            const c = mEntity.getComponent(HealthComponent)
-            if (!c.isAlive)
-            {
-                return
-            }
-
-        } 
-
 
         // enable/disable moving while jumping
         if (!this.airWalk)
@@ -696,14 +692,20 @@ export
 
     // creating and placing a bomb should not be handled with the interactcomponent
     interact(entity: SerializableEntity) {
-        console.log("interact TODO ")
+        console.log("interact TODO currently used as attack  ")
+
+     
+        const playerPosition=entity.getComponent(GenericBody).position
 
 
-
+    
         const bomb = new Bomb()
 
-        //bomb.getComponent(GenericBody)
+        bomb.getComponent(GenericBody).position.copy(playerPosition)
 
+    
+
+        
         entity.engine.addEntity(bomb)
 
     }

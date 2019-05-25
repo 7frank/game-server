@@ -14,6 +14,15 @@
         color="#6a5acd"
       ></a-text>
   
+  <a-text v-if="respawnTimer>0"
+        :value="'respawn in '+respawnTimer" 
+        position="-.35 .35 0"
+        width="1"
+        font="/assets/fonts/Federation TNG Title.fnt"
+        color="red"
+      ></a-text>
+  
+
       <a-plane
         v-for="(item, index) in inventory"
         :position="'-.45 '+(.35-index/10)+ ' 0'"
@@ -109,6 +118,9 @@
       shield= { current: 70, maximum: 100 }
       selection=false 
 
+      respawnTimer=0
+
+
       onClick (e) {
         e.amount++
         console.log("clicky clicky", e)
@@ -128,6 +140,19 @@
       }
 
 
+      startRespawnScreen(spawnTimestamp)
+      {
+        const script= new FPSCtrl(30).start();
+        script.on("frame",()=>{
+
+          this.respawnTimer=(spawnTimestamp-Date.now())/1000;
+          if (this.respawnTimer<=0)
+          {
+            this.respawnTimer=0;
+            script.stop();
+          }
+        });
+      }
     }
 </script>
 

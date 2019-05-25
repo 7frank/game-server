@@ -246,7 +246,7 @@ export
 
 
             const props = entity.getComponent(GenericBody);
-            props.position.y = 5
+           
             const _body = this.addWorldEntity(props.position, [1, 1, 1], dynamicBody.mass)
           
           

@@ -1,9 +1,10 @@
 import { Room, Client } from "colyseus";
 
 import { MessageTypes, PlayerAnimationStateMessage } from "../../../common/types"
-import { Player, GenericBody, JumpComponent, ControllerComponent, InteractControllerComponent, AnimationState, LastPlayerCommand } from "../../ecs/TestComponents";
+import { Player, GenericBody, JumpComponent, ControllerComponent, InteractControllerComponent, AnimationState, LastPlayerCommand, HealthComponent } from "../../ecs/TestComponents";
 import { DynamicBody } from "../../ecs/PhysicsSystem";
 import { ContainerState, PhysicsContainerState } from "../region/ContainerState";
+import { RespawnComponent } from "../../ecs/DamageComponents";
 
 
 const NodePhysijs = require('../../nodejs-physijs');
@@ -40,8 +41,8 @@ export class ContainerRoom extends Room<PhysicsContainerState> {
 
 
 
-    this.addListener(MessageTypes.serverEvent, (player: Player, {name,params}) => {
-      player.emit(name,params)
+    this.addListener(MessageTypes.serverEvent, (player: Player, { name, params }) => {
+      player.emit(name, params)
     })
 
 
@@ -74,16 +75,16 @@ export class ContainerRoom extends Room<PhysicsContainerState> {
 
     })
 
-   /* this.addListener(MessageTypes.playerDance, (player, data) => {
-
-      const animState = player.getComponent(AnimationState)
-     // if (animState.state == PlayerAnimationStateMessage.idle)
-        animState.state = PlayerAnimationStateMessage.dance
-
-    })*/
-
-
+    /* this.addListener(MessageTypes.playerDance, (player, data) => {
  
+       const animState = player.getComponent(AnimationState)
+      // if (animState.state == PlayerAnimationStateMessage.idle)
+         animState.state = PlayerAnimationStateMessage.dance
+ 
+     })*/
+
+
+
 
 
 
@@ -143,7 +144,26 @@ export class ContainerRoom extends Room<PhysicsContainerState> {
     const [command, data] = message;
 
 
-    entity.getComponent(LastPlayerCommand).command=command
+    entity.getComponent(LastPlayerCommand).command = command
+ 
+
+// prevent players sending all input commands but respawn query
+    if (entity.hasComponent(HealthComponent)) {
+      const c = entity.getComponent(HealthComponent)
+      if (!c.isAlive) {
+
+        if (!entity.hasComponent(RespawnComponent)) {
+          const c = entity.putComponent(RespawnComponent)
+
+          // TODO players should receive a dead screen or an instant respawn based on what the actual game play is
+          entity.emit("request-respawn")
+
+        }
+        return
+      }
+    }
+
+
 
     this.emit(command, entity, data)
   }

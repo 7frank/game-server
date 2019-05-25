@@ -431,6 +431,8 @@ export class Application3D {
                         const assetEl = parseHTML(` <a-asset-item id="${asset.id}" src="${asset.src}" animation-mixer="clip: *"></a-asset-item>`)
                         sceneEl.append(assetEl)
 
+                        // FIXME createEntityHTML is player specific and should not be used for other assets
+
                         el = createEntityHTML(`#${asset.id}`, "asset")
                         sceneEl.append(el)
                         window['oo'] = { assetEl, el }
@@ -530,6 +532,22 @@ export class Application3D {
             }
 
         })
+        room.listen("entities/:id/RespawnComponent", (change: DataChange) => {
+            const isCurrentPlayer = change.path.id === room.sessionId
+            const el = entitiesInRoom[change.path.id]
+            // TODO remove item again?
+            if (isCurrentPlayer && el && change.operation=="add") {
+              
+        
+                getHUD().startRespawnScreen(change.value.time)
+                
+            }
+
+        })
+
+
+      
+
 
 
 
