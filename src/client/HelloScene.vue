@@ -9,6 +9,18 @@
       <a-asset-item id="steve" src="/assets/characters/minecraft-steve.glb" animation-mixer="clip: *"></a-asset-item>
       <a-asset-item id="jasper" src="/assets/characters/jasper.glb" animation-mixer="clip: *"></a-asset-item>
       <a-asset-item id="claire" src="/assets/characters/claire.glb" animation-mixer="clip: *"></a-asset-item>
+
+
+    <!--  <a-sound   v-for="(item, index) in assets.audio" :id="generateID(item,index)" :src="'src: url('+item.src+')'" :autoplay="item.autoplay" :volume="item.volume" ::positional="item.positional" ></a-sound>
+-->
+      <a-entity v-for="(item, index) in assets.audio"  :id="generateID(item,index)"  :sound="soundSettings(item)"></a-entity>
+
+
+
+     <!--  <a-sound class="sound-ball-bounce" src="src: url(assets/audio/interaction/rubber_ball_bounce_dirt_01.mp3)" autoplay="false" volume=1 positional=false></a-sound>
+      <a-sound class="bullet-impact" src="src: url(assets/audio/interaction/Bullet_Impact_Metal_Hard_Clang.mp3)" autoplay="false" volume=2 positional=false></a-sound>
+      <a-sound class="command-error" src="src: url(assets/audio/interaction/hl2-button3.wav)" autoplay="false" volume=1 positional=false></a-sound>
+ -->
     </a-assets>
 
 
@@ -52,13 +64,25 @@
    // TODO
    // import { Vue, Component, Prop,Watch } from 'vue-property-decorator'
     import PlayerHUD from "./hud/PlayerHUD.vue"
+    import { DefaultAssets, GameAssets, AFrameAudioTag } from "./MainAssets";
 
+    const uuid = require('uuid/v1');
+console.log("uuid",uuid)
     @Component({
       components: {PlayerHUD}
     })
 
     export default class App extends Vue {
 
+
+      assets:DefaultAssets=GameAssets;
+
+      generateID(item:AFrameAudioTag,key)
+      {
+        if (!item.uuid) item.uuid=uuid()
+
+       return item.uuid // TODO generate hash from string or uuid when initializing
+      }
 
       soundEnabled=false;
     
@@ -78,20 +102,27 @@
   return `src: url(${selected});autoplay: true;positional:false;volume:.6`
   
   }  
-  
+
+  soundSettings(item:AFrameAudioTag){
+    return `src: url(${item.src});autoplay: ${item.autoplay};positional:${item.positional};volume:${item.volume};poolSize:3`
+  }  
+ /**
+  * will start playing audio and listen to ended events to start next track 
+  * 
+  **/ 
  loadAudio()
  {
-  this.soundEnabled=true;
-
+  
+  if (! this.soundEnabled)
   setTimeout(()=>{
    const soundEl= (this.$refs.backgroundMusic as any)
    soundEl.addEventListener('sound-ended',  () =>{
     soundEl.setAttribute("sound",this.ambientSoundSettings())
       });
-  
-  
+  },1000);
 
-  },1000)
+ this.soundEnabled=true;
+
  
  }
 

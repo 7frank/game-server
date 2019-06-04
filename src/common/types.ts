@@ -20,12 +20,20 @@ enum PlayerAnimationStateMessage
    crouch="crouch",
    ducking="ducking",
    interact="interact",
+   attack="attack",
+   attacked="attacked",
    talk="talk",
    dance="dance",
    jump="jump",
    dying="dying",
    dead="dead"
 
+}
+
+export
+enum GameMessages
+{
+  spawn,despawn
 }
 
 

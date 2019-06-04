@@ -13,6 +13,21 @@ import { FPSCtrl } from "./FPSCtrl";
 import { GenericBody } from "../server/ecs/TestComponents";
 import { createRegion, createEntity, createEntityFromData, createEntityHTML } from "./dom-utils";
 
+
+import {playSound as _playSound} from "../../../@nk11-vr-sandbox-frontend/src/js/utils/aframe-utils"
+
+/**
+ *  TODO access assets via defined interface
+ * @param audio 
+ */
+
+function playSound(audio:AFrameAudioTag,a?,b?)
+{
+ _playSound("#"+audio.uuid,a,b)
+
+}
+
+
 var parseHTML = require('parsehtml');
 
 //import 'aframe-extras'
@@ -36,7 +51,8 @@ import gltf_animation from './components/gltf-animation'
 AFRAME.registerComponent("gltf-animation", gltf_animation)
 
 import './components/animation-mixer'
-import animationMixer from "./components/animation-mixer";
+import animationMixer, { LoopMode } from "./components/animation-mixer";
+import { GameAssets, AFrameAudioTag } from "./MainAssets";
 
 
 
@@ -270,6 +286,10 @@ export class Application3D {
 
             this.activeRoom.send([MessageTypes.playerJump, {}]);
 
+            
+               //  playSound(".sound-ball-bounce")
+                 
+                playSound(GameAssets.audio.jump)
 
         }, function () {
             //  jumpScript.stop()
@@ -285,6 +305,10 @@ export class Application3D {
         Hotkeys().on(MessageTypes.playerInteractWith, (evt) => {
             this.activeRoom.send([MessageTypes.playerInteractWith, {}]);
             console.log("interactWith")
+            //playSound(".command-error")
+
+            playSound(GameAssets.audio.dance)
+
         });
 
         Hotkeys.register(MessageTypes.playerDance, 'q', {
@@ -366,6 +390,9 @@ export class Application3D {
                     default: color = 0x000000; break;
                 }
 
+
+
+                playSound(GameAssets.audio.spawn)
 
 
 
@@ -507,14 +534,22 @@ export class Application3D {
 
 
         const getHUD=()=> (document.querySelector("#playerHUD")as any).__vue__ ; 
-      
+      // TODO refactor listneners into playerHUD directly (e. g. via vue plugin)
         room.listen("entities/:id/HealthComponent/life/current", (change: DataChange) => {
             const isCurrentPlayer = change.path.id === room.sessionId
             const el = entitiesInRoom[change.path.id]
             if (isCurrentPlayer && el) {
               
                 getHUD().$data.life.current=change.value
-                
+
+                //playSound(".bullet-impact",-1,5)
+                if (change.value>0) 
+                playSound(GameAssets.audio.dying)
+                else
+                playSound(GameAssets.audio.despawn)
+
+
+
             }
 
         })
@@ -813,7 +848,9 @@ export class Application3D {
         helper.material.linewidth = 3;
         this.scene.add(helper);
 
-        const getAnimation = (id, filename) => `name:${id};src: url(${filename});`
+
+        // FIXME animation-mixer loop=LoopMode.repeat and once
+        const getAnimation = (id, filename,) => `name:${id};src: url(${filename});`
 
 
         targetEl.setAttribute("gltf-animation__1", getAnimation(PlayerAnimationStateMessage.idle, "/assets/animations/Idle.glb"))
