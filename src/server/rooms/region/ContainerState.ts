@@ -29,7 +29,7 @@ import { SteeringBehaviourSystem, SteeringBody, SteeringActions } from "../../ec
 
 class PhysicsECSEngine extends BaseEngine {
 
-  constructor(boundingBox: THREE.Box3, npcCount = 20) {
+  constructor(boundingBox: THREE.Box3) {
 
     super(boundingBox)
 
@@ -38,13 +38,40 @@ class PhysicsECSEngine extends BaseEngine {
     const physics = new PhysicsSystem();
     this.addSystem(physics)
 
+
+
+  }
+
+  demo1( npcCount = 20)
+  {
+
+
+
+
+    const spawnPoint = new SpawnPoint()
+
+    spawnPoint.getComponent(GenericBody).position.y = this.boundingBox.max.y
+
+    spawnPoint.max = npcCount
+    this.addEntity(spawnPoint)
+
+  
+
+
+  }
+
+
+  demo2( npcCount = 20)
+  {
+
+
     const steering = new SteeringBehaviourSystem();
     this.addSystem(steering)
 
 
     const spawnPoint = new SpawnPoint()
 
-    spawnPoint.getComponent(GenericBody).position.y = boundingBox.max.y
+    spawnPoint.getComponent(GenericBody).position.y = this.boundingBox.max.y
 
     spawnPoint.max = npcCount
     this.addEntity(spawnPoint)
@@ -61,9 +88,7 @@ class PhysicsECSEngine extends BaseEngine {
   
 
 
-
   }
-
 
 
 }
@@ -222,7 +247,15 @@ export
   createEngine() {
 
     const boundingBox = new THREE.Box3(new THREE.Vector3(-5, 0, -5), new THREE.Vector3(5, 10, 5))
-    this._engine = new PhysicsECSEngine(boundingBox, 20)
+    
+    const physicsEngine= new PhysicsECSEngine(boundingBox)
+    physicsEngine.demo1(5)
+   // physicsEngine.demo2(20)
+
+    this._engine = physicsEngine
+
+   
+
     this.entities = this._engine._entities
 
   }
