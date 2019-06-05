@@ -11,110 +11,7 @@ import { Engine, Entity } from "@nova-engine/ecs";
 import { PhysicsSystem } from "../../ecs/PhysicsSystem";
 import { AssetTypes } from "../../../common/types";
 import { SteeringBehaviourSystem, SteeringBody, SteeringActions } from "../../ecs/SteeringBehaviourSystem";
-
-
-
-
-
-
-// Components can have custom constructors, but they must be able to be initialized
-// with no arguments, because entities creates the instances for you.
-// Try not to save complex data types in yout components
-
-// If you are making a component library, and want to avoid collitions
-// You can add a tag to your component implementations
-
-
-
-
-class PhysicsECSEngine extends BaseEngine {
-
-  constructor(boundingBox: THREE.Box3) {
-
-    super(boundingBox)
-
-
-
-    const physics = new PhysicsSystem();
-    this.addSystem(physics)
-
-
-
-  }
-
-  demo1( npcCount = 20)
-  {
-
-
-
-
-    const spawnPoint = new SpawnPoint()
-
-    spawnPoint.getComponent(GenericBody).position.y = this.boundingBox.max.y
-
-    spawnPoint.max = npcCount
-    this.addEntity(spawnPoint)
-
-  
-
-
-  }
-
-
-  demo2( npcCount = 20)
-  {
-
-
-    const steering = new SteeringBehaviourSystem();
-    this.addSystem(steering)
-
-
-    const spawnPoint = new SpawnPoint()
-
-    spawnPoint.getComponent(GenericBody).position.y = this.boundingBox.max.y
-
-    spawnPoint.max = npcCount
-    this.addEntity(spawnPoint)
-
-
-   const test= new NPCSteering()
-   this.addEntity(test)
-   this.addEntity(new NPCSteering())
-   this.addEntity(new NPCSteering())
-   this.addEntity(new NPCSteering())
-   this.addEntity(new NPCSteering())
-  // test.getComponent(SteeringBody).mode=SteeringActions.wander
-
-  
-
-
-  }
-
-
-}
-
-
-
-class StaticECSEngine extends BaseEngine {
-
-  constructor(boundingBox: THREE.Box3, npcCount = 20) {
-
-    super(boundingBox)
-
-    const spawnPoint = new SpawnPoint()
-
-    spawnPoint.getComponent(GenericBody).position.y = 1
-
-    spawnPoint.max = npcCount
-    this.addEntity(spawnPoint)
-
-
-  }
-
-
-
-}
-
+import { physicsJumpDemo } from "../../ecs/esc-examples";
 
 
 class Asset {
@@ -201,7 +98,11 @@ export class ContainerState extends THREE.Object3D {
   createEngine() {
 
     const boundingBox = new THREE.Box3(new THREE.Vector3(-5, 0, -5), new THREE.Vector3(5, 15, 5))
-    this._engine = new StaticECSEngine(boundingBox, 10)
+    this._engine = new BaseEngine(boundingBox)
+    physicsJumpDemo( this._engine)
+
+
+
     this.entities = this._engine._entities
 
   }
@@ -237,27 +138,3 @@ export class ContainerState extends THREE.Object3D {
 }
 
 
-
-export
-  class PhysicsContainerState extends ContainerState {
-
-
-
-
-  createEngine() {
-
-    const boundingBox = new THREE.Box3(new THREE.Vector3(-5, 0, -5), new THREE.Vector3(5, 10, 5))
-    
-    const physicsEngine= new PhysicsECSEngine(boundingBox)
-    physicsEngine.demo1(5)
-   // physicsEngine.demo2(20)
-
-    this._engine = physicsEngine
-
-   
-
-    this.entities = this._engine._entities
-
-  }
-
-}

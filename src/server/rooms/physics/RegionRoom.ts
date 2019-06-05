@@ -4,6 +4,7 @@ import { MessageTypes } from "../../../common/types"
 import { Player, GenericBody } from "../../ecs/TestComponents";
 import { DynamicBody } from "../../ecs/PhysicsSystem";
 import { ContainerState } from "../region/ContainerState";
+import { physicsJumpDemo } from "../../ecs/esc-examples";
 
 
 
@@ -62,6 +63,9 @@ export class RegionRoom extends Room<ContainerState> {
 
 
     const mState = new ContainerState()
+   // physicsJumpDemo(mState._engine)
+
+
     mState.maxFoodCount = options.boxCount || mState.maxFoodCount
     mState.data = options.data //|| mState.data
     if (options.position)

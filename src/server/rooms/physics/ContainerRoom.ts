@@ -3,7 +3,7 @@ import { Room, Client } from "colyseus";
 import { MessageTypes, PlayerAnimationStateMessage } from "../../../common/types"
 import { Player, GenericBody, JumpComponent, ControllerComponent, InteractControllerComponent, AnimationState, LastPlayerCommand, HealthComponent } from "../../ecs/TestComponents";
 import { DynamicBody } from "../../ecs/PhysicsSystem";
-import { ContainerState, PhysicsContainerState } from "../region/ContainerState";
+import { ContainerState } from "../region/ContainerState";
 import { RespawnComponent } from "../../ecs/DamageComponents";
 
 
@@ -32,7 +32,7 @@ const roomTemplate = `
 `
 
 // FIXME can we use generics in here ? PhysicsContainerState, ContainerState, etc.
-export class ContainerRoom extends Room<PhysicsContainerState> {
+export class ContainerRoom extends Room<ContainerState> {
 
 
   constructor(...args) {
@@ -111,7 +111,7 @@ export class ContainerRoom extends Room<PhysicsContainerState> {
 
 
 
-    const mState = new PhysicsContainerState()
+    const mState = new ContainerState()
     // mState.maxFoodCount = options.boxCount || mState.maxFoodCount
     mState.data = options.data //|| mState.data
     if (options.position)

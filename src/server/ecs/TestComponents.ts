@@ -152,6 +152,12 @@ export
         return super.addEntity(entity)
     }
 
+    removeEntity(entity) {
+        entity.engine = null
+        return super.removeEntity(entity)
+    }
+
+
 }
 
 
@@ -465,7 +471,7 @@ export
 
         this.current++;
 
-        if (this.current > 20) return
+        if (this.current > this.max) return
         const block = new NPC()
 
 
@@ -570,7 +576,9 @@ export
         const mBody = this.mEntity.getComponent(DynamicBody)
 
         mBody.body.addEventListener('collision', (other_object, relative_velocity, relative_rotation, contact_normal) => {
+            console.log(contact_normal)
             if (contact_normal.y < -0.5) {
+                console.log("stand on ground (reset jump)")
                 this.jump1 = false;
                 this.jump2 = false;
                 this.airborne = false;
@@ -595,20 +603,23 @@ export
 
         const mBody = this.mEntity.getComponent(DynamicBody)
 
-        const force = new THREE.Vector3(0, 6, 0)
+        const force = new THREE.Vector3(0, 11, 0)
         var newForce = force.applyMatrix4(mBody.body.matrix);
-        mBody.body.applyCentralImpulse(newForce);
-
+       // mBody.body.applyCentralImpulse(newForce);
+        console.log("new force",newForce,force)
         if (!this.jump1) {
             mBody.body.applyCentralImpulse(newForce);
             this.jump1 = true;
             // audioArray['jump'].play();
             this.airborne = true;
+            console.log("jump1")
         }
         else if (!this.jump2) {
+           // mBody.body.__dirtyPosition=true //  TODO rset previous force in y direction
             mBody.body.applyCentralImpulse(newForce);
             this.jump2 = true;
             // audioArray['jump'].play();
+            console.log("jump2")
         }
     }
 

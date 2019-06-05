@@ -17,7 +17,7 @@ import * as basicAuth from "express-basic-auth";
 import { monitor } from "@colyseus/monitor";
 
 import { ContainerRoom } from "./rooms/physics/ContainerRoom";
-import { PhysicsContainerState } from "./rooms/region/ContainerState";
+
 import { ChatRoom } from "./rooms/ChatRoom";
 
   
