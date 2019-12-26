@@ -1,5 +1,5 @@
 import { Component, Entity, Engine } from "@nova-engine/ecs";
-import { DynamicBody, PhysicsBodyPlaceholder } from "./PhysicsSystem";
+import { DynamicBody, PhysicsBodyPlaceholder, PhysicsSystem } from "./PhysicsSystem";
 
 import { nosync } from "colyseus";
 
@@ -138,12 +138,8 @@ export
     constructor(public boundingBox: THREE.Box3) {
         super()
 
-
-
         const componentUpdater = new ComponentUpdateSystem();
-
         this.addSystem(componentUpdater)
-
     }
 
 

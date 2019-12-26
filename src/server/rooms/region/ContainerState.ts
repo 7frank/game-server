@@ -99,7 +99,7 @@ export class ContainerState extends THREE.Object3D {
 
     const boundingBox = new THREE.Box3(new THREE.Vector3(-5, 0, -5), new THREE.Vector3(5, 15, 5))
     this._engine = new BaseEngine(boundingBox)
-    physicsJumpDemo( this._engine)
+   // physicsJumpDemo( this._engine)
 
 
 

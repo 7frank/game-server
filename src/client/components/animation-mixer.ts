@@ -4,6 +4,7 @@ const THREE = window.THREE
 // @ts-ignore
 const AFRAME = window.AFRAME
 
+export 
 const LoopMode = {
     once: THREE.LoopOnce,
     repeat: THREE.LoopRepeat,

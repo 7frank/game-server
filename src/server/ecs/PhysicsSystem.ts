@@ -154,7 +154,7 @@ export
         super();
         this.acceleration = acceleration;
         // higher priorities means the system runs before others with lower priority
-        this.priority = 300;
+        this.priority = 301;//800;
 
 
     }

@@ -1,3 +1,10 @@
+
+//FIXME different aframe version
+
+import * as AFRAME from '../aframe.08.min'
+window['AFRAME']=AFRAME
+
+
 import { Application3D } from "./Application3D";
 import { createViews } from "./chat/chat";
 
